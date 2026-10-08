@@ -7,6 +7,9 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Space+Grotesk:wght@500;600&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="../../assets/css/cellscape.css" />
+  <script type="importmap">
+    { "imports": { "three": "../../assets/vendor/three/build/three.module.js", "three/addons/": "../../assets/vendor/three/examples/jsm/" } }
+  </script>
   <style>
     .chip .w { color: var(--ink-faint); }
     .chip .dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 5px; vertical-align: 0; }
@@ -22,7 +25,27 @@
     .chart-card canvas { width: 100%; height: 130px; display: block; }
     .explain small { color: var(--ink-faint); display: block; margin-top: 8px; font-size: 0.75rem; line-height: 1.4; }
     .explain .now { border-top: 1px solid var(--panel-border); padding-top: 8px; margin-top: 8px; font-size: 0.86rem; }
+    .stage { background: #06121c; }
+    #labels { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+    .lbl3d { position: absolute; left: 0; top: 0; white-space: nowrap; font-size: 0.74rem; will-change: transform; }
+    .lbl3d.prot { background: rgba(5,11,22,0.62); border: 1px solid rgba(120,190,255,0.22); padding: 2px 8px; border-radius: 999px; color: var(--ink); backdrop-filter: blur(4px); }
+    .lbl3d.prot.hover { border-color: var(--accent); color: #fff; }
+    .lbl3d.prot.off { color: var(--ink-faint); text-decoration: line-through; }
+    .lbl3d.status { color: #fde68a; font-size: 0.7rem; text-shadow: 0 1px 6px #000; }
+    .lbl3d.side { color: rgba(232,241,255,0.55); font-size: 0.68rem; letter-spacing: 0.14em; font-weight: 600; text-shadow: 0 1px 8px #000; }
+    .lbl3d.floater { font-weight: 700; font-size: 0.85rem; text-shadow: 0 1px 8px #000, 0 0 14px currentColor; }
+    .lbl3d.inspect { background: rgba(5,11,22,0.85); border: 1px solid var(--accent); padding: 5px 9px; border-radius: 10px; font-size: 0.76rem; line-height: 1.35; text-align: center; }
+    .lbl3d.inspect span { color: var(--ink-dim); }
+    #tray { position: absolute; left: 50%; bottom: 12px; transform: translateX(-50%); display: flex; gap: 6px; padding: 6px; border-radius: 14px;
+      background: rgba(5,11,22,0.7); border: 1px solid var(--panel-border); backdrop-filter: blur(8px); max-width: calc(100% - 24px); overflow-x: auto; }
+    .tray-item { display: flex; align-items: center; gap: 6px; border: 1px solid transparent; background: transparent; color: var(--ink-dim);
+      padding: 6px 10px; border-radius: 10px; cursor: grab; font-size: 0.8rem; white-space: nowrap; touch-action: none; }
+    .tray-item i { width: 12px; height: 12px; border-radius: 50%; box-shadow: inset -2px -2px 4px rgba(0,0,0,0.35), 0 0 8px currentColor; }
+    .tray-item[aria-pressed="true"] { border-color: var(--accent); color: var(--ink); background: rgba(79,209,197,0.12); }
+    .tray-ghost { position: fixed; left: 0; top: 0; width: 28px; height: 28px; border-radius: 50%; pointer-events: none; z-index: 50;
+      box-shadow: inset -4px -4px 8px rgba(0,0,0,0.35), 0 0 20px rgba(255,255,255,0.5); }
     @media (max-width: 600px) {
+      .tray-item { padding: 5px 7px; font-size: 0.72rem; }
       .chip .w { display: none; }
       .chip.opt { display: none; }
       .chip { padding: 3px 8px; font-size: 0.74rem; }
@@ -39,10 +62,17 @@
     </header>
     <main class="stage" id="stage">
       <canvas id="canvas" aria-label="Membrane transport simulation: a phospholipid bilayer separating extracellular fluid (top) from cytoplasm (bottom), with an aquaporin, a potassium channel, a GLUT glucose carrier, a sodium-potassium pump and a sodium channel. Oxygen, carbon dioxide, water, glucose, sodium, potassium and large protein molecules move between the two sides. The What's happening panel describes the current state."></canvas>
+      <div id="labels"></div>
       <div class="stage-overlay" id="overlay"></div>
+      <div id="tray" role="toolbar" aria-label="Molecules to add"></div>
     </main>
     <aside class="panel" id="panel"></aside>
   </div>
-  <script type="module" src="./sim.js"></script>
+  <script type="module">
+    let gl = false;
+    try { const c = document.createElement("canvas"); gl = !!(c.getContext("webgl2") || c.getContext("webgl")); } catch {}
+    if (!gl) document.getElementById("tray").remove();
+    import(gl ? "./sim.js" : "./sim2d.js");
+  </script>
 </body>
 </html>

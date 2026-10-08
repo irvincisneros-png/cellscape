@@ -1,7 +1,9 @@
-// Membrane Transport — CellScape showpiece. UI wiring; physics in model.js, rendering in draw.js.
+// Membrane Transport — CellScape showpiece. UI wiring; physics in model.js, 3D rendering in scene3d.js.
+// sim2d.js is the original Canvas 2D version, used automatically when WebGL isn't available.
 import * as K from "../../assets/js/kit.js";
 import { Model, SP, ORDER } from "./model.js";
-import * as D from "./draw.js";
+import { drawChart } from "./draw.js";
+import { Scene3D, VW, VH } from "./scene3d.js";
 
 const stageEl = K.$("#stage");
 const panel = K.$("#panel");
@@ -11,8 +13,17 @@ const toast = K.toaster(stageEl);
 const reduced = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
 const M = new Model();
-const stage = K.createStage(canvas, (s) => M.setSize(s.w, s.h));
-const { ctx } = stage;
+M.setSize(VW, VH);
+const G = new Scene3D(canvas, M, K.$("#labels"));
+const stage = { w: 1, h: 1, dpr: Math.min(window.devicePixelRatio || 1, 2) };
+const fit = () => {
+  const r = stageEl.getBoundingClientRect();
+  stage.w = Math.max(1, r.width); stage.h = Math.max(1, r.height);
+  G.resize(stage.w, stage.h);
+};
+new ResizeObserver(fit).observe(stageEl);
+fit();
+window.cellscape = { M, G }; // handy for debugging in the console
 
 let sel = "glc";          // species chosen in the palette
 let focus = "intro";      // what the explain card talks about
@@ -79,15 +90,13 @@ K.button(addRow, "Clear", () => {
   M.parts.forEach((p) => { if (p.sp === sel && p.mode === "free") p.dead = true; });
   toast(`Removed free ${SP[sel].long.toLowerCase()} particles`);
 });
-addCard.insertAdjacentHTML("beforeend", `<p class="hint">Or drag a molecule from the tray under the stage onto either side — or tap empty space to add 3 of the selected molecule.</p>`);
+addCard.insertAdjacentHTML("beforeend", `<p class="hint">Or drag a molecule from the tray at the bottom of the stage onto either side — or tap empty space to add 3 of the selected molecule.</p>`);
 
-function selectSpecies(sp) {
+let selectSpecies = function (sp) {
   sel = sp;
   for (const s of ORDER) spBtns[s].setAttribute("aria-pressed", String(s === sp));
   setFocus(sp);
-}
-selectSpecies(sel);
-focus = "intro";
+};
 
 function addSel(side) {
   const n = M.addCluster(sel, side, 5);
@@ -313,30 +322,8 @@ function updateExplain(c) {
   if (explainBody.innerHTML !== html) explainBody.innerHTML = html;
 }
 
-// ---------- canvas interaction ----------
-function hitProtein(x, y) {
-  const L = M.L;
-  for (const P of M.prot) {
-    const hw = Math.max(D.protW(P, L) / 2 + 4, 22);
-    const top = L.memTop - L.protH * 0.42 - 8;
-    const bot = L.memBot + (P.kind === "pump" ? L.protH * 0.62 : L.protH * 0.25) + 8;
-    if (Math.abs(x - P.x) < hw && y > top && y < bot) return P;
-  }
-  return null;
-}
-
-function hitParticle(x, y) {
-  let best = null, bd = Infinity;
-  for (const p of M.parts) {
-    if (p.dead || p.side === "ves") continue;
-    const d = Math.hypot(p.x - x, p.y - y);
-    if (d < SP[p.sp].r * M.L.sc + 14 && d < bd) { bd = d; best = p; }
-  }
-  return best;
-}
-
+// ---------- 3D interaction ----------
 const sideAt = (y) => (y < M.L.memTop - 2 ? "out" : y > M.L.memBot + 2 && y < M.L.uh ? "in" : null);
-const focusFor = (sp) => sp;
 
 function toggleProtein(P) {
   if (P.kind === "channel") {
@@ -352,62 +339,94 @@ function toggleProtein(P) {
   }
 }
 
-K.pointer(canvas, {
-  down(p) {
-    const L = M.L;
-    if (p.y >= L.uh) {
-      const R = D.paletteRects(L).find((r) => p.x >= r.x - 3 && p.x <= r.x + r.w + 3);
-      if (R) { selectSpecies(R.sp); drag = { sp: R.sp, x: p.x, y: p.y, sx: p.x, sy: p.y, moved: false }; }
-      return;
-    }
-    const P = hitProtein(p.x, p.y);
-    if (P) {
-      press = { id: P.id };
-      if (P.kind === "pump") {
-        M.feeding = true; M.feedATP(2); setFocus("pump");
-        toast("Feeding the pump ATP — keep holding for more");
-      }
-      return;
-    }
-    const part = hitParticle(p.x, p.y);
-    if (part) { M.inspect = { p: part, t: M.time }; setFocus(focusFor(part.sp)); return; }
-    const side = sideAt(p.y);
-    if (side) {
-      const n = M.addCluster(sel, side, 3, p.x, p.y);
-      if (!n) toast("That side is full for this molecule");
-      setFocus(sel);
-    }
-  },
-  move(p) {
-    if (drag) {
-      drag.x = p.x; drag.y = p.y;
-      if (Math.hypot(p.x - drag.sx, p.y - drag.sy) > 6) drag.moved = true;
-      return;
-    }
-    const P = p.y < M.L.uh ? hitProtein(p.x, p.y) : null;
-    hover = P ? P.id : null;
-    canvas.style.cursor = p.y >= M.L.uh ? "grab" : P || hitParticle(p.x, p.y) ? "pointer" : sideAt(p.y) ? "copy" : "default";
-  },
-  up(p) {
-    if (drag) {
-      const side = sideAt(p.y);
-      if (drag.moved && side) {
-        const n = M.addCluster(drag.sp, side, 5, p.x, p.y);
-        toast(n ? `Added ${n} ${SP[drag.sp].name} ${side === "out" ? "outside" : "inside"}` : "That side is full for this molecule");
-        setFocus(drag.sp);
-      } else if (!drag.moved) toast(`${SP[drag.sp].long} selected — drag it onto a side, or tap empty space to add 3`);
-      drag = null;
-      return;
-    }
-    if (press) {
-      const P = M.byId[press.id];
-      if (P.kind === "pump") M.feeding = false;
-      else if (hitProtein(p.x, p.y) === P) toggleProtein(P);
-      press = null;
-    }
-  },
+function addAt(sp, cx, cy, n) {
+  const pt = G.toModel(cx, cy);
+  if (pt) pt.y = Math.min(Math.max(pt.y, 12), M.L.uh - 12); // taps beyond the water still count
+  const side = pt && sideAt(pt.y);
+  if (!side) { toast("Drop molecules above (outside) or below (inside) the membrane"); return; }
+  const before = M.nextId;
+  const k = M.addCluster(sp, side, n, pt.x, pt.y);
+  for (const p of M.parts) if (p.id >= before) p.zHint = (Math.random() - 0.5) * 1.6;
+  toast(k ? `Added ${k} ${SP[sp].name} ${side === "out" ? "outside" : "inside"}` : "That side is full for this molecule");
+  setFocus(sp);
+}
+
+const HOW = {
+  o2: "crosses the lipids by simple diffusion", co2: "crosses the lipids by simple diffusion",
+  h2o: "mostly crosses through aquaporins (osmosis)", glc: "needs the GLUT carrier (facilitated diffusion)",
+  na: "needs the Na⁺ channel or the pump", k: "needs the K⁺ channel or the pump", prot: "too big: needs a vesicle",
+};
+const inspectHTML = (p) => `<b style="color:${SP[p.sp].color}">${SP[p.sp].long}</b> · ${p.side === "out" ? "outside" : p.side === "in" ? "inside" : "crossing"}<br><span>${HOW[p.sp]}</span>`;
+
+let down = null;
+canvas.addEventListener("pointerdown", (e) => {
+  const id = G.pickProtein(e.clientX, e.clientY);
+  down = { x: e.clientX, y: e.clientY, t: performance.now(), prot: id };
+  if (id === "pump") {
+    G.controls.enabled = false;
+    M.feeding = true; M.feedATP(2); setFocus("pump");
+    toast("Feeding the pump ATP — keep holding for more");
+  }
 });
-canvas.addEventListener("pointercancel", () => { drag = null; press = null; M.feeding = false; });
+canvas.addEventListener("pointermove", (e) => {
+  if (e.buttons) return;
+  const id = G.pickProtein(e.clientX, e.clientY);
+  hover = id;
+  canvas.style.cursor = id ? "pointer" : "grab";
+});
+const endPress = (e) => {
+  if (!down) return;
+  const moved = Math.hypot(e.clientX - down.x, e.clientY - down.y) > 6;
+  if (down.prot === "pump") { M.feeding = false; G.controls.enabled = true; }
+  else if (!moved) {
+    if (down.prot) toggleProtein(M.byId[down.prot]);
+    else {
+      const part = G.pickParticle(e.clientX, e.clientY);
+      if (part) { M.inspect = { p: part, t: M.time }; setFocus(part.sp); }
+      else addAt(sel, e.clientX, e.clientY, 3);
+    }
+  }
+  down = null;
+};
+canvas.addEventListener("pointerup", endPress);
+canvas.addEventListener("pointercancel", () => { down = null; M.feeding = false; G.controls.enabled = true; });
+
+// molecule tray: tap to select, drag onto the stage to drop 5
+const tray = K.$("#tray");
+const trayBtns = {};
+for (const sp of ORDER) {
+  const b = document.createElement("button");
+  b.type = "button";
+  b.className = "tray-item";
+  b.innerHTML = `<i style="background:${SP[sp].color}"></i>${SP[sp].short}`;
+  b.setAttribute("aria-label", `Select ${SP[sp].long}`);
+  tray.appendChild(b);
+  trayBtns[sp] = b;
+  b.addEventListener("pointerdown", (e) => {
+    e.preventDefault();
+    selectSpecies(sp);
+    const ghost = document.createElement("div");
+    ghost.className = "tray-ghost";
+    ghost.style.background = SP[sp].color;
+    let moved = false;
+    const mv = (ev) => {
+      if (Math.hypot(ev.clientX - e.clientX, ev.clientY - e.clientY) > 6 && !moved) { moved = true; document.body.appendChild(ghost); }
+      ghost.style.transform = `translate(${ev.clientX - 14}px, ${ev.clientY - 14}px)`;
+    };
+    const up = (ev) => {
+      removeEventListener("pointermove", mv); removeEventListener("pointerup", up);
+      ghost.remove();
+      const r = canvas.getBoundingClientRect();
+      if (moved && ev.clientX > r.left && ev.clientX < r.right && ev.clientY > r.top && ev.clientY < r.bottom) addAt(sp, ev.clientX, ev.clientY, 5);
+      else if (!moved) toast(`${SP[sp].long} selected — drag it onto a side, or tap empty space to add 3`);
+    };
+    addEventListener("pointermove", mv); addEventListener("pointerup", up);
+  });
+}
+const _sel = selectSpecies;
+selectSpecies = (sp) => { _sel(sp); for (const s of ORDER) trayBtns[s].setAttribute("aria-pressed", String(s === sp)); };
+selectSpecies(sel);
+focus = "intro";
 
 // ---------- reset ----------
 function resetAll() {
@@ -427,43 +446,31 @@ function drawPanelChart(c) {
   if (chartCv.width !== Math.round(w * dpr)) { chartCv.width = Math.round(w * dpr); chartCv.height = Math.round(h * dpr); }
   chartCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
   chartCtx.clearRect(0, 0, w, h);
-  D.drawChart(chartCtx, 0, 0, w, h, c, { panel: false });
+  drawChart(chartCtx, 0, 0, w, h, c, { panel: false });
 }
+
+// ---------- graphics quality ----------
+const qCard = K.card(panel, "Graphics");
+const qSeg = K.segmented(qCard, [
+  { value: "high", label: "Cinematic" }, { value: "medium", label: "Balanced" }, { value: "low", label: "Fast" },
+], G.quality, (v) => { G.lockQuality = true; G.setQuality(v); });
+qCard.insertAdjacentHTML("beforeend", `<p class="hint">Drag the background to orbit the camera, scroll or pinch to zoom. Cinematic adds depth-of-field and glow; it drops automatically on slower devices.</p>`);
+G.onQuality = (q) => qSeg.set(q);
+if (matchMedia("(pointer: coarse)").matches || (navigator.hardwareConcurrency || 8) <= 4) { G.setQuality("medium"); qSeg.set("medium"); }
 
 // ---------- main loop ----------
 let uiTimer = 0;
 const L = K.loop((dt, t) => {
   M.step(dt);
-  const Ly = M.L, dpr = stage.dpr;
   const c = M.counts();
   if (c.na.out >= 12 && c.na.out >= 3 * Math.max(1, c.na.in)) naPeak = true;
-
-  D.drawBackground(ctx, M, t);
-  D.drawAtpDots(ctx, M, dpr);
-  D.drawParticles(ctx, M, dpr, (p) => p.mode === "free" || (p.mode === "ves" && M.ves.phase !== "away" && M.ves.phase !== "come"));
-  D.drawMembrane(ctx, M, t, dpr);
-  D.drawVesicle(ctx, M, t, dpr);
-  D.drawParticles(ctx, M, dpr, (p) => p.mode === "ves" && (M.ves.phase === "away" || M.ves.phase === "come"));
-  D.drawProteins(ctx, M, t, dpr, { hover });
-  D.drawParticles(ctx, M, dpr, (p) => p.mode === "transit" || p.mode === "bound");
-  D.drawProteinLabels(ctx, M, {});
-  D.drawFx(ctx, M, dpr);
-  D.drawInspect(ctx, M);
-
-  const wide = stage.w >= 760 && Ly.uh - Ly.memBot > 150;
-  if (wide) {
-    const cw = Math.min(260, stage.w * 0.24), ch = 112;
-    D.drawChart(ctx, 26, Ly.uh - ch - 10, cw, ch, c);
-  }
-  D.drawPalette(ctx, M, dpr, sel, drag);
-
+  G.render(dt, t, { hover, inspectHTML });
   uiTimer -= 1 / 60;
   explainTimer -= 1 / 60;
   if (uiTimer <= 0) {
     uiTimer = 0.2;
     updateChips(c);
-    chartCard.style.display = wide ? "none" : "";
-    if (!wide) drawPanelChart(c);
+    drawPanelChart(c);
   }
   if (explainTimer <= 0) { explainTimer = 0.5; updateExplain(c); }
   missions.update();
