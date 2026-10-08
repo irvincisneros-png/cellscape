@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Photosynthesis: Inside the Chloroplast · CellScape</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Space+Grotesk:wght@500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../../assets/css/cellscape.css" />
+  <style>
+    .chip.lim { border-color: currentColor; }
+    .chip.lim b { color: inherit; }
+    .graph-canvas { width: 100%; height: 200px; display: block; margin-top: 8px; border-radius: 10px; background: rgba(5, 11, 22, 0.55); }
+    .graph-key { display: flex; flex-wrap: wrap; gap: 4px 12px; font-size: 0.78rem; color: var(--ink-dim); margin-top: 6px; }
+    .graph-key i { display: inline-block; width: 14px; height: 3px; border-radius: 2px; vertical-align: middle; margin-right: 5px; }
+    .small { font-size: 0.8rem; color: var(--ink-faint) !important; }
+    .sel-info { border-left: 3px solid var(--accent); padding-left: 8px; }
+    .control-sub { font-size: 0.78rem; color: var(--ink-faint); margin: -4px 0 6px; }
+    .spectrum-bar { height: 6px; border-radius: 3px; margin: 4px 0 2px;
+      background: linear-gradient(90deg, #8b3dff, #3d5bff 15%, #2fd0ff 30%, #3dff6a 45%, #e8ff3d 60%, #ffa23d 75%, #ff3d3d 90%, #b81f1f); }
+    .sim-header h1 { min-width: 0; }
+    @media (max-width: 860px) {
+      .sim-shell { grid-template-columns: minmax(0, 1fr); }
+      .stage-overlay { gap: 5px; left: 8px; right: 8px; top: 8px; }
+      .stage-overlay .chip { font-size: 0.72rem; padding: 3px 8px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="sim-shell">
+    <header class="sim-header">
+      <a class="back" href="../../index.html">← CellScape</a>
+      <h1>Photosynthesis: Inside the Chloroplast</h1>
+      <span class="tag">Stage 4–5 / Biology Y11 · Module 1 · Photosynthesis</span>
+    </header>
+    <main class="stage" id="stage">
+      <canvas id="canvas" aria-label="Photosynthesis: Inside the Chloroplast simulation. A thylakoid membrane with photosystem II, cytochrome b6f, photosystem I and ATP synthase, a draggable lamp, the Calvin cycle in the stroma and a pondweed bubble counter."></canvas>
+      <div class="stage-overlay" id="overlay"></div>
+    </main>
+    <aside class="panel" id="panel"></aside>
+  </div>
+  <script type="module" src="./sim.js"></script>
+</body>
+</html>

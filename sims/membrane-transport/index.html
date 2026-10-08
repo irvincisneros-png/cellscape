@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Membrane Transport · CellScape</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Space+Grotesk:wght@500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../../assets/css/cellscape.css" />
+  <style>
+    .chip .w { color: var(--ink-faint); }
+    .chip .dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 5px; vertical-align: 0; }
+    .chip .fx { margin-left: 5px; font-variant-numeric: tabular-nums; font-weight: 600; }
+    .chip .fx.in { color: #4ade80; }
+    .chip .fx.out { color: #fbbf24; }
+    .chip .fx.eq { color: var(--ink-faint); font-weight: 400; }
+    .chip.warn { border-color: rgba(248, 113, 113, 0.6); }
+    .species-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 4px; }
+    .species-grid .btn { padding: 6px 4px; font-size: 0.8rem; display: flex; align-items: center; justify-content: center; gap: 5px; }
+    .species-grid .btn i { width: 9px; height: 9px; border-radius: 50%; display: inline-block; flex: 0 0 9px; }
+    .hint { font-size: 0.8rem; color: var(--ink-faint); margin: 6px 0 0; }
+    .chart-card canvas { width: 100%; height: 130px; display: block; }
+    .explain small { color: var(--ink-faint); display: block; margin-top: 8px; font-size: 0.75rem; line-height: 1.4; }
+    .explain .now { border-top: 1px solid var(--panel-border); padding-top: 8px; margin-top: 8px; font-size: 0.86rem; }
+    @media (max-width: 600px) {
+      .chip .w { display: none; }
+      .chip.opt { display: none; }
+      .chip { padding: 3px 8px; font-size: 0.74rem; }
+      .stage-overlay { gap: 5px; left: 8px; right: 8px; top: 8px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="sim-shell">
+    <header class="sim-header">
+      <a class="back" href="../../index.html">← CellScape</a>
+      <h1>Membrane Transport</h1>
+      <span class="tag">Biology Y11 · Module 1 · Cell membrane transport</span>
+    </header>
+    <main class="stage" id="stage">
+      <canvas id="canvas" aria-label="Membrane transport simulation: a phospholipid bilayer separating extracellular fluid (top) from cytoplasm (bottom), with an aquaporin, a potassium channel, a GLUT glucose carrier, a sodium-potassium pump and a sodium channel. Oxygen, carbon dioxide, water, glucose, sodium, potassium and large protein molecules move between the two sides. The What's happening panel describes the current state."></canvas>
+      <div class="stage-overlay" id="overlay"></div>
+    </main>
+    <aside class="panel" id="panel"></aside>
+  </div>
+  <script type="module" src="./sim.js"></script>
+</body>
+</html>

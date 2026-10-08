@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Meiosis &amp; Variation · CellScape</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Space+Grotesk:wght@500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../../assets/css/cellscape.css" />
+  <style>
+    .tally { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 5px; margin: 8px 0; }
+    .tcell {
+      display: flex; flex-direction: column; align-items: center; gap: 1px;
+      padding: 6px 2px; border-radius: 8px; min-width: 0; border: 1px solid var(--panel-border);
+      background: rgba(255,255,255,0.02); color: var(--ink-faint); font-size: 0.72rem;
+    }
+    .tcell b { font-family: var(--font-display); font-size: 0.95rem; letter-spacing: 0.04em; color: var(--ink-faint); }
+    .tcell span { font-variant-numeric: tabular-nums; }
+    .tcell em { font-style: normal; font-size: 0.58rem; text-transform: uppercase; letter-spacing: 0.02em; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .tcell.found { border-color: rgba(79,209,197,0.6); background: rgba(79,209,197,0.1); color: var(--ink-dim); }
+    .tcell.found b { color: var(--ink); }
+    .tcell.rec.found { border-color: rgba(167,139,250,0.7); background: rgba(167,139,250,0.12); }
+    .zyg { margin-top: 6px; padding: 6px 8px; border-radius: 8px; background: rgba(251,191,36,0.08); border: 1px solid rgba(251,191,36,0.3); font-size: 0.85rem; color: var(--ink-dim); }
+    .zyg strong { color: var(--ink); }
+    table.cmp { width: 100%; border-collapse: collapse; font-size: 0.8rem; color: var(--ink-dim); }
+    table.cmp th, table.cmp td { text-align: left; padding: 5px 4px; border-bottom: 1px solid var(--panel-border); vertical-align: top; }
+    table.cmp th { color: var(--ink); font-weight: 600; }
+    table.cmp td:first-child { color: var(--ink-faint); width: 30%; }
+    .legend .wide { grid-column: 1 / -1; }
+    .legend i.bar { border-radius: 3px; width: 18px; flex-basis: 18px; }
+    .note { font-size: 0.78rem; color: var(--ink-faint) !important; }
+  </style>
+</head>
+<body>
+  <div class="sim-shell">
+    <header class="sim-header">
+      <a class="back" href="../../index.html">← CellScape</a>
+      <h1>Meiosis &amp; Variation</h1>
+      <span class="tag">Biology Y12 · Module 5 · Meiosis &amp; variation</span>
+    </header>
+    <main class="stage" id="stage">
+      <canvas id="canvas" aria-label="Meiosis and variation simulation: a diploid germ cell with two homologous chromosome pairs divides by meiosis into four haploid gametes. Place crossovers and flip bivalent orientation to create genetic variation."></canvas>
+      <div class="stage-overlay" id="overlay"></div>
+    </main>
+    <aside class="panel" id="panel"></aside>
+  </div>
+  <script type="module" src="./sim.js"></script>
+</body>
+</html>

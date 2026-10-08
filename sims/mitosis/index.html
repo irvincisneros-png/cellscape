@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Cell Division: Mitosis · CellScape</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Space+Grotesk:wght@500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../../assets/css/cellscape.css" />
+  <style>
+    .explain .task {
+      margin-top: 8px; padding: 8px 10px; border-radius: 10px;
+      border: 1px solid rgba(251, 191, 36, 0.45); background: rgba(251, 191, 36, 0.08); color: var(--ink);
+    }
+    .explain .note { font-size: 0.78rem; color: var(--ink-faint); }
+    .countcard .opts { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+    .countcard .fb { font-size: 0.85rem; margin-top: 8px; color: var(--ink-dim); }
+    .act-row .btn { flex: 1 1 auto; }
+    .btn.holding { background: rgba(251, 191, 36, 0.3); border-color: var(--accent-3); }
+    .legend .wide { grid-column: 1 / -1; }
+    .legend i.bar { border-radius: 3px; height: 6px; width: 16px; flex-basis: 16px; }
+  </style>
+</head>
+<body>
+  <div class="sim-shell">
+    <header class="sim-header">
+      <a class="back" href="../../index.html">← CellScape</a>
+      <h1>Cell Division: Mitosis</h1>
+      <span class="tag">Biology Y12 · Module 5 · Cell replication</span>
+    </header>
+    <main class="stage" id="stage">
+      <canvas id="canvas" role="img" aria-label="Cell Division: Mitosis simulation. An animal cell with four chromosomes copies its DNA and divides into two daughter cells. The What's happening panel describes the current phase."></canvas>
+      <div class="stage-overlay" id="overlay"></div>
+    </main>
+    <aside class="panel" id="panel"></aside>
+  </div>
+  <script type="module" src="./sim.js"></script>
+</body>
+</html>

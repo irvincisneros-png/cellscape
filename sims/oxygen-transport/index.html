@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Oxygen Transport: Haemoglobin &amp; Red Blood Cells · CellScape</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Space+Grotesk:wght@500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../../assets/css/cellscape.css" />
+  <style>
+    .graph-wrap { position: relative; height: 250px; margin: 0 -4px; }
+    .graph-wrap canvas { width: 100%; height: 100%; display: block; touch-action: pan-y; cursor: ew-resize; }
+    .graph-cap { font-size: 0.82rem; margin-top: 6px !important; }
+    .graph-cap b { color: var(--ink); font-variant-numeric: tabular-nums; }
+    .explain .small { font-size: 0.8rem; color: var(--ink-faint); }
+    .chip .lab { color: var(--ink-faint); }
+    @media (max-width: 520px) {
+      .stage-overlay { left: 8px; right: 8px; top: 8px; gap: 5px; }
+      .chip { font-size: 0.7rem; padding: 3px 8px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="sim-shell">
+    <header class="sim-header">
+      <a class="back" href="../../index.html">← CellScape</a>
+      <h1>Oxygen Transport: Haemoglobin &amp; Red Blood Cells</h1>
+      <span class="tag">Biology Y11 · Module 2 · Gas exchange &amp; transport</span>
+    </header>
+    <main class="stage" id="stage">
+      <canvas id="canvas" aria-label="Oxygen transport simulation: red blood cells circulate from an alveolus in the lungs, through the heart, to a capillary in working muscle and back. Tap a red blood cell to follow it and see its haemoglobin saturation."></canvas>
+      <div class="stage-overlay" id="overlay"></div>
+    </main>
+    <aside class="panel" id="panel"></aside>
+  </div>
+  <script type="module" src="./sim.js"></script>
+</body>
+</html>

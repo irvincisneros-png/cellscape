@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>CellScape · Interactive Cell Biology</title>
+  <meta name="description" content="Interactive cell biology simulations: membranes, osmosis, enzymes, photosynthesis, ATP synthase, haemoglobin, mitosis, meiosis and protein synthesis." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="assets/css/cellscape.css" />
+  <style>
+    body { min-height: 100vh; }
+    .hero { position: relative; height: min(72vh, 620px); min-height: 420px; overflow: hidden; }
+    .hero canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+    .hero-copy {
+      position: relative; z-index: 1; max-width: 1180px; margin: 0 auto; padding: 0 24px;
+      height: 100%; display: flex; flex-direction: column; justify-content: center; pointer-events: none;
+    }
+    .brand { font-family: var(--font-display); font-weight: 700; letter-spacing: 0.02em; color: var(--accent); font-size: 0.95rem; }
+    .hero h1 {
+      font-family: var(--font-display); font-size: clamp(2.2rem, 6vw, 4.4rem); line-height: 1.02; margin: 10px 0 14px;
+      max-width: 13ch; text-shadow: 0 4px 30px rgba(0,0,0,0.6);
+    }
+    .hero h1 em { font-style: normal; background: linear-gradient(90deg, var(--accent), var(--accent-2)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+    .hero p { max-width: 44ch; color: var(--ink-dim); font-size: 1.08rem; margin: 0 0 22px; text-shadow: 0 2px 12px rgba(0,0,0,0.8); }
+    .hero .cta { pointer-events: auto; display: flex; gap: 10px; flex-wrap: wrap; }
+    .hero .cta a { text-decoration: none; }
+    .hint { position: absolute; z-index: 1; right: 18px; bottom: 14px; font-size: 0.8rem; color: var(--ink-faint); }
+
+    main.hub { max-width: 1180px; margin: 0 auto; padding: 8px 24px 60px; }
+    .filters { display: flex; flex-wrap: wrap; gap: 8px; margin: 18px 0 26px; }
+    .filters .btn { border-radius: 999px; }
+    .theme-block { margin-bottom: 34px; }
+    .theme-block h2 { font-family: var(--font-display); font-size: 1.05rem; margin: 0 0 12px; display: flex; align-items: center; gap: 10px; }
+    .theme-block h2 i { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; }
+    .sim-card {
+      display: flex; flex-direction: column; text-decoration: none; color: inherit;
+      background: var(--panel); border: 1px solid var(--panel-border); border-radius: 18px; overflow: hidden;
+      transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
+    }
+    .sim-card:hover, .sim-card:focus-visible { transform: translateY(-3px); border-color: var(--c); box-shadow: 0 12px 40px -12px var(--c); outline: none; }
+    .sim-card canvas { width: 100%; height: 150px; display: block; background: var(--bg-1); }
+    .sim-card .body { padding: 14px 16px 16px; display: flex; flex-direction: column; gap: 6px; flex: 1; }
+    .sim-card h3 { margin: 0; font-family: var(--font-display); font-size: 1.12rem; }
+    .sim-card p { margin: 0; color: var(--ink-dim); font-size: 0.9rem; flex: 1; }
+    .sim-card .tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 6px; }
+    .sim-card .tags span { font-size: 0.72rem; padding: 2px 8px; border-radius: 999px; border: 1px solid var(--panel-border); color: var(--ink-faint); }
+    .sim-card .tags .feat { color: var(--accent-3); border-color: rgba(251,191,36,0.4); }
+    footer { text-align: center; color: var(--ink-faint); font-size: 0.82rem; padding: 0 20px 40px; }
+  </style>
+</head>
+<body>
+  <header class="hero">
+    <canvas id="hero" aria-hidden="true"></canvas>
+    <div class="hero-copy">
+      <div class="brand">CELLSCAPE</div>
+      <h1>Don't just watch the cell. <em>Run it.</em></h1>
+      <p>Interactive simulations of life at the molecular scale. Pump ions, spin ATP synthase, split chromosomes and load haemoglobin yourself. Built for the NSW Science and Biology syllabuses.</p>
+      <div class="cta">
+        <a class="btn primary" href="sims/membrane-transport/index.html">Start with the membrane →</a>
+        <a class="btn" href="#sims">Browse all simulations</a>
+      </div>
+    </div>
+    <div class="hint">Move your pointer over the membrane</div>
+  </header>
+
+  <main class="hub" id="sims">
+    <div class="filters" id="filters" role="group" aria-label="Filter by stage"></div>
+    <div id="blocks"></div>
+  </main>
+  <footer>CellScape · Simulations are simplified models and not to scale.</footer>
+
+  <script type="module" src="assets/js/hub.js"></script>
+</body>
+</html>

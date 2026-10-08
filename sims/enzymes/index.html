@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Enzyme Lab · CellScape</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Space+Grotesk:wght@500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../../assets/css/cellscape.css" />
+</head>
+<body>
+  <div class="sim-shell">
+    <header class="sim-header">
+      <a class="back" href="../../index.html">← CellScape</a>
+      <h1>Enzyme Lab</h1>
+      <span class="tag">Stage 5 / Biology Y11 · Module 1 · Enzymes</span>
+    </header>
+    <main class="stage" id="stage">
+      <canvas id="canvas" aria-label="Enzyme Lab simulation: enzyme molecules with notched active sites float among substrate molecules. Drag a substrate into an active site, tap a molecule to rotate it, tap an enzyme to zoom in. The What’s happening panel describes the current state."></canvas>
+      <div class="stage-overlay" id="overlay"></div>
+    </main>
+    <aside class="panel" id="panel"></aside>
+  </div>
+  <script type="module" src="./sim.js"></script>
+</body>
+</html>
