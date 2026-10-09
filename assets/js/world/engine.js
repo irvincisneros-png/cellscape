@@ -11,6 +11,7 @@ import { RenderPass } from "three/addons/postprocessing/RenderPass.js";
 import { UnrealBloomPass } from "three/addons/postprocessing/UnrealBloomPass.js";
 import { BokehPass } from "three/addons/postprocessing/BokehPass.js";
 import { OutputPass } from "three/addons/postprocessing/OutputPass.js";
+import { StyleManager } from "./style.js";
 
 const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 const ease = (t) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
@@ -37,7 +38,9 @@ export function disposeTree(root) {
   const free = (r) => { if (r && !seen.has(r) && !r.userData?.shared) { seen.add(r); r.dispose?.(); } };
   root.traverse((o) => {
     free(o.geometry);
-    const mats = Array.isArray(o.material) ? o.material : o.material ? [o.material] : [];
+    // the clay style keeps the original material in userData.realMat and its own in userData.clayMat: free both
+    const u = o.userData || {};
+    const mats = [o.material, u.realMat, u.clayMat].flat().filter(Boolean);
     for (const m of mats) {
       for (const v of Object.values(m)) if (v && v.isTexture) free(v);
       free(m);
@@ -60,6 +63,8 @@ export class Engine {
     r.toneMapping = THREE.ACESFilmicToneMapping;
     r.outputColorSpace = THREE.SRGBColorSpace;
     r.localClippingEnabled = true;
+    r.shadowMap.enabled = true;          // only used by the clay style's key light (no light casts shadows in the real style)
+    r.shadowMap.type = THREE.PCFSoftShadowMap;
 
     const scene = (this.scene = new THREE.Scene());
     const pm = new THREE.PMREMGenerator(r);
@@ -76,6 +81,8 @@ export class Engine {
     this.addBackground();
     this.addLights();
     this.setupPost();
+    this.styleName = "real";
+    this.style = new StyleManager(this);
 
     this.ray = new THREE.Raycaster();
     this.stack = [];            // [{ id, inst, portal, saved }]
@@ -99,10 +106,10 @@ export class Engine {
   addBackground() {
     const m = new THREE.ShaderMaterial({
       side: THREE.BackSide, depthWrite: false, fog: false,
-      uniforms: { t: { value: 0 }, top: { value: new THREE.Color() }, bottom: { value: new THREE.Color() }, accent: { value: new THREE.Color() } },
+      uniforms: { t: { value: 0 }, calm: { value: 1 }, top: { value: new THREE.Color() }, bottom: { value: new THREE.Color() }, accent: { value: new THREE.Color() } },
       vertexShader: `varying vec3 vP; void main(){ vP = normalize(position); vec4 p = projectionMatrix * modelViewMatrix * vec4(position,1.0); gl_Position = p.xyww; }`,
       fragmentShader: `
-        varying vec3 vP; uniform float t; uniform vec3 top, bottom, accent;
+        varying vec3 vP; uniform float t, calm; uniform vec3 top, bottom, accent;
         float h(vec3 p){ return fract(sin(dot(p, vec3(12.9898,78.233,37.719)))*43758.5453); }
         float n(vec3 p){ vec3 i=floor(p), f=fract(p); f=f*f*(3.0-2.0*f);
           return mix(mix(mix(h(i),h(i+vec3(1,0,0)),f.x),mix(h(i+vec3(0,1,0)),h(i+vec3(1,1,0)),f.x),f.y),
@@ -110,9 +117,9 @@ export class Engine {
         float fbm(vec3 p){ float s=0.0, a=0.5; for(int i=0;i<5;i++){ s+=a*n(p); p*=2.03; a*=0.5; } return s; }
         void main(){
           vec3 c = mix(bottom, top, smoothstep(-0.6, 0.7, vP.y));
-          float f = fbm(vP * 3.0 + vec3(t*0.01, 0.0, t*0.007));
+          float f = fbm(vP * 3.0 + vec3(t*0.01, 0.0, t*0.007)) * calm;
           c = mix(c, accent, smoothstep(0.45, 0.85, f) * 0.85);
-          c += bottom * smoothstep(0.55, 0.9, fbm(vP*5.0 - t*0.005)) * 0.5;
+          c += bottom * smoothstep(0.55, 0.9, fbm(vP*5.0 - t*0.005) * calm) * 0.5;
           gl_FragColor = vec4(c, 1.0);
         }`,
     });
@@ -133,15 +140,17 @@ export class Engine {
     s.add(this.lights);
   }
 
-  applyEnv(env = {}) {
-    const e = { ...DEFAULT_ENV, ...env };
+  applyEnv(env = {}, inst = this.current) {
+    const e = this.style.env({ ...DEFAULT_ENV, ...env }, inst);
     const u = this.bg.material.uniforms;
+    u.calm.value = this.style.clay ? 0 : 1;   // clay: a clean studio backdrop, no nebula clouds
     u.top.value.set(e.bg[0]); u.bottom.value.set(e.bg[1]); u.accent.value.set(e.bg[2]);
     this.scene.fog.color.set(e.fog[0]);
     this.scene.fog.density = e.fog[1];
     this.renderer.toneMappingExposure = e.exposure;
     [this.bloom.strength, this.bloom.radius, this.bloom.threshold] = e.bloom;
     this.bokeh.uniforms.aperture.value = e.aperture;
+    this.bokeh.uniforms.maxblur.value = this.style.clay ? 0.008 : 0.006;
     this.env = e;
     this.fade.style.background = `radial-gradient(circle at 50% 50%, ${e.bg[1]}, ${e.bg[0]})`;
   }
@@ -157,10 +166,22 @@ export class Engine {
     this.composer.addPass(new OutputPass());
   }
 
+  /** Art style: "real" (default) or "clay" (pastel plasticine diorama). Re-applies to the current level; new levels inherit it. */
+  setStyle(name) {
+    this.styleName = name === "clay" ? "clay" : "real";
+    this.style.set(this.styleName);
+    this.onStyle && this.onStyle(this.styleName);
+  }
+
+  refreshPost() {
+    this.bokeh.enabled = this.quality === "high";
+    this.bloom.enabled = this.quality !== "low" && !this.style.clay;
+  }
+
   setQuality(q) {
     this.quality = q;
-    this.bokeh.enabled = q === "high";
-    this.bloom.enabled = q !== "low";
+    this.refreshPost();
+    this.style.refreshQuality();
     this.resize();
     this.onQuality && this.onQuality(q);
   }
@@ -210,9 +231,11 @@ export class Engine {
     const L = this.current;
     if (!L?.pickables?.length) return null;
     this.setRay(cx, cy);
-    const hit = this.ray.intersectObjects(L.pickables, true)[0];
+    // hidden parts (invisible, or hidden by the clay style) can't be picked even though Raycaster doesn't check .visible
+    const live = (h) => { for (let o = h.object; o; o = o.parent) if (o.visible === false || o.userData?.clayHidden) return false; return true; };
+    const hit = this.ray.intersectObjects(L.pickables, true).find(live);
     if (hit) return hit;
-    return (L.fallbackPickables && this.ray.intersectObjects(L.fallbackPickables, true)[0]) || null;
+    return (L.fallbackPickables && this.ray.intersectObjects(L.fallbackPickables, true).find(live)) || null;
   }
 
   // ---------- input ----------
@@ -359,7 +382,11 @@ export class Engine {
 
   mount(inst) {
     this.scene.add(inst.root);
-    this.applyEnv(inst.env);
+    this.style.name = this.styleName;
+    this.applyEnv(inst.env, inst);
+    this.style.applyTo(inst, this.styleName);
+    this.style.attach(inst);
+    this.refreshPost();
     const c = this.controls;
     c.minDistance = inst.minDistance ?? 0.1;
     c.maxDistance = inst.maxDistance ?? 100;
@@ -373,12 +400,14 @@ export class Engine {
     this.camera.far = inst.far ?? c.maxDistance * 20;
     this.camera.updateProjectionMatrix();
     inst.mountPanel?.(this.panel);
+    if ((inst._hookStyle || "real") !== this.styleName) { inst._hookStyle = this.styleName; safe(() => inst.onStyle?.(this.styleName)); }
     this.setHover(null);
     this.select(null);
   }
 
   unmount(inst) {
     this.scene.remove(inst.root);
+    this.style.detach();
     inst.unmountPanel?.(this.panel);
     this.panel.innerHTML = "";
   }
@@ -653,6 +682,7 @@ export class Engine {
       this.tip.style.transform = `translate(${this.pointer.x - r.left + 14}px, ${this.pointer.y - r.top + 14}px)`;
     } else this.tip.style.display = "none";
     this.checkAutoDive();
+    this.style.tick(dt);
     this.updateScale();
     if (this.quality === "low") this.renderer.render(this.scene, this.camera);
     else this.composer.render();

@@ -140,6 +140,21 @@ export async function boot(opts) {
   ], engine.quality, (v) => { engine.lockQuality = true; engine.setQuality(v); });
   qCard.insertAdjacentHTML("beforeend", `<p class="hint">Cinematic adds depth-of-field and glow. It steps down automatically on slower devices.</p>`);
   engine.onQuality = (q) => qSeg.set(q);
+  // art style: the realistic glass look (default) or a pastel clay-model diorama; remembered between visits
+  let look = "real";
+  try { look = localStorage.getItem("cellscape.look") === "clay" ? "clay" : "real"; } catch { /* storage blocked: default look */ }
+  const lookHead = document.createElement("p");
+  lookHead.className = "hint";
+  lookHead.style.margin = "10px 0 6px";
+  lookHead.textContent = "Look";
+  qCard.appendChild(lookHead);
+  const lookSeg = K.segmented(qCard, [{ value: "real", label: "Realistic" }, { value: "clay", label: "Clay model" }], look, (v) => {
+    engine.setStyle(v);
+    try { localStorage.setItem("cellscape.look", v); } catch { /* ignore */ }
+  });
+  engine.onStyle = (v) => lookSeg.set(v);
+  engine.styleName = look;                 // set before the first level mounts
+  engine.style.name = look;
   if (matchMedia("(pointer: coarse)").matches || (navigator.hardwareConcurrency || 8) <= 4) engine.setQuality("medium");
 
   // the homepage cell can be a plant or an animal cell (?cell=animal); the URL follows the toggle

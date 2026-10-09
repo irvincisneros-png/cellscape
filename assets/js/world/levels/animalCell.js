@@ -7,12 +7,14 @@ import * as K from "../../kit.js";
 import { physical, glass, specks, hash, wobble, softDot } from "../materials.js";
 import { AnimalCellModel, N_MITO } from "./animalCellModel.js";
 import { ORGANELLES, SWITCHES, FLOWS, MISSIONS, QUIZ, COMPARE, NOTE, narrative } from "./animalCellContent.js";
+import { clipGeometryBelow, slabGeometry, clayMaterial } from "../style.js";
 
 // ---------- constants ----------
 const PLANT_NUC = new THREE.Vector3(-20.5, 1.5, 0);           // the plant cell's nucleus (morph start)
 const PH = [28, 17, 17], PR = 6;                              // the plant membrane's half-extents and corner radius
 const NUC = new THREE.Vector3(-1.2, 0.8, -0.6), NUC_R = 5;
 const UP = new THREE.Vector3(0, 1, 0), ZAX = new THREE.Vector3(0, 0, 1), XAX = new THREE.Vector3(1, 0, 0);
+const CUT = -3;                                               // clay style: the cut-away plane (and the cytoplasm floor), cell frame, µm
 const SIN_X = 21.8;                                           // sinusoid centre line (x)
 const NLY = 14, NPX = 15, NGLY = 44, NRBC = 13, NMV = 240, NGLUT = 70, NPUMP = 40, NMT = 64;
 const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
@@ -110,6 +112,11 @@ export function create(engine) {
   const toWorld = (p, out) => out.copy(p).multiplyScalar(sCell);
   let sCell = 1;
 
+  // clay style state (see setClay below): the cell is cut in half and its organelles sit on the cytoplasm floor
+  let clay = false;
+  const clayK = { mito: 1, small: 1 };
+  const RIM = new Float32Array(128);                          // distance from the cell axis to the membrane at the cut, per angle
+
   // ---------- morph state ----------
   const morph = { k: 1, e: 1, org: 1, cyto: 1 };
   let burstT = 0, dissolve = 0;
@@ -176,6 +183,7 @@ export function create(engine) {
   const membrane = new THREE.Mesh(blobGeometry(30, true), memMat);
   membrane.frustumCulled = false;
   membrane.renderOrder = 4;
+  membrane.userData.clayHide = true;
   cellGroup.add(membrane);
   const memHandle = new THREE.Mesh(blobGeometry(7, false), new THREE.MeshBasicMaterial({ visible: false }));
   memHandle.scale.setScalar(0.995);
@@ -188,16 +196,21 @@ export function create(engine) {
   const nucShell = tag(new THREE.Mesh(new THREE.SphereGeometry(NUC_R, 56, 36), glass("#8b5cf6", { rim: "#c4b5fd", minAlpha: 0.14, maxAlpha: 0.85, rimStrength: 0.7 })), "nucleus");
   const nucleolus = new THREE.Mesh(new THREE.SphereGeometry(1.6, 32, 20), physical("#5b21b6", { emissive: new THREE.Color("#7c3aed"), emissiveIntensity: 0.25 }));
   nucleolus.position.set(0.9, 0.7, 0.4);
+  nucleolus.userData.clayHide = true;
+  nucShell.userData.clayColor = "#d6a4c6";
   nucleus.add(nucShell, nucleolus);
   const chromMat = physical("#e879f9", { emissive: new THREE.Color("#a21caf"), emissiveIntensity: 0.25, roughness: 0.5 });
   for (let i = 0; i < 9; i++) {
     const pts = [];
     for (let k = 0; k < 7; k++) pts.push(new THREE.Vector3((hash(i * 9 + k) - 0.5) * 6.5, (hash(i * 9 + k + 3) - 0.5) * 6.5, (hash(i * 9 + k + 6) - 0.5) * 6.5).clampLength(0, 3.9));
-    nucleus.add(new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts), 60, 0.11, 6), chromMat));
+    const chr = new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts), 60, 0.11, 6), chromMat);
+    chr.userData.clayHide = true;
+    nucleus.add(chr);
   }
   { // dense heterochromatin granules just inside the envelope
     const gm = new THREE.InstancedMesh(new THREE.IcosahedronGeometry(0.16, 1), physical("#a21caf", { emissive: new THREE.Color("#701a75"), emissiveIntensity: 0.12 }), 70);
     gm.frustumCulled = false;
+    gm.userData.clayHide = true;
     for (let i = 0; i < 70; i++) {
       tA.set(rng() - 0.5, rng() - 0.5, rng() - 0.5).normalize().multiplyScalar(NUC_R * (0.72 + 0.2 * rng()));
       const s = 0.6 + rng() * 1.2;
@@ -260,9 +273,11 @@ export function create(engine) {
   });
   const rerMat = glass("#2dd4bf", { rim: "#99f6e4", minAlpha: 0.12, maxAlpha: 0.7, rimStrength: 0.6, side: THREE.DoubleSide });
   const rer = tag(new THREE.Mesh(mergeGeometries(sheetGeos), rerMat), "er");
+  rer.userData.clayColor = "#a3b3f1";
   rerGroup.add(rer);
   const riboMesh = new THREE.InstancedMesh(new THREE.SphereGeometry(0.075, 6, 5), physical("#6366f1", { emissive: new THREE.Color("#4338ca"), emissiveIntensity: 0.45, roughness: 0.5 }), riboPos.length / 3);
   riboMesh.frustumCulled = false;
+  riboMesh.userData.clayColor = "#8b95e8";
   for (let i = 0; i < riboPos.length / 3; i++) riboMesh.setMatrixAt(i, tmpM.makeTranslation(riboPos[i * 3], riboPos[i * 3 + 1], riboPos[i * 3 + 2]));
   rerGroup.add(riboMesh);
 
@@ -299,6 +314,7 @@ export function create(engine) {
     }
     const glow = new THREE.Sprite(new THREE.SpriteMaterial({ map: softDot(), color: "#fb7185", transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, opacity: 0.55 }));
     glow.scale.setScalar(4.4);
+    glow.userData.clayHide = true;
     centroGroup.add(glow);
     const handle = new THREE.Mesh(new THREE.SphereGeometry(1.5, 12, 8), new THREE.MeshBasicMaterial({ visible: false }));
     handle.position.set(0.25, 0.1, 0);
@@ -338,6 +354,7 @@ export function create(engine) {
       const geos = [];
       for (let k = 0; k < 6; k++) { const c = cis(1.55 - k * 0.07 + (gi === 1 ? -0.15 : 0)); c.translate(0, 0, -k * 0.24); geos.push(c); }
       const mesh = tag(new THREE.Mesh(mergeGeometries(geos), golgiMat), "golgi", gi);
+      mesh.userData.clayColor = "#f2e3bf";
       g.add(mesh);
       golgiGroup.add(g);
       g.updateMatrix();
@@ -358,6 +375,7 @@ export function create(engine) {
   const gVesMat = glass("#f472b6", { rim: "#fbcfe8", minAlpha: 0.25, maxAlpha: 0.85, rimStrength: 0.6, emissive: new THREE.Color("#be185d"), emissiveIntensity: 0.25 });
   const gVes = instanced(new THREE.IcosahedronGeometry(0.32, 3), gVesMat, gVesPos.length / 3, "golgi");
   const gTiny = instanced(new THREE.IcosahedronGeometry(0.11, 2), physical("#f5d0a9", { roughness: 0.4 }), gTinyPos.length / 3, "golgi");
+  gVes.userData.clayHide = gTiny.userData.clayHide = true;
   cellGroup.add(gVes, gTiny);
 
   // ---------- mitochondria ----------
@@ -382,6 +400,7 @@ export function create(engine) {
   const mitoMesh = instanced(mitoGeo, mitoMat, N_MITO, "mitochondrion");
   const cristaeMat = physical("#c2410c", { emissive: new THREE.Color("#9a3412"), emissiveIntensity: 0.3, side: THREE.DoubleSide });
   const cristaeMesh = instanced(cristaeGeo, cristaeMat, N_MITO);
+  cristaeMesh.userData.clayColor = "#f1a57c";
   const mito = [];
   for (let i = 0; i < N_MITO; i++) {
     const L = 0.72 + rng() * 0.95, Rr = 0.78 + rng() * 0.4;
@@ -450,6 +469,7 @@ export function create(engine) {
       const s = new THREE.SphereGeometry(0.15 + rng() * 0.05, 8, 6); s.translate(a.x, a.y, a.z); geos.push(s);
     });
     const ser = tag(new THREE.Mesh(mergeGeometries(geos), glass("#38bdf8", { rim: "#bae6fd", minAlpha: 0.3, maxAlpha: 0.88, rimStrength: 0.55 })), "ser");
+    ser.userData.clayHide = true;
     serGroup.add(ser);
     cellGroup.add(serGroup);
   }
@@ -506,6 +526,7 @@ export function create(engine) {
     mtIndexPer = geos[0].index.count;
     const mtMat = new THREE.MeshPhysicalMaterial({ color: "#86efac", emissive: new THREE.Color("#34d399"), emissiveIntensity: 0.22, roughness: 0.4, transparent: true, opacity: 0.34, depthWrite: false, vertexColors: true });
     var mtMesh = tag(new THREE.Mesh(mergeGeometries(geos), mtMat), "microtubule");
+    mtMesh.userData.clayHide = true;
     mtGroup.add(mtMesh);
     cellGroup.add(mtGroup);
   }
@@ -525,7 +546,9 @@ export function create(engine) {
       }
       geos.push(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts), 10, 0.028, 4, false));
     }
-    actinGroup.add(new THREE.Mesh(mergeGeometries(geos), new THREE.MeshBasicMaterial({ color: "#fecdd3", transparent: true, opacity: 0.3, depthWrite: false, blending: THREE.AdditiveBlending })));
+    const actinMesh = new THREE.Mesh(mergeGeometries(geos), new THREE.MeshBasicMaterial({ color: "#fecdd3", transparent: true, opacity: 0.3, depthWrite: false, blending: THREE.AdditiveBlending }));
+    actinMesh.userData.clayHide = true;
+    actinGroup.add(actinMesh);
     cellGroup.add(actinGroup);
   }
 
@@ -543,6 +566,7 @@ export function create(engine) {
       break;
     }
   }
+  mvMesh.userData.clayHide = true;
   mvMesh.count = mvData.length;
   mvData.forEach((m, i) => {
     tmpQ.setFromUnitVectors(UP, m.n);
@@ -576,6 +600,7 @@ export function create(engine) {
     if (i < NGLUT) { glutMesh.setMatrixAt(i, tmpM.compose(tA, tmpQ, tmpS.set(1, 1, 1))); glutCore.setMatrixAt(i, tmpM.compose(tA, tmpQ, tmpS.set(1, 1, 1))); }
     else pumpMesh.setMatrixAt(i - NGLUT, tmpM.compose(tA, tmpQ, tmpS.set(1, 1, 1)));
   });
+  glutMesh.userData.clayHide = glutCore.userData.clayHide = pumpMesh.userData.clayHide = true;
   cellGroup.add(glutMesh, glutCore, pumpMesh);
 
   // ---------- cytosol crowding: ribosomes and small molecules ----------
@@ -657,6 +682,7 @@ export function create(engine) {
     ctxGroup.add(nn, nl);
   }
 
+  ctxGroup.traverse((o) => { o.userData.clayHide = true; });
   const ctxMats = [sinusoid.material, nbMat, nbNucMat, plasma.material].map((m) => ({ m, base: m.opacity }));
 
   // ---------- dive markers ----------
@@ -667,12 +693,14 @@ export function create(engine) {
   marker.quaternion.setFromUnitVectors(ZAX, mkDir);
   const markerRing = tag(new THREE.Mesh(new THREE.TorusGeometry(1.8, 0.16, 12, 48), physical("#5eead4", { emissive: new THREE.Color("#2dd4bf"), emissiveIntensity: 1.2 })), "membrane");
   const markerDisc = tag(new THREE.Mesh(new THREE.CircleGeometry(1.7, 32), new THREE.MeshBasicMaterial({ color: "#5eead4", transparent: true, opacity: 0.08, depthWrite: false })), "membrane");
+  markerRing.userData.keepMaterial = true;
   marker.add(markerRing, markerDisc);
   cellGroup.add(marker);
   const cyDir = new THREE.Vector3(-0.42, 0.5, 0.76).normalize();
   const CYTO_SPOT = surfacePoint(cyDir.x, cyDir.y, cyDir.z, new THREE.Vector3()).multiplyScalar(0.74);
   const cytoMarker = tag(new THREE.Mesh(new THREE.TorusGeometry(1.3, 0.13, 12, 40), physical("#fbbf24", { emissive: new THREE.Color("#f59e0b"), emissiveIntensity: 1.0 })), "cytosol");
   cytoMarker.position.copy(CYTO_SPOT);
+  cytoMarker.userData.keepMaterial = true;
   cellGroup.add(cytoMarker);
   const cytoLbl = engine.label("🔍 Zoom into the cytosol (enzymes)", "dive");
   const diveLbl = engine.label("🔍 Zoom into the membrane", "dive");
@@ -763,14 +791,16 @@ export function create(engine) {
   const flowOn = { energy: true, gases: true, protein: true, water: true };
   const rr = () => Math.random();
   const bloodPoint = (out) => out.set(SIN_X - 2.2 - rr() * 3.2, (rr() - 0.5) * 22, (rr() - 0.5) * 7);
-  const siteWorld = (list0, count, out) => { const m = memSites[list0 + Math.floor(rr() * count)]; return toWorld(m.p, out); };
+  const rimAt = (th) => { const f = ((th / (Math.PI * 2)) % 1 + 1) % 1 * 128, i = Math.floor(f) % 128; return RIM[i] + (RIM[(i + 1) % 128] - RIM[i]) * (f - Math.floor(f)); };
+  const rimProject = (out, k = 1) => { const th = Math.atan2(out.z, out.x), R = rimAt(th) * k * sCell; return out.set(Math.cos(th) * R, out.y, Math.sin(th) * R); };   // clay: membrane points land on the cut rim
+  const siteWorld = (list0, count, out) => { const m = memSites[list0 + Math.floor(rr() * count)]; toWorld(m.p, out); return clay ? rimProject(out) : out; };
   const glutW = (out) => siteWorld(0, NGLUT, out);
   const pumpW = (out) => siteWorld(NGLUT, NPUMP, out);
   const pickMito = (out) => { let t = null; for (let k = 0; k < 8; k++) { const i = Math.floor(rr() * N_MITO); if (mito[i].state === 1) { t = i; break; } } return mitoWorld(t === null ? Math.floor(rr() * N_MITO) : t, out); };
   const rosN = () => (M.glycogen < 1.5 ? 0 : Math.max(1, Math.round(NGLY * (0.08 + 0.92 * M.glycogen / 100))));   // visible rosettes (none when empty)
   const cytoPoint = (out) => siteWorld(0, NGLUT, out).multiplyScalar(0.55);                                       // a spot in the cytosol (glucose that is neither in glycogen nor in a mitochondrion)
   const glyW = (out) => { const n = rosN(); return n ? toWorld(glyc[Math.floor(rr() * n)].p, out) : cytoPoint(out); };
-  const memAt = (dir, out, k = 1) => { surfacePoint(dir.x, dir.y, dir.z, out); return out.multiplyScalar(k * sCell); };
+  const memAt = (dir, out, k = 1) => { surfacePoint(dir.x, dir.y, dir.z, out); out.multiplyScalar(k * sCell); return clay ? rimProject(out, 1) .multiplyScalar(k) : out; };
   const randDir = (out) => out.set(rr() - 0.5, rr() - 0.5, rr() - 0.5).normalize();
 
   // particles are pooled (no per-spawn allocation); a leg can chain into a second leg (glucose via GLUT2, albumin along a microtubule)
@@ -893,6 +923,7 @@ export function create(engine) {
         const t = p.t, u = 1 - t;
         if (p.curve) p.curve.getPoint(p.t0 + (1 - p.t0) * t, tP).multiplyScalar(sCell);
         else tP.set(0, 0, 0).addScaledVector(p.a, u * u).addScaledVector(p.c, 2 * u * t).addScaledVector(p.b, t * t);
+        if (clay) tP.y = (CUT + 0.7) * sCell + tP.y * 0.08;       // clay diorama: beads run just above the floor
         if (k === "mrna") tmpQ.setFromUnitVectors(UP, tD.copy(p.b).sub(p.a).normalize());
         else tmpQ.setFromEuler(tEu.set(p.spin + t * 3, p.spin * 0.7 + t * 2, 0));
         const s = Math.min(1, t * 6, (1 - t) * 6);
@@ -941,6 +972,7 @@ export function create(engine) {
     marker.scale.setScalar(Math.max(1e-3, cy)); cytoMarker.scale.setScalar(Math.max(1e-3, cy));
     marker.visible = cytoMarker.visible = cy > 0.01 && dissolve < 0.2;
     key.intensity = 1.3 * morph.cyto; rimL.intensity = 1.0 * morph.cyto;
+    clayKit.visible = clay && dissolve < 0.15;      // (the clay bowl does not stylise lysis: it simply goes when the cell bursts)
   }
   const tAx = new THREE.Vector3(), tSc = new THREE.Vector3();
   let t0Anim = 0;
@@ -960,7 +992,7 @@ export function create(engine) {
     let anyMitoChange = false;
     for (let i = 0; i < N_MITO; i++) {
       const o = mito[i];
-      const jit = still ? 0 : 1;
+      const jit = still ? 0 : clay ? 0.25 : 1;
       o.pos.copy(o.base);
       o.pos.x += jit * (Math.sin(t * 0.9 + o.ph) * 0.1 + Math.sin(t * 0.31 + o.ph * 2.0) * 0.22);
       o.pos.y += jit * (Math.sin(t * 0.77 + o.ph * 1.3) * 0.1 + Math.cos(t * 0.27 + o.ph) * 0.2);
@@ -974,10 +1006,10 @@ export function create(engine) {
       else o.sc += (1 - o.sc) * Math.min(1, dt * 1.2);
       const dmg = o.state === 2 ? 1 : 0;
       const sw = o.state === 3 ? 1.2 : 1 + 0.2 * dmg;
-      const sx = o.L * (dmg ? 0.82 : 1) * sw, sy = o.Rr * (dmg ? 1.28 : 1) * sw;
+      const sx = o.L * (dmg ? 0.82 : 1) * sw * clayK.mito, sy = o.Rr * (dmg ? 1.28 : 1) * sw * clayK.mito;
       const k = Math.max(1e-3, o.sc * org * fade);
       tQ2.copy(o.q);
-      if (!still) { tmpQ.setFromAxisAngle(tAx.set(0.3, 1, 0.2).normalize(), Math.sin(t * 0.21 + o.ph) * 0.35); tQ2.multiply(tmpQ); }
+      if (!still) { tmpQ.setFromAxisAngle(clay ? UP : tAx.set(0.3, 1, 0.2).normalize(), Math.sin(t * 0.21 + o.ph) * (clay ? 0.2 : 0.35)); tQ2.multiply(tmpQ); }
       tAx.copy(o.pos);
       if (dissolve > 0) tAx.multiplyScalar(1 + dissolve * (0.5 + 0.8 * hash(i)));
       o.qn.copy(tQ2); o.sx = sx; o.sy = sy;
@@ -1012,7 +1044,7 @@ export function create(engine) {
       if (!still) { l.pos.x += Math.sin(t * 0.8 + l.ph) * 0.12; l.pos.y += Math.cos(t * 0.7 + l.ph * 1.5) * 0.12; l.pos.z += Math.sin(t * 0.6 + l.ph * 2.2) * 0.12; }
       if (l.a > 0 && l.busy >= 0) { tAx.copy(mito[l.busy].pos).sub(l.base); const reach = Math.max(0, tAx.length() - (l.r + 0.55)); l.pos.addScaledVector(tAx.normalize(), reach * l.a); }
       tAx.copy(l.pos); if (dissolve > 0) tAx.multiplyScalar(1 + dissolve * (0.5 + 0.8 * hash(i + 50)));
-      const k = Math.max(1e-3, l.r * org * fade * (M.on.lysosome ? 1 : 0.8));
+      const k = Math.max(1e-3, l.r * org * fade * (M.on.lysosome ? 1 : 0.8) * clayK.small);
       lyMesh.setMatrixAt(i, tmpM.compose(tAx, l.q, tSc.set(k, k, k)));
       lyCore.setMatrixAt(i, tmpM.compose(tAx, l.q, tSc.set(k, k, k)));
       for (const g of granLocal) { tB.copy(g).multiplyScalar(k).applyQuaternion(l.q).add(tAx); lyGran.setMatrixAt(gi++, tmpM.compose(tB, l.q, tSc.set(k * 0.8, k * 0.8, k * 0.8))); }
@@ -1025,14 +1057,14 @@ export function create(engine) {
       const p = perox[i];
       tAx.copy(p.base); if (!still) { tAx.x += Math.sin(t * 0.7 + p.ph) * 0.1; tAx.y += Math.cos(t * 0.6 + p.ph) * 0.1; }
       if (dissolve > 0) tAx.multiplyScalar(1 + dissolve * (0.5 + 0.8 * hash(i + 80)));
-      const k = Math.max(1e-3, p.r * org * fade);
+      const k = Math.max(1e-3, p.r * org * fade * clayK.small);
       pxMesh.setMatrixAt(i, tmpM.compose(tAx, p.q, tSc.set(k, k, k)));
       pxCore.setMatrixAt(i, tmpM.compose(tAx, p.q, tSc.set(k * 0.4, k * 0.4, k * 0.4)));
     }
     pxMesh.instanceMatrix.needsUpdate = pxCore.instanceMatrix.needsUpdate = true;
 
     // glycogen rosettes: how many, and how big, follows the glycogen store
-    const gl = M.glycogen / 100, nRos = rosN(), gs = (0.55 + 0.75 * gl) * org * fade;
+    const gl = M.glycogen / 100, nRos = rosN(), gs = (0.55 + 0.75 * gl) * org * fade * clayK.small;
     let gk = 0;
     for (let i = 0; i < nRos; i++) {
       const g = glyc[i];
@@ -1104,7 +1136,7 @@ export function create(engine) {
     }
     rbcMesh.instanceMatrix.needsUpdate = true;
     plasma.position.y = still ? 0 : (t * 2.6) % 40;
-    if (!still) { marker.children[0].rotation.z = t * 0.4; cytoMarker.rotation.y = t * 0.6; }
+    if (!still) { marker.children[0].rotation.z = t * 0.4; if (!clay) cytoMarker.rotation.y = t * 0.6; }
     markerRing.material.emissiveIntensity = 0.9 + Math.sin(t * 2.5) * 0.4;
     pores.material.emissiveIntensity = M.on.pores ? 0.3 : 0.0;
     pores.material.color.set(M.on.pores ? "#b8a6f5" : "#7f1d1d");
@@ -1482,6 +1514,140 @@ export function create(engine) {
     applyMorph();
   }
 
+  // ---------- clay style: a classroom model of the cell cut in half ----------
+  // The glass membrane, cytoskeleton, membrane furniture, smooth-ER web and the blood context are hidden (userData.clayHide).
+  // The lower half of the cell is rebuilt as a clay bowl whose cut edge shows the membrane as a thin two-tone rim around a
+  // blue cytoplasm floor, and the organelles are re-laid out on that floor (positions only; the originals are saved and restored exactly).
+  const clayKit = new THREE.Group();
+  clayKit.visible = false;
+  cellGroup.add(clayKit);
+  let kitBuilt = false, saved = null, kitAo = null;
+  const cutR = (th, inset) => {                                  // radius of the cell outline at the cut, minus an inset
+    let lo = 0, hi = 26;
+    for (let i = 0; i < 24; i++) { const m = (lo + hi) / 2; if (insideCell(tmpV.set(Math.cos(th) * m, CUT, Math.sin(th) * m), inset)) lo = m; else hi = m; }
+    return lo;
+  };
+  const outline = (inset, n = 128) => { const a = []; for (let i = 0; i < n; i++) { const th = (i / n) * Math.PI * 2, r = cutR(th, inset); a.push([Math.cos(th) * r, Math.sin(th) * r]); } return a; };
+  function buildKit() {
+    if (kitBuilt) return;
+    kitBuilt = true;
+    const ST = engine.style, mat = (c) => clayMaterial(ST, c);
+    for (let i = 0; i < 128; i++) RIM[i] = cutR((i / 128) * Math.PI * 2, 0.9);
+    const add = (geo, m, y = 0) => {
+      const mesh = new THREE.Mesh(geo, m);
+      mesh.position.y = y; mesh.castShadow = mesh.receiveShadow = true;
+      mesh.userData.keepMaterial = true; mesh.userData.styled = "clay";
+      clayKit.add(mesh);
+      return mesh;
+    };
+    const bowl = add(clipGeometryBelow(membrane.geometry, CUT), mat("#7499e2"));
+    const o0 = outline(0, 128), o1 = outline(0.65, 128), o2 = outline(1.1, 128);
+    add(slabGeometry(o0, o1, 2.6), mat("#bba8ea"), CUT - 2.05);       // plasma membrane: outer lipid heads (lilac)
+    add(slabGeometry(o1, o2, 2.5), mat("#f6c5a2"), CUT - 2.05);       // lipid tails (peach); a thin rim, not individual molecules
+    add(slabGeometry(o2, null, 2.0), mat("#8db0ea"), CUT - 2.0);      // cytoplasm floor
+    bowl.geometry.computeBoundingBox();
+    // soft contact-shadow blobs under the organelles (a cheap stand-in for ambient occlusion)
+    const aoMat = new THREE.MeshBasicMaterial({ map: ST.blobTexture, transparent: true, depthWrite: false, opacity: 0.55, fog: false });
+    const ao = new THREE.InstancedMesh(new THREE.PlaneGeometry(1, 1).rotateX(-Math.PI / 2), aoMat, 160);
+    ao.frustumCulled = false; ao.renderOrder = -5; ao.count = 0;
+    ao.userData.keepMaterial = true; ao.userData.styled = "clay";
+    clayKit.add(ao);
+    kitAo = ao;
+  }
+  function layoutClay() {
+    saved ||= {
+      nuc: NUC.clone(), plantNuc: PLANT_NUC.clone(), centro: CENTRO.clone(), mem: MEM_SPOT.clone(), cyt: CYTO_SPOT.clone(),
+      mp: marker.position.clone(), mq: marker.quaternion.clone(),
+      mito: mito.map((o) => ({ o, base: o.base.clone(), q: o.q.clone() })),
+      lyso: lyso.map((o) => ({ o, base: o.base.clone() })),
+      perox: perox.map((o) => ({ o, base: o.base.clone() })),
+      glyc: glyc.map((o) => ({ o, p: o.p.clone() })),
+      gol: golgiGroup.children.map((g, i) => ({ g, p: g.position.clone(), q: g.quaternion.clone(), pos: golgiStacks[i].pos.clone(), trans: golgiStacks[i].trans.clone() })),
+    };
+    NUC.set(-1.5, CUT - 1.3, -0.5);
+    PLANT_NUC.set(-17, CUT - 1.2, 0);
+    nucleus.position.copy(NUC);
+    CENTRO.copy(NUC).addScaledVector(nucDirCentro, NUC_R + 1.05);
+    // marker rings lie flat on the rim / floor
+    const th = Math.atan2(11, 5), rr0 = cutR(th, 1.0);
+    MEM_SPOT.set(Math.cos(th) * (rr0 - 0.2), CUT + 0.9, Math.sin(th) * (rr0 - 0.2));
+    marker.position.copy(MEM_SPOT);
+    marker.quaternion.setFromEuler(new THREE.Euler(-Math.PI / 2, 0, 0));
+    CYTO_SPOT.set(-8.5, CUT + 1.4, 6.5);
+    cytoMarker.position.copy(CYTO_SPOT); cytoMarker.rotation.set(-Math.PI / 2, 0, 0);
+    // floor placement: random sequential packing that avoids the rim, the nucleus + its ER, and the Golgi
+    const placed = [];
+    const inside = (x, z, r) => insideCell(tmpV.set(x, CUT, z), r + 1.5);
+    const free = (x, z, r, gap) => inside(x, z, r) && Math.hypot(x - NUC.x, z - NUC.z) > 7.4 + r * 0.6 && placed.every((q) => Math.hypot(q.x - x, q.z - z) > q.r + r + gap);
+    const spot = (r, seed) => {
+      for (let k = 0; k < 700; k++) {
+        const gap = k < 250 ? 0.35 : k < 500 ? 0 : -0.5;
+        const x = (hash(seed * 31 + k * 1.7) * 2 - 1) * 14, z = (hash(seed * 17 + k * 2.3 + 9) * 2 - 1) * 14;
+        if (free(x, z, r, gap)) { placed.push({ x, z, r }); return { x, z }; }
+      }
+      const x = (hash(seed * 5) * 2 - 1) * 9, z = (hash(seed * 7 + 1) * 2 - 1) * 9;
+      placed.push({ x, z, r }); return { x, z };
+    };
+    // Golgi stacks stand on the floor beside the centrosome (positions are relative to the nucleus)
+    const golA = [0.55, 1.1, 1.65];
+    golgiGroup.children.forEach((g, i) => {
+      const a = golA[i], R = 9.6, rel = tmpV.set(Math.cos(a + 0.4) * R, CUT - NUC.y + 1.15, Math.sin(a + 0.4) * R);
+      g.position.copy(rel);
+      g.quaternion.setFromUnitVectors(ZAX, tA.set(-rel.x, 0, -rel.z).normalize());
+      g.updateMatrix();
+      const gs = golgiStacks[i];
+      gs.pos.copy(g.position).add(NUC);
+      gs.trans.set(0, 0, -6 * 0.24 - 0.4).applyMatrix4(g.matrix).add(NUC);
+      placed.push({ x: gs.pos.x, z: gs.pos.z, r: 2.3 });
+    });
+    mito.forEach((o, i) => {
+      const r = 0.62 * 1.07 * o.L * 1.15 + 0.45;
+      const p = spot(r, 40 + i);
+      o.base.set(p.x, CUT + 0.4, p.z);
+      o.q.setFromAxisAngle(UP, hash(i * 7.7 + 3) * Math.PI * 2);
+      o.pos.copy(o.base);
+    });
+    lyso.forEach((o, i) => { const p = spot(o.r * 1.5 + 0.2, 300 + i); o.base.set(p.x, CUT + o.r * 1.5 * 0.8, p.z); o.pos.copy(o.base); });
+    perox.forEach((o, i) => { const p = spot(o.r * 1.5 + 0.2, 500 + i); o.base.set(p.x, CUT + o.r * 1.5 * 0.7, p.z); o.pos.copy(o.base); });
+    glyc.forEach((o, i) => { const p = spot(0.75, 700 + i); o.p.set(p.x, CUT + 0.3, p.z); });
+    if (kitAo) {
+      const m = new THREE.Matrix4(), q0 = new THREE.Quaternion(), sc = new THREE.Vector3(), v3 = new THREE.Vector3();
+      let n = 0;
+      const blob = (x, z, d) => kitAo.setMatrixAt(n++, m.compose(v3.set(x, CUT + 0.05, z), q0, sc.set(d, 1, d)));
+      for (const q of placed) if (n < 158) blob(q.x, q.z, q.r * 3.0);
+      blob(NUC.x, NUC.z, 22);
+      kitAo.count = n; kitAo.instanceMatrix.needsUpdate = true;
+    }
+    Object.assign(clayK, { mito: 1.15, small: 1.5 });
+    clearFlows();
+  }
+  function restoreLayout() {
+    if (!saved) return;
+    NUC.copy(saved.nuc); PLANT_NUC.copy(saved.plantNuc); CENTRO.copy(saved.centro);
+    nucleus.position.copy(NUC);
+    MEM_SPOT.copy(saved.mem); marker.position.copy(saved.mp); marker.quaternion.copy(saved.mq);
+    CYTO_SPOT.copy(saved.cyt); cytoMarker.position.copy(CYTO_SPOT); cytoMarker.rotation.set(0, 0, 0);
+    for (const it of saved.mito) { it.o.base.copy(it.base); it.o.q.copy(it.q); it.o.pos.copy(it.base); }
+    for (const it of saved.lyso) { it.o.base.copy(it.base); it.o.pos.copy(it.base); }
+    for (const it of saved.perox) { it.o.base.copy(it.base); it.o.pos.copy(it.base); }
+    for (const it of saved.glyc) it.o.p.copy(it.p);
+    saved.gol.forEach((it, i) => { it.g.position.copy(it.p); it.g.quaternion.copy(it.q); golgiStacks[i].pos.copy(it.pos); golgiStacks[i].trans.copy(it.trans); });
+    Object.assign(clayK, { mito: 1, small: 1 });
+    clearFlows();
+  }
+  function setClay(on, user) {
+    if (on === clay) return;
+    clay = on;
+    if (on) { buildKit(); layoutClay(); } else restoreLayout();
+    clayKit.visible = on;
+    memHandle.visible = !on;
+    if (user && !engine.busy && engine.stack.length === 1 && !tour) {
+      const v = level.view, d = v.dir.clone().normalize();
+      engine.fly(v.target, v.target.clone().addScaledVector(d, v.distance), 0.9);
+      engine.userMoved = false;
+    }
+  }
+
   // ---------- level object ----------
   let uiT = 0, exT = 0, chT = 0, pulse = 0;
   const level = {
@@ -1492,7 +1658,13 @@ export function create(engine) {
     root, pickables, portals,
     fallbackPickables: [memHandle],
     metersPerUnit: 1e-6,
-    get view() { const a = engine.camera.aspect; return { target: new THREE.Vector3(a < 0.9 ? 1 : 3.5, 0, 0), distance: Math.min(150, Math.max(52, 23 / (0.344 * a))), dir: new THREE.Vector3(0.12, 0.3, 1) }; },
+    get view() {
+      const a = engine.camera.aspect, d = Math.min(150, Math.max(52, 23 / (0.344 * a)));
+      return clay ? { target: new THREE.Vector3(0, CUT * 0.7, 0), distance: d * (a < 1 ? 0.95 : 0.86), dir: new THREE.Vector3(0.06, 0.74, 0.66) } : { target: new THREE.Vector3(a < 0.9 ? 1 : 3.5, 0, 0), distance: d, dir: new THREE.Vector3(0.12, 0.3, 1) };
+    },
+    clay: { groundY: -13.2, groundR: 26, shadow: 28, freq: 0.7 },
+    clayEnv: { aperture: 0.0016 },
+    onStyle(name, user) { setClay(name === "clay", user); },
     minDistance: 5, maxDistance: 150, near: 0.2, far: 1200,
     env: { bg: ["#1c0a22", "#3b1530", "#5c2140"], fog: ["#2a0e26", 0.0042], exposure: 1.1, bloom: [0.55, 0.62, 0.84], aperture: 0.0005 },
     info(obj) {

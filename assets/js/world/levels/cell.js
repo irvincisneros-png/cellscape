@@ -7,11 +7,13 @@ import * as K from "../../kit.js";
 import { physical, glass, specks, hash, wobble, softDot } from "../materials.js";
 import { PlantCellModel } from "./plantCellModel.js";
 import { ORGANELLES, SWITCHES, FLOWS, MISSIONS, QUIZ, narrative } from "./cellContent.js";
+import { clipGeometryBelow, roundedRectPts, slabGeometry, clayMaterial } from "../style.js";
 
 const HX = 28, HY = 17, HZ = 17;               // membrane half-extents (µm)
 const NUC = new THREE.Vector3(-20.5, 1.5, 0), NUC_R = 5;
 const VAC = new THREE.Vector3(5, 0, 0);
 const UP = new THREE.Vector3(0, 1, 0);
+const CUT = -3;                                // clay style: the cut-away plane (and the cytoplasm floor) in µm
 
 /** Random point just inside the membrane, `inset` µm in from a face, plus that face's normal. */
 function cortexPoint(seed, inset, avoid = []) {
@@ -51,23 +53,30 @@ export function create(engine) {
   const tmpM = new THREE.Matrix4(), tmpV = new THREE.Vector3(), tmpQ = new THREE.Quaternion(), tmpS = new THREE.Vector3();
 
   const tag = (mesh, kind, i = 0) => { mesh.userData.kind = kind; mesh.userData.i = i; pickables.push(mesh); return mesh; };
+  // clay style state (see setClay below): the cell is cut in half, organelles sit on the cytoplasm floor
+  let clay = false;
+  const clayK = { granaDy: 0, starchDy: 0, cristaeDy: 0, mito: 1, chl: 1, granaS: 1 };
 
   // ---------- wall, membrane, neighbours ----------
   const wallMat = glass("#2f7d4f", { rim: "#86efac", minAlpha: 0.035, maxAlpha: 0.5, rimStrength: 0.5 });
   const wall = new THREE.Mesh(new RoundedBoxGeometry(2 * HX + 2.6, 2 * HY + 2.6, 2 * HZ + 2.6, 5, 7.2), wallMat);
   root.add(wall);
+  wall.userData.clayHide = true;
   const memMat = glass("#a78bfa", { rim: "#ddd6fe", minAlpha: 0.02, maxAlpha: 0.3, rimStrength: 0.45 });
   const membrane = new THREE.Mesh(new RoundedBoxGeometry(2 * HX, 2 * HY, 2 * HZ, 5, 6), memMat);
   root.add(membrane);
+  membrane.userData.clayHide = true;
   const nbMat = glass("#2f7d4f", { rim: "#4ade80", minAlpha: 0.0, maxAlpha: 0.12, rimStrength: 0.18 });
   const nbGeo = new RoundedBoxGeometry(2 * HX + 2.6, 2 * HY + 2.6, 2 * HZ + 2.6, 3, 7.2);
   for (const [x, y, z] of [[-59.5, 0, 0], [59.5, 0, 0], [0, 37.5, 0], [0, -37.5, 0], [-30, 0, -40], [30, 0, -40], [0, 0, 40]]) {
     const nb = new THREE.Mesh(nbGeo, nbMat);
     nb.position.set(x, y, z);
+    nb.userData.clayHide = true;
     root.add(nb);
     for (let i = 0; i < 6; i++) { // a few chloroplast hints in neighbours
       const c = new THREE.Mesh(new THREE.SphereGeometry(1, 12, 8), physical("#2f9e5a", { transparent: true, opacity: 0.5 }));
       c.scale.set(2.4, 0.9, 1.4);
+      c.userData.clayHide = true;
       c.position.set(x + (hash(i + x) - 0.5) * 40, y + (hash(i * 3 + y) - 0.5) * 24, z + (hash(i * 7 + z) - 0.5) * 24);
       root.add(c);
     }
@@ -81,6 +90,7 @@ export function create(engine) {
     pd.setMatrixAt(i, tmpM.makeTranslation(tmpV.x, tmpV.y, tmpV.z));
   }
   root.add(pd);
+  pd.userData.clayHide = true;
   // pick handle for the wall: an invisible slab on the front face (so clicks inside aren't blocked)
   const wallHandle = new THREE.Mesh(new THREE.BoxGeometry(2 * HX, 2 * HY, 0.6), new THREE.MeshBasicMaterial({ visible: false }));
   wallHandle.position.z = HZ + 1.4;
@@ -90,6 +100,7 @@ export function create(engine) {
   const vacGeo = wobble(new RoundedBoxGeometry(38, 24, 24, 6, 9), 0.5, 0.18, 2);
   const vacuole = tag(new THREE.Mesh(vacGeo, glass("#38bdf8", { rim: "#bae6fd", minAlpha: 0.05, maxAlpha: 0.55, rimStrength: 0.6 })), "vacuole");
   vacuole.position.copy(VAC);
+  vacuole.userData.clayColor = "#b6d6f4";
   root.add(vacuole);
 
   // ---------- nucleus ----------
@@ -98,12 +109,16 @@ export function create(engine) {
   const nucShell = tag(new THREE.Mesh(new THREE.SphereGeometry(NUC_R, 48, 32), glass("#8b5cf6", { rim: "#c4b5fd", minAlpha: 0.14, maxAlpha: 0.85, rimStrength: 0.7 })), "nucleus");
   const nucleolus = new THREE.Mesh(new THREE.SphereGeometry(1.6, 32, 20), physical("#5b21b6", { emissive: new THREE.Color("#7c3aed"), emissiveIntensity: 0.25 }));
   nucleolus.position.set(0.9, 0.7, 0.4);
+  nucleolus.userData.clayHide = true;
+  nucShell.userData.clayColor = "#d6a4c6";
   nucleus.add(nucShell, nucleolus);
   const chromMat = physical("#e879f9", { emissive: new THREE.Color("#a21caf"), emissiveIntensity: 0.25, roughness: 0.5 });
   for (let i = 0; i < 9; i++) {
     const pts = [];
     for (let k = 0; k < 7; k++) pts.push(new THREE.Vector3((hash(i * 9 + k) - 0.5) * 6.5, (hash(i * 9 + k + 3) - 0.5) * 6.5, (hash(i * 9 + k + 6) - 0.5) * 6.5).clampLength(0, 3.9));
-    nucleus.add(new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts), 60, 0.11, 6), chromMat));
+    const chr = new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts), 60, 0.11, 6), chromMat);
+    chr.userData.clayHide = true;
+    nucleus.add(chr);
   }
   const poreGeo = new THREE.TorusGeometry(0.28, 0.09, 8, 16);
   const pores = new THREE.InstancedMesh(poreGeo, physical("#ede9fe", { emissive: new THREE.Color("#a78bfa"), emissiveIntensity: 0.4 }), 110);
@@ -124,6 +139,7 @@ export function create(engine) {
   const chloroGeo = new THREE.SphereGeometry(1, 40, 24);
   const NCH = 18, GRANA = 5, DISCS = 5;
   const grana = new THREE.InstancedMesh(new THREE.CylinderGeometry(0.34, 0.34, 0.1, 18), physical("#15803d", { emissive: new THREE.Color("#22c55e"), emissiveIntensity: 0.15 }), NCH * GRANA * DISCS);
+  grana.userData.clayColor = "#79c585";
   const starchMesh = new THREE.InstancedMesh(new THREE.SphereGeometry(1, 16, 12), physical("#f8fafc", { roughness: 0.6 }), NCH);
   const granaLocal = [];
   for (let g = 0; g < GRANA; g++) {
@@ -148,6 +164,7 @@ export function create(engine) {
   mitoGeo.rotateZ(Math.PI / 2);
   const NMI = 22;
   const cristae = new THREE.InstancedMesh(new THREE.BoxGeometry(0.08, 0.55, 0.62), physical("#c2410c"), NMI * 5);
+  cristae.userData.clayColor = "#f1a57c";
   for (let i = 0; i < NMI; i++) {
     const { p, n } = cortexPoint(i + 101, 3.7, placed);
     placed.push(p);
@@ -174,6 +191,7 @@ export function create(engine) {
     }
     const curve = new THREE.CatmullRomCurve3(pts);
     const mesh = tag(new THREE.Mesh(new THREE.TubeGeometry(curve, 48, 0.32, 8), erMat), "er", i);
+    mesh.userData.clayColor = "#a3b3f1";
     root.add(mesh);
     org.er.push({ mesh, curve, pos: curve.getPoint(0.55) });
     for (let k = 0; k < 26; k++) {
@@ -195,6 +213,7 @@ export function create(engine) {
     g.lookAt(NUC);
     for (let k = 0; k < 5; k++) {
       const c = tag(new THREE.Mesh(cisGeo, golgiMat), "golgi", i);
+      c.userData.clayColor = "#f2e3bf";
       const r = 2.1 - k * 0.15;
       c.scale.set(r, 0.9, r * 0.75);
       c.rotation.x = Math.PI / 2;
@@ -223,6 +242,7 @@ export function create(engine) {
   const MEM_SPOT = new THREE.Vector3(6, -7, HZ);
   const marker = tag(new THREE.Mesh(new THREE.TorusGeometry(1.8, 0.16, 12, 48), physical("#5eead4", { emissive: new THREE.Color("#2dd4bf"), emissiveIntensity: 1.2 })), "membrane");
   marker.position.copy(MEM_SPOT);
+  marker.userData.keepMaterial = true;
   root.add(marker);
   const markerDisc = tag(new THREE.Mesh(new THREE.CircleGeometry(1.7, 32), new THREE.MeshBasicMaterial({ color: "#5eead4", transparent: true, opacity: 0.08, depthWrite: false })), "membrane");
   markerDisc.position.copy(MEM_SPOT);
@@ -233,6 +253,7 @@ export function create(engine) {
   const CYTO_SPOT = new THREE.Vector3(-9, 9.5, 11.5);
   const cytoMarker = tag(new THREE.Mesh(new THREE.TorusGeometry(1.3, 0.13, 12, 40), physical("#fbbf24", { emissive: new THREE.Color("#f59e0b"), emissiveIntensity: 1.0 })), "cytosol");
   cytoMarker.position.copy(CYTO_SPOT);
+  cytoMarker.userData.keepMaterial = true;
   root.add(cytoMarker);
   const cytoLbl = engine.label("🔍 Zoom into the cytosol (enzymes)", "dive");
 
@@ -325,6 +346,11 @@ export function create(engine) {
     // keep paths out of the vacuole: push the control point toward the cortex
     const ctrl = mid.add(off);
     if (Math.abs(ctrl.x - VAC.x) < 18 && Math.abs(ctrl.y) < 11 && Math.abs(ctrl.z) < 11) ctrl.copy(memPoint(ctrl).multiplyScalar(0.9));
+    if (clay && kind !== "light") {   // clay diorama: beads travel just above the cytoplasm floor
+      const lo = CUT + 0.5, hi = CUT + 5;
+      from = from.clone(); to = to.clone();
+      from.y = THREE.MathUtils.clamp(from.y, lo, hi); to.y = THREE.MathUtils.clamp(to.y, lo, hi); ctrl.y = THREE.MathUtils.clamp(ctrl.y, lo, hi);
+    }
     fm.parts.push({ a: from.clone(), b: to.clone(), c: ctrl, t: 0, dur: Math.max(1.2, from.distanceTo(to) / speed), spin: Math.random() * 6 });
   }
 
@@ -395,37 +421,38 @@ export function create(engine) {
   // ---------- per-frame organelle motion ----------
   const tA = new THREE.Vector3(), tQ2 = new THREE.Quaternion(), tAx = new THREE.Vector3();
   function animate(t) {
-    const still = engine.reducedMotion, keep = 1 - gone;
+    const still = engine.reducedMotion, keep = 1 - gone, dk = clay ? 0.15 : 1, cs = clayK.chl;
     let gi = 0;
     org.chloroplast.forEach((o, i) => {
-      const drift = still ? 0 : Math.sin(t * 0.08 + o.phase) * 0.9;
+      const drift = still ? 0 : Math.sin(t * 0.08 + o.phase) * 0.9 * dk;
       o.pos.copy(o.base).addScaledVector(tAx.set(o.n.y, o.n.z, o.n.x), drift);
       o.mesh.position.copy(o.pos);
       const dim = (M.on.chloroplast ? 1 : 0.35) * keep;
-      o.mesh.scale.set(2.5 * keep, 0.85 * keep, 1.45 * keep);
+      o.mesh.scale.set(2.5 * keep * cs, 0.85 * keep * cs, 1.45 * keep * cs);
       o.mesh.visible = keep > 0.001;
       o.mesh.updateMatrix();
       for (const L of granaLocal) {
         tmpV.copy(L).applyQuaternion(o.q).add(o.pos);
-        grana.setMatrixAt(gi++, tmpM.compose(tmpV, o.q, tmpS.set(dim, keep, dim)));
+        grana.setMatrixAt(gi++, tmpM.compose(tmpV, o.q, tmpS.set(dim * clayK.granaS, keep, dim * clayK.granaS)));
       }
       const st = (0.15 + (M.starch / 100) * 0.4) * keep;
-      tmpV.set(1.0, 0.0, 0.2).applyQuaternion(o.q).add(o.pos);
+      tmpV.set(1.0, clayK.starchDy, 0.2).applyQuaternion(o.q).add(o.pos);
       starchMesh.setMatrixAt(i, tmpM.compose(tmpV, o.q, tmpS.set(st * 1.4, st * 0.7, st)));
     });
     grana.instanceMatrix.needsUpdate = true;
     starchMesh.instanceMatrix.needsUpdate = true;
     let ci = 0;
     org.mitochondrion.forEach((o) => {
-      const drift = still ? 0 : Math.sin(t * 0.11 + o.phase) * 1.2;
+      const drift = still ? 0 : Math.sin(t * 0.11 + o.phase) * 1.2 * dk;
       o.pos.copy(o.base).addScaledVector(tAx.set(o.n.z, o.n.x, o.n.y), drift);
       o.mesh.position.copy(o.pos);
       const q = tQ2.copy(o.q).multiply(tmpQ.setFromAxisAngle(UP, still ? 0 : Math.sin(t * 0.2 + o.phase) * 0.3));
       o.mesh.quaternion.copy(q);
-      o.mesh.scale.setScalar(sharedK);
+      const mk = sharedK * clayK.mito;
+      o.mesh.scale.setScalar(mk);
       for (let k = 0; k < 5; k++) {
-        tA.set((-0.75 + k * 0.38) * sharedK, 0, 0).applyQuaternion(q).add(o.pos);
-        cristae.setMatrixAt(ci++, tmpM.compose(tA, q, tmpS.set(sharedK, sharedK, sharedK)));
+        tA.set((-0.75 + k * 0.38) * mk, clayK.cristaeDy * mk, 0).applyQuaternion(q).add(o.pos);
+        cristae.setMatrixAt(ci++, tmpM.compose(tA, q, tmpS.set(mk, mk, mk)));
       }
     });
     cristae.instanceMatrix.needsUpdate = true;
@@ -434,12 +461,14 @@ export function create(engine) {
     chloroMat.emissive.set("#22c55e").multiplyScalar(M.on.chloroplast ? Math.min(1, M.flux.photo / 4) * 0.5 : 0);
     // vacuole size follows turgor; the membrane pulls away from the wall when the cell is flaccid
     const vs = 0.72 + 0.28 * (M.turgor / 100);
-    vacuole.scale.set(vs * keep, (0.6 + 0.4 * vs) * keep, (0.6 + 0.4 * vs) * keep);
+    const vy = (0.6 + 0.4 * vs) * keep;
+    if (clay) { vacuole.scale.set(vs * keep * 0.5, vy, vs * keep * 0.56); vacuole.position.set(VAC.x, CUT + 2.8 - 12 * vy, VAC.z); }   // a low pillow on the floor: its height still follows turgor
+    else vacuole.scale.set(vs * keep, vy, vy);
     vacuole.visible = keep > 0.001;
     const ms = M.turgor < 35 ? 1 - ((35 - M.turgor) / 35) * 0.07 : 1;
     membrane.scale.setScalar(ms + (1 - ms) * gone);   // hand over at the reference box during the morph
     marker.rotation.z = still ? 0 : t * 0.4;
-    cytoMarker.rotation.y = still ? 0 : t * 0.6;
+    cytoMarker.rotation.y = still || clay ? 0 : t * 0.6;
     marker.material.emissiveIntensity = 0.9 + Math.sin(t * 2.5) * 0.4;
     sun.intensity = (0.2 + 2.6 * (M.light / 100)) * keep;
     pores.material.emissiveIntensity = M.on.pores ? 0.4 : 0.0;
@@ -455,8 +484,8 @@ export function create(engine) {
     mitochondrion: () => org.mitochondrion[5].pos.clone().add(new THREE.Vector3(0, 1.6, 0)),
     er: () => org.er[3].pos.clone().add(new THREE.Vector3(0, 1.2, 0)),
     golgi: () => org.golgi[0].pos.clone().add(new THREE.Vector3(0, 2.6, 0)),
-    vacuole: () => VAC.clone().add(new THREE.Vector3(4, 4, 12.5)),
-    wall: () => new THREE.Vector3(HX - 4, HY + 2.4, HZ + 1.3),
+    vacuole: () => (clay ? new THREE.Vector3(VAC.x + 2, CUT + 5.6, VAC.z + 4) : VAC.clone().add(new THREE.Vector3(4, 4, 12.5))),
+    wall: () => (clay ? new THREE.Vector3(HX - 6, CUT + 2.2, HZ + 1.2) : new THREE.Vector3(HX - 4, HY + 2.4, HZ + 1.3)),
   };
   const statusKey = { nucleus: "nucleus", chloroplast: "chloroplast", mitochondrion: "mitochondrion", er: "er", golgi: "golgi", vacuole: "vacuole" };
   let showLabels = lens.band === "y7-8" || lens.band === "y9-10";
@@ -721,6 +750,139 @@ export function create(engine) {
     cap.querySelector('[data-a="n"]').onclick = () => { if (tour.i < tour.steps.length - 1) { tour.i++; showStep(); } else { tour = null; showStep(); engine.fly(new THREE.Vector3(0, 0, 0), new THREE.Vector3(0, 30, 82), 1.2); } };
   }
 
+  // ---------- clay style: a classroom model of the cell cut in half ----------
+  // The wall/membrane shells and neighbours are hidden (userData.clayHide), the lower half of the cell is rebuilt as a
+  // clay bowl whose cut edge shows the wall (mint) and membrane (lilac) as bands, around a blue cytoplasm floor.
+  // Organelles are re-laid out on that floor (positions only; originals are saved and restored exactly).
+  const clayKit = new THREE.Group();
+  clayKit.visible = false;
+  root.add(clayKit);
+  let kitBuilt = false, saved = null, kitAo = null;
+  function buildKit() {
+    if (kitBuilt) return;
+    kitBuilt = true;
+    const ST = engine.style, mat = (c) => clayMaterial(ST, c);
+    const add = (geo, m, y = 0) => {
+      const mesh = new THREE.Mesh(geo, m);
+      mesh.position.y = y; mesh.castShadow = mesh.receiveShadow = true;
+      mesh.userData.keepMaterial = true; mesh.userData.styled = "clay";
+      clayKit.add(mesh);
+      return mesh;
+    };
+    const mint = mat("#a8dcc0"), lilac = mat("#bba8ea"), blue = mat("#7c9fe2");
+    add(clipGeometryBelow(new RoundedBoxGeometry(2 * HX + 2.6, 2 * HY + 2.6, 2 * HZ + 2.6, 5, 7.2), CUT), mint);          // outer wall, lower half
+    const wallO = roundedRectPts(HX + 1.3, HZ + 1.3, 7.2), wallI = roundedRectPts(HX, HZ, 6), memI = roundedRectPts(HX - 0.7, HZ - 0.7, 5.3);
+    add(slabGeometry(wallO, wallI, 3.0), mint, CUT - 2.3);                // cell wall band at the cut edge
+    add(slabGeometry(wallI, memI, 2.85), lilac, CUT - 2.3);               // plasma membrane band (a thin rim: it is only ~7 nm thick in life)
+    add(slabGeometry(memI, null, 2.0), blue, CUT - 2.0);                  // the cytoplasm "floor"
+    // soft contact-shadow blobs under the organelles (a cheap stand-in for ambient occlusion)
+    const aoMat = new THREE.MeshBasicMaterial({ map: ST.blobTexture, transparent: true, depthWrite: false, opacity: 0.55, fog: false });
+    aoMat.userData.shared = false;
+    const ao = new THREE.InstancedMesh(new THREE.PlaneGeometry(1, 1).rotateX(-Math.PI / 2), aoMat, 80);
+    ao.frustumCulled = false; ao.renderOrder = -5; ao.count = 0;
+    ao.userData.keepMaterial = true; ao.userData.styled = "clay";
+    clayKit.add(ao);
+    kitAo = ao;
+  }
+  const flat = (o) => o.set(0, 0, 0);
+  function layoutClay() {
+    const E = org.er, G = org.golgi;
+    saved ||= {
+      nuc: NUC.clone(), mem: MEM_SPOT.clone(), cyt: CYTO_SPOT.clone(), vac: vacuole.position.clone(),
+      grana: granaLocal.map((v) => v.clone()),
+      items: [...org.chloroplast, ...org.mitochondrion].map((o) => ({ o, base: o.base.clone(), n: o.n.clone(), q: o.q.clone(), pos: o.pos.clone() })),
+      per: org.peroxisome.map((o) => ({ o, p: o.pos.clone(), s: o.mesh.scale.clone() })),
+      gol: G.map((o) => ({ o, p: o.mesh.position.clone(), q: o.mesh.quaternion.clone(), pos: o.pos.clone() })),
+      er: E.map((o) => ({ o, geo: o.mesh.geometry, curve: o.curve, pos: o.pos.clone() })),
+    };
+    NUC.set(-17, CUT - 1.2, 0);
+    nucleus.position.copy(NUC);
+    MEM_SPOT.set(6, CUT + 1.0, HZ - 1.1);
+    marker.position.copy(MEM_SPOT); marker.rotation.x = -Math.PI / 2;
+    CYTO_SPOT.set(-8, CUT + 1.4, 10.5);
+    cytoMarker.position.copy(CYTO_SPOT); cytoMarker.rotation.set(-Math.PI / 2, 0, 0);
+    // floor placement: random sequential packing that avoids the rim, the nucleus + its ER, and the vacuole
+    const placed = [];
+    const rimOk = (x, z, r) => Math.abs(x) <= HX - 2.6 - r && Math.abs(z) <= HZ - 2.6 - r
+      && Math.hypot(Math.max(Math.abs(x) - (HX - 8.6), 0), Math.max(Math.abs(z) - (HZ - 8.6), 0)) <= 6 - r;
+    const free = (x, z, r, gap) => rimOk(x, z, r) && Math.hypot(x - NUC.x, z - NUC.z) > 9.2 + r * 0.5
+      && ((x - VAC.x) / (11.6 + r)) ** 2 + (z / (8.2 + r)) ** 2 > 1 && placed.every((q) => Math.hypot(q.x - x, q.z - z) > q.r + r + gap);
+    const spot = (r, seed) => {
+      for (let k = 0; k < 600; k++) {
+        const gap = k < 200 ? 0.5 : k < 400 ? 0 : -0.6;
+        const x = (hash(seed * 31 + k * 1.7) * 2 - 1) * (HX - 2.4), z = (hash(seed * 17 + k * 2.3 + 9) * 2 - 1) * (HZ - 2.4);
+        if (free(x, z, r, gap)) { placed.push({ x, z, r }); return { x, z }; }
+      }
+      const x = (hash(seed * 5) * 2 - 1) * (HX - 4), z = (hash(seed * 7 + 1) * 2 - 1) * (HZ - 4);
+      placed.push({ x, z, r }); return { x, z };
+    };
+    G.forEach((o, i) => {
+      const p = spot(2.7, 900 + i);
+      o.mesh.position.set(p.x, CUT + 1.1, p.z);
+      o.pos.copy(o.mesh.position);
+      o.mesh.lookAt(NUC.x, CUT + 1.1, NUC.z);
+    });
+    saved.items.forEach(({ o }, i) => {
+      const isC = org.chloroplast.includes(o), r = isC ? 2.3 : 1.55;
+      const p = spot(r, (isC ? 100 : 400) + i);
+      o.base.set(p.x, CUT + (isC ? 0.55 : 0.4), p.z);
+      o.n.set(0, 1, 0);
+      o.q.setFromAxisAngle(UP, hash(i * 7.7 + (isC ? 1 : 2)) * Math.PI * 2);
+      o.pos.copy(o.base);
+    });
+    org.peroxisome.forEach((o, i) => {
+      const p = spot(0.9, 700 + i);
+      o.mesh.position.set(p.x, CUT + 0.45, p.z); o.mesh.scale.setScalar(1.4);
+      o.pos.copy(o.mesh.position);
+    });
+    // ER becomes low worms along the floor, radiating from the nucleus
+    E.forEach((o, i) => {
+      const sv = saved.er[i];
+      const pts = sv.curve.points.map((q) => { const v = q.clone().sub(saved.nuc); return new THREE.Vector3(NUC.x + v.x * 0.62, CUT + 0.45 + 0.1 * v.y, NUC.z + v.z * 0.62); });
+      const curve = new THREE.CatmullRomCurve3(pts);
+      o.mesh.geometry = new THREE.TubeGeometry(curve, 40, 0.42, 8);
+      o.curve = curve; o.pos.copy(curve.getPoint(0.55));
+    });
+    if (kitAo) {
+      const m = new THREE.Matrix4(), q0 = new THREE.Quaternion(), sc = new THREE.Vector3();
+      let n = 0;
+      const blob = (x, z, sx, sz) => kitAo.setMatrixAt(n++, m.compose(new THREE.Vector3(x, CUT + 0.05, z), q0, sc.set(sx, 1, sz)));
+      for (const q of placed) blob(q.x, q.z, q.r * 2.9, q.r * 2.9);
+      blob(NUC.x, NUC.z, 21, 21);
+      blob(VAC.x, 0, 30, 21);
+      kitAo.count = Math.min(n, 80); kitAo.instanceMatrix.needsUpdate = true;
+    }
+    granaLocal.forEach((v, i) => v.y = saved.grana[i].y + 0.85);
+    Object.assign(clayK, { granaDy: 0.85, starchDy: 0.5, cristaeDy: 0.42, mito: 1.4, chl: 0.9, granaS: 1.35 });
+  }
+  function restoreLayout() {
+    if (!saved) return;
+    NUC.copy(saved.nuc); nucleus.position.copy(NUC);
+    MEM_SPOT.copy(saved.mem); marker.position.copy(MEM_SPOT); marker.rotation.x = 0;
+    CYTO_SPOT.copy(saved.cyt); cytoMarker.position.copy(CYTO_SPOT); cytoMarker.rotation.set(0, 0, 0);
+    vacuole.position.copy(saved.vac);
+    for (const it of saved.items) { it.o.base.copy(it.base); it.o.n.copy(it.n); it.o.q.copy(it.q); it.o.pos.copy(it.pos); }
+    for (const it of saved.per) { it.o.mesh.position.copy(it.p); it.o.mesh.scale.copy(it.s); it.o.pos.copy(it.p); }
+    for (const it of saved.gol) { it.o.mesh.position.copy(it.p); it.o.mesh.quaternion.copy(it.q); it.o.pos.copy(it.pos); }
+    for (const it of saved.er) { const g = it.o.mesh.geometry; it.o.mesh.geometry = it.geo; g.dispose(); it.o.curve = it.curve; it.o.pos.copy(it.pos); }
+    granaLocal.forEach((v, i) => v.copy(saved.grana[i]));
+    Object.assign(clayK, { granaDy: 0, starchDy: 0, cristaeDy: 0, mito: 1, chl: 1, granaS: 1 });
+    for (const fm of Object.values(flowMeshes)) { fm.parts.length = 0; fm.acc = 0; }
+  }
+  function setClay(on, user) {
+    if (on === clay) return;
+    clay = on;
+    if (on) { buildKit(); layoutClay(); } else restoreLayout();
+    for (const fm of Object.values(flowMeshes)) { fm.parts.length = 0; fm.acc = 0; }
+    clayKit.visible = on;
+    wallHandle.visible = !on;
+    if (user && !engine.busy && engine.stack.length === 1 && !tour) {
+      const v = level.view, d = v.dir.clone().normalize();
+      engine.fly(v.target, v.target.clone().addScaledVector(d, v.distance), 0.9);
+      engine.userMoved = false;
+    }
+  }
+
   // ---------- level object ----------
   let uiT = 0, exT = 0, chT = 0;
   const level = {
@@ -731,7 +893,13 @@ export function create(engine) {
     root, pickables, portals,
     fallbackPickables: [wallHandle],
     metersPerUnit: 1e-6,
-    get view() { const a = engine.camera.aspect; return { target: new THREE.Vector3(0, 0, 0), distance: Math.min(190, Math.max(100, 33 / (0.344 * a))), dir: new THREE.Vector3(0.12, 0.34, 1) }; },
+    get view() {
+      const a = engine.camera.aspect, d = Math.min(190, Math.max(100, 33 / (0.344 * a)));
+      return clay ? { target: new THREE.Vector3(0, CUT * 0.6, 0), distance: d * (a < 1 ? 1.2 : 0.92), dir: new THREE.Vector3(0.08, 0.7, 0.72) } : { target: new THREE.Vector3(0, 0, 0), distance: d, dir: new THREE.Vector3(0.12, 0.34, 1) };
+    },
+    clay: { groundY: -(HY + 1.3) - 0.05, groundR: 44, shadow: 46, freq: 0.5 },
+    clayEnv: { aperture: 0.0007 },
+    onStyle(name, user) { setClay(name === "clay", user); },
     minDistance: 6, maxDistance: 190, near: 0.2, far: 1200,
     env: { bg: ["#0a1d33", "#123d3a", "#2a1650"], fog: ["#0a2230", 0.0045], exposure: 1.05, bloom: [0.45, 0.6, 0.85], aperture: 0.00055 },
     info(obj) {
@@ -750,7 +918,7 @@ export function create(engine) {
     },
     unmountPanel() { for (const el of Object.values(labels)) el.style.display = "none"; diveLbl.style.display = "none"; cytoLbl.style.display = "none"; cap.style.display = "none"; engine.overlay.innerHTML = ""; },
     onResume() { makeLabels(); },
-    dispose() { for (const el of [...Object.values(labels), diveLbl, cytoLbl, cap]) el.remove(); },
+    dispose() { for (const el of [...Object.values(labels), diveLbl, cytoLbl, cap]) el.remove(); saved?.er.forEach((it) => it.geo.dispose()); },
     onLens() { showLabels = lens.band === "y7-8" || lens.band === "y9-10"; progress = null; buildPanel(panelEl); },
     update(dt, t, rdt = dt) {
       M.step(dt);
