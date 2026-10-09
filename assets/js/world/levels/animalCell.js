@@ -1334,6 +1334,9 @@ export function create(engine) {
     const divePortal = (to, label) => ({ to, label, radius: NUC_R, center: () => nucShell.getWorldPosition(new THREE.Vector3()), object: nucShell });
     K.button(dr, lens.pick({ "y7-8": "Watch it divide ▸", "y9-10": "Mitosis ▸" }), () => engine.dive(divePortal("mitosis", "Cell division")), { kind: "primary" });
     K.button(dr, "Meiosis ▸", () => engine.dive(divePortal("meiosis", "Meiosis")));
+    const spc = K.card(el, lens.pick({ "y7-8": "Cells with special jobs", "y9-10": "Specialised cells" }));
+    spc.insertAdjacentHTML("beforeend", `<p class="hint" style="margin:0 0 8px">${lens.pick({ "y7-8": "Red blood cells, nerve cells, root hair cells and more: see how each cell's shape fits its job, and how cells build tissues and organs.", "y9-10": "Explore how structure fits function in specialised plant and animal cells, and how cells form tissues, organs and systems.", y11: "Structure–function relationships in differentiated cells (SA:V, organelle content, shape), and the cell → tissue → organ → system hierarchy." })}</p>`);
+    K.button(K.buttonRow(spc), lens.pick({ "y7-8": "Meet the specialists ▸", "y9-10": "Specialised cells ▸" }), () => engine.dive(divePortal("specialised", "Specialised cells")));
 
     ms.sec0 = M.secreted;
     mission = K.missions(el, lens.filter(MISSIONS).map((m) => ({ text: m.text, check: () => m.check(M, ms) })), (m) => engine.toast(`🎯 Mission complete: ${m.text.replace(/<[^>]+>/g, "")}`, 3400));

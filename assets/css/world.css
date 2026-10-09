@@ -32,6 +32,8 @@
 }
 .cs-up { position: absolute; left: 14px; bottom: 46px; z-index: 3; background: rgba(5, 11, 22, 0.75); }
 .cs-pause { position: absolute; right: 14px; bottom: 40px; z-index: 3; background: rgba(5, 11, 22, 0.75); }
+.cs-scope { position: absolute; right: 14px; bottom: 84px; z-index: 3; background: rgba(5, 11, 22, 0.75); }
+.cs-scope[aria-pressed="true"] { border-color: var(--accent); color: var(--accent); }
 @media (prefers-reduced-motion: reduce) { .lbl3d.dive { animation: none; } .cs-fade { transition: none !important; } }
 
 /* header */

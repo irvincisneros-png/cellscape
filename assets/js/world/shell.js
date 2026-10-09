@@ -22,6 +22,7 @@ export const LEVELS = {
   meiosis: { title: "Meiosis & variation", load: () => import("../../../sims/meiosis/level.js") },
   karyotype: { title: "Human karyotype", load: () => import("./levels/karyotype.js") },
   inheritance: { title: "Inheritance lab", load: () => import("./levels/inheritance.js") },
+  specialised: { title: "Specialised cells", load: () => import("./levels/specialised.js") },
 };
 
 /**
@@ -35,6 +36,7 @@ export async function boot(opts) {
     <a class="back" href="${root}index.html" title="CellScape home">CellScape</a>
     <nav class="crumbs" aria-label="Zoom level"></nav>
     <select class="lens-select" aria-label="Year level"></select>
+    <span class="cs-theme-slot"></span>
     <a class="lib" href="${root}library.html">All simulations</a>`;
   const crumbs = K.$(".crumbs", header);
   const sel = K.$(".lens-select", header);
@@ -82,6 +84,15 @@ export async function boot(opts) {
     pauseBtn.setAttribute("aria-pressed", String(engine.paused));
   });
   stageEl.appendChild(pauseBtn);
+  // light / dark page theme (theme.js) and microscopy mode (microscope.js) hook in here
+  import("./theme.js").then((m) => m.mountThemeToggle(K.$(".cs-theme-slot", header))).catch((e) => console.error(e));
+  const scopeBtn = document.createElement("button");
+  scopeBtn.className = "btn cs-scope";
+  scopeBtn.type = "button";
+  scopeBtn.textContent = "🔬 Microscope";
+  scopeBtn.setAttribute("aria-pressed", "false");
+  scopeBtn.addEventListener("click", () => import("./microscope.js").then((m) => m.toggle(engine, scopeBtn)).catch((e) => console.error(e)));
+  stageEl.appendChild(scopeBtn);
   engine.onChange = (stack) => {
     crumbs.innerHTML = "";
     stack.forEach((s, i) => {
