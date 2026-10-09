@@ -507,6 +507,62 @@ export class Engine {
     }
   }
 
+  /** Run fn(k) every frame for k = 0 → 1 (eased) over `dur` seconds of real time. */
+  tween(dur, fn) {
+    if (this.reducedMotion || dur <= 0) { fn(1); return Promise.resolve(); }
+    return new Promise((res) => {
+      const t0 = performance.now();
+      const tick = () => {
+        const x = Math.min(1, (performance.now() - t0) / (dur * 1000));
+        safe(() => fn(x < 0.5 ? 2 * x * x : 1 - Math.pow(-2 * x + 2, 2) / 2));
+        x < 1 ? requestAnimationFrame(tick) : res();
+      };
+      requestAnimationFrame(tick);
+    });
+  }
+
+  /**
+   * Replace the root level in place (e.g. plant cell ⇄ animal cell), keeping the camera.
+   * Optional hooks: old.morphOut(k) (k 0→1: hide what the new level doesn't share), then
+   * new.morphIn(k) (k 0→1: grow in its own parts). Both levels are in the scene only briefly.
+   */
+  async swapRoot(id) {
+    if (this.busy || this.stack.length !== 1 || this.stack[0].id === id) return;
+    this.busy = true;
+    const old = this.stack[0];
+    try {
+      const loading = this.load(id);
+      loading.catch(() => {});
+      if (old.inst.morphOut) await this.tween(0.7, (k) => old.inst.morphOut(k));
+      const inst = await loading;
+      inst.morphIn?.(0);
+      const cam = { target: this.controls.target.clone(), pos: this.camera.position.clone() };
+      try {
+        this.unmount(old.inst);
+        this.stack[0] = { id, inst };
+        this.mount(inst);
+      } catch (err) {
+        safe(() => this.unmount(inst));
+        this.stack[0] = old;
+        old.inst.morphOut?.(0);
+        this.mount(old.inst);
+        throw err;
+      }
+      this.controls.target.copy(cam.target);
+      this.camera.position.copy(cam.pos);
+      this.controls.update();
+      safe(() => old.inst.dispose?.());
+      safe(() => disposeTree(old.inst.root));
+      if (inst.morphIn) await this.tween(0.9, (k) => inst.morphIn(k));
+    } catch (err) {
+      console.error(err);
+      this.toast?.("Couldn't switch cells. Try again.");
+    } finally {
+      this.busy = false;
+      this.emitChange();
+    }
+  }
+
   emitChange() {
     this.select(null);
     this.onChange && this.onChange(this.stack.map((s) => ({ id: s.id, title: s.inst.title })));

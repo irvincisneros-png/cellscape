@@ -61,6 +61,7 @@ export function create(engine) {
   const pm = parentInst?.model && typeof parentInst.model.atp === "number" ? parentInst.model : null;
 
   const M = new MitosisModel();
+  if (parentInst?.species === "animal") M.cellType = "animal";
   const G = new Scene3D(engine);
   G.setCellType(M.cellType);
   const root = G.root;
@@ -244,7 +245,12 @@ export function create(engine) {
     cmpEl = document.createElement("div");
     ct.appendChild(cmpEl);
     renderCompare();
-    ct.insertAdjacentHTML("beforeend", `<p class="hint">${lens.pick({
+    if (parentInst?.species === "animal") ct.insertAdjacentHTML("beforeend", `<p class="hint">${lens.pick({
+      "y7-8": "Body cells divide to grow and to repair damage. Liver cells usually rest, but they start dividing again if the liver is injured.",
+      "y9-10": "Mitosis makes new body cells for growth and repair. Liver cells normally rest, but they can re-enter the cell cycle to regrow a damaged liver.",
+      y11: "Hepatocytes are normally quiescent (G0) but re-enter G1 after injury or partial hepatectomy, so the liver regenerates. Constantly dividing tissues include skin, gut lining and bone marrow.",
+    })}</p>`);
+    else ct.insertAdjacentHTML("beforeend", `<p class="hint">${lens.pick({
       "y7-8": "Big leaf cells like the one you came from don't divide much. New plant cells are made at the tips of roots and shoots, in small young cells like this one.",
       "y9-10": "Mature leaf cells rarely divide. Plant cells divide in <strong>meristems</strong> (root and shoot tips): small cells with a thin wall and no big vacuole — like this one.",
       y11: "Division happens in meristematic cells (thin primary wall, small vacuoles). Mature mesophyll cells like the one you dived from are usually post-mitotic.",

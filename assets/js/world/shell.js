@@ -6,6 +6,7 @@ import { lens, BANDS } from "./lens.js";
 
 export const LEVELS = {
   cell: { title: "Plant cell", load: () => import("./levels/cell.js") },
+  animal: { title: "Animal cell", load: () => import("./levels/animalCell.js") },
   membrane: { title: "Cell membrane", load: () => import("../../../sims/membrane-transport/level.js") },
   chloroplast: { title: "Chloroplast", load: () => import("./levels/chloroplast.js") },
   thylakoid: { title: "Thylakoid membrane", load: () => import("../../../sims/photosynthesis/level.js") },
@@ -103,7 +104,7 @@ export async function boot(opts) {
   const qs = new URLSearchParams(location.search);
   const dotParam = qs.get("dot"), codeParam = qs.get("code")?.replace(/^y/i, "Y").replace("-", " ");
   const focusDot = syl ? syl.dotpoints.find((d) => (dotParam && d.id === dotParam) || (codeParam && d.school_code === codeParam)) : null;
-  if (focusDot) lens.set(focusDot.band);
+  if (focusDot) { lens.set(focusDot.band); sel.value = lens.band; }
   const esc = (t) => String(t).replace(/[&<>]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" })[c]);
   const sylCard = K.card(panelEl, "Syllabus links");
   const sylBody = document.createElement("div");
@@ -139,7 +140,21 @@ export async function boot(opts) {
   engine.onQuality = (q) => qSeg.set(q);
   if (matchMedia("(pointer: coarse)").matches || (navigator.hardwareConcurrency || 8) <= 4) engine.setQuality("medium");
 
+  // the homepage cell can be a plant or an animal cell (?cell=animal); the URL follows the toggle
+  const SPECIES = { cell: "plant", animal: "animal" };
+  let start = opts.start;
+  if (start === "cell" && qs.get("cell") === "animal" && levels.animal) start = "animal";
+  const prevChange2 = engine.onChange;
+  engine.onChange = (stack) => {
+    prevChange2(stack);
+    const sp = SPECIES[stack[0]?.id];
+    if (!sp || opts.start !== "cell") return;
+    const u = new URL(location.href);
+    if (sp === "animal") u.searchParams.set("cell", "animal"); else u.searchParams.delete("cell");
+    if (u.href !== location.href) history.replaceState(null, "", u);
+  };
+
   K.loop((dt, t) => engine.render(dt, t));
-  await engine.start(opts.start);
+  await engine.start(start);
   return engine;
 }

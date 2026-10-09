@@ -507,7 +507,8 @@ export function create(engine) {
     },
     mountPanel(el) {
       // entered from the plant cell: be honest that this patch shows animal-cell transport proteins
-      const parent = engine.stack.at(-1)?.id === "cell" ? "cell" : engine.stack.at(-2)?.id;
+      const top = engine.stack.at(-1)?.id;
+      const parent = top === "cell" || top === "animal" ? top : engine.stack.at(-2)?.id;
       plantNote.style.display = parent === "cell" ? "" : "none";
       el.appendChild(panel);
       engine.overlay.appendChild(overlay);

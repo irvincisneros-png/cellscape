@@ -183,7 +183,8 @@ export function create(engine) {
   }
   const riboGeo = new THREE.BufferGeometry();
   riboGeo.setAttribute("position", new THREE.Float32BufferAttribute(riboPts, 3));
-  root.add(new THREE.Points(riboGeo, new THREE.PointsMaterial({ color: "#1e3a8a", size: 0.22, sizeAttenuation: true })));
+  const riboMat = new THREE.PointsMaterial({ color: "#1e3a8a", size: 0.22, sizeAttenuation: true });
+  root.add(new THREE.Points(riboGeo, riboMat));
 
   // ---------- Golgi ----------
   const golgiMat = physical("#e9c49a", { roughness: 0.45, clearcoat: 0.5, emissive: new THREE.Color("#7c5a3a"), emissiveIntensity: 0.12 });
@@ -239,6 +240,34 @@ export function create(engine) {
   const sun = new THREE.DirectionalLight("#fff5d6", 2.0);
   sun.position.set(-20, 60, 30);
   root.add(sun);
+
+  // ---------- plant ⇄ animal morph ----------
+  // `gone` 0 = full plant cell, 1 = the plant-only parts (wall, neighbours, plasmodesmata, vacuole,
+  // chloroplasts, sunlight) have faded away, so the animal cell can grow in around the shared organelles.
+  let gone = 0, sharedK = 1;
+  const cytoBase = cyto.material.opacity;
+  const fadeMats = [];
+  root.traverse((o) => {
+    if (o === wall || o === pd || (o.isMesh && o.material && (o.material === nbMat || (o.parent === root && o.geometry?.type === "SphereGeometry" && o.material.opacity === 0.5)))) {
+      const m = o.material;
+      if (!fadeMats.some((f) => f.m === m)) fadeMats.push({ m, base: m.opacity ?? 1 });
+    }
+  });
+  function setGone(g) {
+    gone = g;
+    for (const f of fadeMats) { f.m.transparent = true; f.m.opacity = f.base * (1 - g); f.m.depthWrite = g === 0 && f.m === pd.material; }
+    const late = 1 - THREE.MathUtils.smoothstep(g, 0.45, 1);
+    erMat.opacity = golgiMat.opacity = perMat.opacity = late;
+    golgiMat.transparent = g > 0;
+    riboMat.opacity = late; riboMat.transparent = true;
+    for (const o of org.golgi) o.mesh.scale.setScalar(Math.max(0.001, late));
+    for (const o of org.peroxisome) o.mesh.scale.setScalar(Math.max(0.001, late));
+    cyto.material.opacity = cytoBase * Math.max(late, 0.0);
+    sharedK = Math.max(0.001, late);
+    for (const m of [marker, markerDisc, cytoMarker]) m.scale.setScalar(Math.max(0.001, 1 - g));
+    wall.visible = pd.visible = g < 0.999;
+    if (g > 0) for (const fm of Object.values(flowMeshes)) { fm.parts.length = 0; fm.acc = 0; }
+  }
 
   // ---------- portals ----------
   const has = (id) => !!engine.levelsDef[id];
@@ -366,19 +395,21 @@ export function create(engine) {
   // ---------- per-frame organelle motion ----------
   const tA = new THREE.Vector3(), tQ2 = new THREE.Quaternion(), tAx = new THREE.Vector3();
   function animate(t) {
-    const still = engine.reducedMotion;
+    const still = engine.reducedMotion, keep = 1 - gone;
     let gi = 0;
     org.chloroplast.forEach((o, i) => {
       const drift = still ? 0 : Math.sin(t * 0.08 + o.phase) * 0.9;
       o.pos.copy(o.base).addScaledVector(tAx.set(o.n.y, o.n.z, o.n.x), drift);
       o.mesh.position.copy(o.pos);
-      const dim = M.on.chloroplast ? 1 : 0.35;
+      const dim = (M.on.chloroplast ? 1 : 0.35) * keep;
+      o.mesh.scale.set(2.5 * keep, 0.85 * keep, 1.45 * keep);
+      o.mesh.visible = keep > 0.001;
       o.mesh.updateMatrix();
       for (const L of granaLocal) {
         tmpV.copy(L).applyQuaternion(o.q).add(o.pos);
-        grana.setMatrixAt(gi++, tmpM.compose(tmpV, o.q, tmpS.set(dim, 1, dim)));
+        grana.setMatrixAt(gi++, tmpM.compose(tmpV, o.q, tmpS.set(dim, keep, dim)));
       }
-      const st = 0.15 + (M.starch / 100) * 0.4;
+      const st = (0.15 + (M.starch / 100) * 0.4) * keep;
       tmpV.set(1.0, 0.0, 0.2).applyQuaternion(o.q).add(o.pos);
       starchMesh.setMatrixAt(i, tmpM.compose(tmpV, o.q, tmpS.set(st * 1.4, st * 0.7, st)));
     });
@@ -391,9 +422,10 @@ export function create(engine) {
       o.mesh.position.copy(o.pos);
       const q = tQ2.copy(o.q).multiply(tmpQ.setFromAxisAngle(UP, still ? 0 : Math.sin(t * 0.2 + o.phase) * 0.3));
       o.mesh.quaternion.copy(q);
+      o.mesh.scale.setScalar(sharedK);
       for (let k = 0; k < 5; k++) {
-        tA.set(-0.75 + k * 0.38, 0, 0).applyQuaternion(q).add(o.pos);
-        cristae.setMatrixAt(ci++, tmpM.compose(tA, q, tmpS.set(1, 1, 1)));
+        tA.set((-0.75 + k * 0.38) * sharedK, 0, 0).applyQuaternion(q).add(o.pos);
+        cristae.setMatrixAt(ci++, tmpM.compose(tA, q, tmpS.set(sharedK, sharedK, sharedK)));
       }
     });
     cristae.instanceMatrix.needsUpdate = true;
@@ -402,13 +434,14 @@ export function create(engine) {
     chloroMat.emissive.set("#22c55e").multiplyScalar(M.on.chloroplast ? Math.min(1, M.flux.photo / 4) * 0.5 : 0);
     // vacuole size follows turgor; the membrane pulls away from the wall when the cell is flaccid
     const vs = 0.72 + 0.28 * (M.turgor / 100);
-    vacuole.scale.set(vs, 0.6 + 0.4 * vs, 0.6 + 0.4 * vs);
+    vacuole.scale.set(vs * keep, (0.6 + 0.4 * vs) * keep, (0.6 + 0.4 * vs) * keep);
+    vacuole.visible = keep > 0.001;
     const ms = M.turgor < 35 ? 1 - ((35 - M.turgor) / 35) * 0.07 : 1;
     membrane.scale.setScalar(ms);
     marker.rotation.z = still ? 0 : t * 0.4;
     cytoMarker.rotation.y = still ? 0 : t * 0.6;
     marker.material.emissiveIntensity = 0.9 + Math.sin(t * 2.5) * 0.4;
-    sun.intensity = 0.2 + 2.6 * (M.light / 100);
+    sun.intensity = (0.2 + 2.6 * (M.light / 100)) * keep;
     pores.material.emissiveIntensity = M.on.pores ? 0.4 : 0.0;
     pores.material.color.set(M.on.pores ? "#ede9fe" : "#7f1d1d");
     cyto.rotation.y = Math.sin(t * 0.02) * 0.05;
@@ -436,7 +469,7 @@ export function create(engine) {
   function updateLabels() {
     const st = M.status();
     for (const [k, el] of Object.entries(labels)) {
-      if (!showLabels) { el.style.display = "none"; continue; }
+      if (!showLabels || gone > 0) { el.style.display = "none"; continue; }
       const name = lens.pick(ORGANELLES[k].name);
       const s = statusKey[k] ? st[statusKey[k]] : "";
       const html = `${name}${s ? `<small>${s}</small>` : ""}`;
@@ -444,6 +477,7 @@ export function create(engine) {
       el.classList.toggle("off", /off|stalled|stopped|starved|waiting|shrunk/.test(s));
       engine.place(el, labelTargets[k]());
     }
+    if (gone > 0) { diveLbl.style.display = cytoLbl.style.display = "none"; return; }
     engine.place(diveLbl, MEM_SPOT.clone().add(new THREE.Vector3(0, 2.8, 0.5)));
     engine.place(cytoLbl, CYTO_SPOT.clone().add(new THREE.Vector3(0, 2.2, 0.5)));
   }
@@ -473,6 +507,8 @@ export function create(engine) {
     progress = { band: lens.band, node: host };
     el = host;
     const band = lens.band;
+    const sp = K.card(el, lens.pick({ "y7-8": "Plant or animal cell?", "y9-10": "Cell type" }));
+    K.segmented(sp, [{ value: "cell", label: "🌱 Plant cell" }, { value: "animal", label: "🫀 Animal cell" }], "cell", (v) => { if (v !== "cell") engine.swapRoot(v); });
     const ex = K.card(el, "What's happening", "explain");
     explainBody = document.createElement("div");
     ex.appendChild(explainBody);
@@ -689,6 +725,7 @@ export function create(engine) {
   let uiT = 0, exT = 0, chT = 0;
   const level = {
     title: "Plant cell",
+    species: "plant",
     model: M,   // read by child levels (e.g. the nucleus uses the cell's ATP)
     topics: ["cell-structure", "organelles", "photosynthesis", "respiration", "atp", "osmosis", "protein-synthesis"],
     root, pickables, portals,
@@ -704,6 +741,8 @@ export function create(engine) {
       return infoFor(kind, obj);
     },
     onSelect(info) { showSelection(info); },
+    morphOut(k) { setGone(k); },
+    morphIn(k) { setGone(1 - k); },
     mountPanel(el) {
       makeLabels();
       if (progress && progress.band === lens.band) { panelEl = el; el.appendChild(progress.node); buildChips(); }
@@ -716,7 +755,7 @@ export function create(engine) {
       M.step(dt);
       nightTime = M.light < 10 ? nightTime + dt : 0;
       if (M.turgor < 35 && M.outside > 20) wasFlaccid = true;
-      emitFlows(dt);
+      if (gone === 0) emitFlows(dt);
       drawFlows(dt);
       animate(t);
       updateLabels();

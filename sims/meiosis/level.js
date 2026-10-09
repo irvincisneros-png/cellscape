@@ -68,6 +68,7 @@ export function create(engine) {
   const pick = (v) => lens.pick(v);
   const toast = (m, ms) => engine.toast?.(m, ms);
   const fromPlant = engine.stack.at(-1)?.id === "cell";
+  const fromAnimal = engine.stack.at(-1)?.id === "animal";
 
   // ---------------------------------------------------------------- state
   const S = {
@@ -76,7 +77,7 @@ export function create(engine) {
     orient: MD.randOrient(), disp: [0, 0], orient2: MD.randOrient2(), disp2: [[0, 0], [0, 0]],
     errUI: { nd: "none", ndPair: 0, ndCell: 0, sgo: true }, runErr: null, err: null, dest: null,
     gametes: null, fert: null, drag: null, zip: 0,
-    org: "plant", p2: { A: "Aa", B: "Bb", D: "Dd", phase: "cis" }, p2chroms: null,
+    org: fromAnimal ? "animal" : "plant", p2: { A: "Aa", B: "Bb", D: "Dd", phase: "cis" }, p2chroms: null,
     auto: false, preRandom: false, autoCam: true, crossMode: "random",
     tally: {}, aneu: 0, runs: 0, watched: new Set(), watchedRuns: 0, orientSeen: new Set(), combos: new Set(), flips: 0,
     crossMade: false, zygotes: 0, lastZygote: null, trisomy: false, ndDone: { I: false, II: false }, noXRuns: 0, sgoAneu: false,
@@ -263,6 +264,7 @@ export function create(engine) {
 
     // where are we?
     const orgCard = K.card(host, pick({ "y7-8": "Which living thing?", "y9-10": "Germ cell" }));
+    if (fromAnimal) orgCard.insertAdjacentHTML("beforeend", `<p class="note body">${pick({ "y7-8": "Meiosis doesn't happen in the body cell you came from. It happens only in the testes and ovaries, where sex cells are made. We've jumped to one of those cells.", "y9-10": "Body cells like the one you came from divide by mitosis. Meiosis happens only in the testes and ovaries, so we've jumped to a cell there that is making sperm.", y11: "Somatic cells divide by mitosis; meiosis is restricted to the germ line. This level shows a primary spermatocyte in the testis." })}</p>`);
     if (fromPlant) orgCard.insertAdjacentHTML("beforeend", `<p class="note leaf">${pick({ "y7-8": "Meiosis doesn't happen in the leaf cell you came from. It happens only in special cells in a flower. We've jumped to one of those.", "y9-10": "Meiosis doesn't happen in ordinary leaf cells (they divide by mitosis). It happens only in special cells in the flower's anthers and ovules, so we've jumped to one of those.", y11: "Somatic plant cells divide by mitosis; meiosis is restricted to sporocytes in anthers (microsporocytes) and ovules (megasporocytes). This level shows a microsporocyte." })}</p>`);
     orgSeg = K.segmented(orgCard, [
       { value: "plant", label: pick({ "y7-8": "Flower (anther)", "y9-10": "Plant: anther" }) },
@@ -368,6 +370,8 @@ export function create(engine) {
     // things that depend on the organism toggle
     const leaf = panelHost?.querySelector(".mei .leaf");
     if (leaf) leaf.style.display = S.org === "plant" ? "" : "none";
+    const body = panelHost?.querySelector(".mei .body");
+    if (body) body.style.display = S.org === "animal" ? "" : "none";
     ui.orgNote.innerHTML = S.org === "plant"
       ? pick({ "y7-8": "In a flower, meiosis makes 4 cells that grow into <strong>pollen grains</strong>. Each pollen grain makes the sperm cells.", "y9-10": "In the anther, meiosis makes four haploid <strong>spores</strong>; each grows (by mitosis) into a pollen grain that makes sperm cells with the same genotype. Plant cells have no centrosomes and divide with a cell plate.", y11: "Plants alternate generations: meiosis in the sporophyte makes haploid spores (here microspores in a callose-walled tetrad), which grow by mitosis into the gametophyte (pollen grain) that makes the gametes. Acentrosomal spindle; cell-plate cytokinesis." })
       : pick({ "y7-8": "In a testis, meiosis makes 4 <strong>sperm cells</strong>. (In an ovary it makes 1 egg.)", "y9-10": "In a testis, one spermatocyte makes four sperm. In an ovary, meiosis makes <strong>one egg</strong> and small polar bodies. Animal cells divide by a cleavage furrow; their spindle grows from centrosomes.", y11: "Spermatogenesis: primary spermatocyte → 2 secondary spermatocytes → 4 spermatids. Oogenesis is asymmetric (1 egg + polar bodies), arrests in prophase I from before birth and completes meiosis II only at fertilisation." });
