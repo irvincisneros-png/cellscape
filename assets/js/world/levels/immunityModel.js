@@ -64,7 +64,9 @@ export class ImmuneModel {
   _begin(id, kind) {
     const s = this.slots[id];
     const secondary = s.Bm + s.Tm > 0.004;
-    for (const r of this.records) if (r.id === id) r.closed = true;      // an earlier exposure stops being tracked once a new one starts
+    // an earlier exposure stops being tracked once a new one starts, except an infection that is still going on:
+    // it keeps its own record (and outcome) until the pathogen is cleared
+    for (const r of this.records) if (r.id === id && !r.closed) { if (r.kind === "infect" && this.active(id)) r.keepOpen = true; else r.closed = true; }
     const rec = { id, kind, t0: this.day, secondary, detect: null, peakAb: this.total(id), peakDay: this.day, peakP: 0, peakI: 0, baseAb: this.total(id) };
     this.records.push(rec);
     this.events.push({ day: this.day, id, kind });
@@ -176,6 +178,7 @@ export class ImmuneModel {
     // ---- bookkeeping for the open exposures
     for (const r of this.records) {
       const s = this.slots[r.id], tot = s.IgM + s.IgG;
+      if (r.keepOpen && !this.active(r.id)) { r.closed = true; r.keepOpen = false; }
       if (r.closed || this.day - r.t0 > 60) continue;
       if (r.detect == null && tot - r.baseAb > Math.max(DETECT, 0.15 * r.baseAb)) r.detect = this.day - r.t0;
       if (tot > r.peakAb) { r.peakAb = tot; r.peakDay = this.day; }
@@ -196,10 +199,12 @@ export class ImmuneModel {
   phase(id) {
     const s = this.slots[id], tot = s.IgM + s.IgG;
     if (s.exposures === 0) return "naive";
-    if (tot < DETECT && s.Th < 0.05) return "priming";          // antigen is being presented, clones are still tiny
-    if (tot < DETECT) return "expanding";                       // helper T cells are active, B cells multiplying
+    const ag = s.P + s.I + s.depot + s.Z;
+    const responding = ag > 0.002 || s.Ba > 0.02 || s.Th > 0.05;   // antigen is present or the clones are still active
+    if (tot < DETECT && responding && s.Th < 0.05) return "priming";     // antigen is being presented, clones are still tiny
+    if (tot < DETECT && responding) return "expanding";                  // helper T cells are active, B cells multiplying
     if (s.Pm + s.Pg > 0.02) return "secreting";
-    return "memory";
+    return "memory";                                                     // resting: antigen gone, memory cells (and some antibody) remain
   }
 }
 

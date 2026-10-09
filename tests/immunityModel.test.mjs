@@ -26,4 +26,10 @@ for (const id of ["virus","bacterium"]) { const m=new ImmuneModel(); m.infect(id
 // 7/8: narrative never claims memory right after a vaccine, and never blames the chosen pathogen for another's infection
 { const m=new ImmuneModel(); m.vaccinate("bacterium"); const t0=narrative(m,"y11",{id:"bacterium"}).join(" "); assert(!/Memory B and T cells now remain|memory cells now remain/i.test(t0),t0); assert(/pending|no antibodies/i.test(t0));
   const b=new ImmuneModel(); b.infect("bacterium"); adv(b,2); const tv=narrative(b,"y11",{id:"virus"}).join(" "); assert(/No virus has entered/.test(tv)&&/bacterial infection/.test(tv)&&!/virus have just entered|host cells are infected/.test(tv),tv); }
+// overlapping exposures: infect -> 4 d -> vaccinate -> 36 d keeps the infection's own outcome
+{ const m=new ImmuneModel(); m.infect("bacterium"); adv(m,4); m.vaccinate("bacterium"); adv(m,36); const [i,v]=m.records;
+  assert(i.kind==="infect"&&m.illness(i)==="severe"&&i.detect!=null&&i.detect>6&&i.detect<11,"infection record lost: "+i.detect+" "+m.illness(i));
+  const n=narrative(m,"y11",{id:"bacterium"}).join(" "); assert(/earlier infection/.test(n)&&/severe/.test(n),n); assert(!/you have not been ill/.test(n)); }
+// resting memory after clearance: no "priming" and no antigen-carrying dendritic cells at day 300
+for (const id of ["virus","bacterium"]) { const m=new ImmuneModel(); m.infect(id); adv(m,300); assert.equal(m.phase(id),"memory",id+" phase "+m.phase(id)); const n=narrative(m,"y11",{id}).join(" "); assert(!/carrying antigen|still tiny|first response is slow/.test(n),n); assert(/memory cells remain/.test(n),n); }
 console.log("ALL PASS");

@@ -335,6 +335,7 @@ export function narrative(M, band, ctx = {}) {
     return p;
   }
   const rec = [...M.records].reverse().find((r) => r.id === id);        // this pathogen's own latest exposure (never another pathogen's)
+  const recI = [...M.records].reverse().find((r) => r.id === id && r.kind === "infect");   // its latest infection (it may overlap a later vaccination)
   // where the inflammation is coming from
   const src = [];
   if (M.active("bacterium")) src.push(y7 ? "the bacteria" : "the bacterial infection");
@@ -384,11 +385,12 @@ export function narrative(M, band, ctx = {}) {
   // line 3: outcome and memory (memory is only claimed when the model actually has memory cells)
   if (!idActive) {
     if (vac) {
-      if (hasMemory) p.push(y7 ? "The vaccine has trained your body: memory cells now remain, and you have not been ill." : `The vaccine (inactivated antigen) caused a primary response with no illness. ${sen ? "Memory B and T cells now remain." : "Memory cells now remain."}`);
+      if (hasMemory) p.push(y7 ? "The vaccine has trained your body: memory cells now remain, and the vaccine itself did not make you ill." : `The vaccine (inactivated antigen) caused a primary response with no illness. ${sen ? "Memory B and T cells now remain." : "Memory cells now remain."}`);
       else p.push(y7 ? "Your body is still learning from the vaccine: no antibodies or memory cells yet." : "Vaccine response pending: there are no antibodies and no memory cells yet. They take days to form.");
     } else if (M.illness(rec) === "none" && sec) p.push(y7 ? "Memory cells stopped the germ before you got ill." : "Memory cells and antibodies controlled it at once: little or no illness.");
     else if (hasMemory) p.push(y7 ? "The infection is over, and memory cells stay behind." : `The infection has been cleared and memory cells remain, so the next exposure should be faster${sen ? " (shorter lag, higher IgG peak)" : ""}. Memory is usually, but not always, lasting: some viruses change or hide in the body.`);
   }
+  if (vac && recI && recI.t0 < rec.t0 && !idActive) { const ill = M.illness(recI); p.push(y7 ? `The earlier infection made you ${ill === "none" ? "not ill" : ill === "mild" ? "a little ill" : "quite ill"}.` : `The earlier infection (day ${recI.t0.toFixed(0)}) caused ${ill === "none" ? "no" : ill} illness${recI.detect != null ? `, and antibodies were first detectable ${recI.detect.toFixed(1)} days after it started` : ""}.`); }
   if (M.compromised && (idActive || ph !== "naive")) p.push(sen ? "Helper T cells are reduced (as in untreated HIV infection), so B cells and cytotoxic T cells get little help." : "Fewer helper T cells: the response is weaker and slower.");
   return p;
 }
