@@ -228,6 +228,13 @@ export function create(engine) {
   root.add(markerDisc);
   wallHandle.userData.kind = "wall"; root.add(wallHandle);   // fallback pick only — see level.fallbackPickables
 
+  // ---------- cytosol "dive" marker (enzymes) ----------
+  const CYTO_SPOT = new THREE.Vector3(-9, 9.5, 11.5);
+  const cytoMarker = tag(new THREE.Mesh(new THREE.TorusGeometry(1.3, 0.13, 12, 40), physical("#fbbf24", { emissive: new THREE.Color("#f59e0b"), emissiveIntensity: 1.0 })), "cytosol");
+  cytoMarker.position.copy(CYTO_SPOT);
+  root.add(cytoMarker);
+  const cytoLbl = engine.label("🔍 Zoom into the cytosol (enzymes)", "dive");
+
   // ---------- sunlight ----------
   const sun = new THREE.DirectionalLight("#fff5d6", 2.0);
   sun.position.set(-20, 60, 30);
@@ -239,6 +246,7 @@ export function create(engine) {
   portals.push({ to: "membrane", label: "Cell membrane", object: marker, objects: [marker, markerDisc], radius: 2.2, center: () => marker.getWorldPosition(new THREE.Vector3()) });
   for (const o of org.chloroplast) portals.push({ to: "chloroplast", label: "Chloroplast", object: o.mesh, radius: 2.6, center: () => o.mesh.getWorldPosition(new THREE.Vector3()), auto: has("chloroplast"), fallback: fallback("chloroplast") });
   for (const o of org.mitochondrion) portals.push({ to: "mitochondrion", label: "Mitochondrion", object: o.mesh, radius: 1.4, center: () => o.mesh.getWorldPosition(new THREE.Vector3()), auto: has("mitochondrion"), fallback: fallback("mitochondrion") });
+  portals.push({ to: "enzymes", label: "Cytosol", object: cytoMarker, radius: 1.6, center: () => cytoMarker.getWorldPosition(new THREE.Vector3()), auto: has("enzymes"), fallback: fallback("cytosol") });
   portals.push({ to: "nucleus", label: "Nucleus", object: nucShell, radius: NUC_R, center: () => NUC.clone(), auto: has("nucleus"), fallback: fallback("nucleus") });
 
   // ---------- flows ----------
@@ -398,6 +406,7 @@ export function create(engine) {
     const ms = M.turgor < 35 ? 1 - ((35 - M.turgor) / 35) * 0.07 : 1;
     membrane.scale.setScalar(ms);
     marker.rotation.z = still ? 0 : t * 0.4;
+    cytoMarker.rotation.y = still ? 0 : t * 0.6;
     marker.material.emissiveIntensity = 0.9 + Math.sin(t * 2.5) * 0.4;
     sun.intensity = 0.2 + 2.6 * (M.light / 100);
     pores.material.emissiveIntensity = M.on.pores ? 0.4 : 0.0;
@@ -436,6 +445,7 @@ export function create(engine) {
       engine.place(el, labelTargets[k]());
     }
     engine.place(diveLbl, MEM_SPOT.clone().add(new THREE.Vector3(0, 2.8, 0.5)));
+    engine.place(cytoLbl, CYTO_SPOT.clone().add(new THREE.Vector3(0, 2.2, 0.5)));
   }
 
   // ---------- selection highlight ----------
@@ -692,10 +702,10 @@ export function create(engine) {
       if (progress && progress.band === lens.band) { panelEl = el; el.appendChild(progress.node); buildChips(); }
       else buildPanel(el);
     },
-    unmountPanel() { for (const el of Object.values(labels)) el.style.display = "none"; diveLbl.style.display = "none"; cap.style.display = "none"; engine.overlay.innerHTML = ""; },
+    unmountPanel() { for (const el of Object.values(labels)) el.style.display = "none"; diveLbl.style.display = "none"; cytoLbl.style.display = "none"; cap.style.display = "none"; engine.overlay.innerHTML = ""; },
     onResume() { makeLabels(); },
     onLens() { showLabels = lens.band === "y7-8" || lens.band === "y9-10"; progress = null; buildPanel(panelEl); },
-    update(dt, t) {
+    update(dt, t, rdt = dt) {
       M.step(dt);
       nightTime = M.light < 10 ? nightTime + dt : 0;
       if (M.turgor < 35 && M.outside > 20) wasFlaccid = true;
@@ -704,7 +714,7 @@ export function create(engine) {
       animate(t);
       updateLabels();
       if (selGlow.visible) selGlow.material.opacity = 0.45 + 0.25 * Math.sin(t * 3);
-      if ((uiT -= dt) <= 0) {
+      if ((uiT -= rdt) <= 0) {
         uiT = 0.25;
         updateChips();
         const st = M.status();
@@ -715,8 +725,8 @@ export function create(engine) {
           row.classList.toggle("off", !M.on[k] || /stalled|stopped|starved|waiting/.test(s));
         }
       }
-      if ((exT -= dt) <= 0) { exT = 0.6; updateExplain(); }
-      if ((chT -= dt) <= 0) { chT = 0.5; drawChart(); }
+      if ((exT -= rdt) <= 0) { exT = 0.6; updateExplain(); }
+      if ((chT -= rdt) <= 0) { chT = 0.5; drawChart(); }
       mission?.update();
     },
   };

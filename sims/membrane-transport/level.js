@@ -407,17 +407,22 @@ export function create(engine) {
     b.addEventListener("pointerdown", (e) => {
       if (e.button !== 0) return;
       e.preventDefault();
+      activeDrag?.();   // only one tray drag at a time
+      const pid = e.pointerId;
       selectSpecies(sp);
       const ghost = document.createElement("div");
       ghost.className = "tray-ghost";
       ghost.style.background = SP[sp].color;
       let moved = false;
       const mv = (ev) => {
+        if (ev.pointerId !== pid) return;
         if (Math.hypot(ev.clientX - e.clientX, ev.clientY - e.clientY) > 6 && !moved) { moved = true; document.body.appendChild(ghost); }
         ghost.style.transform = `translate(${ev.clientX - 14}px, ${ev.clientY - 14}px)`;
       };
-      const cleanup = () => { removeEventListener("pointermove", mv); removeEventListener("pointerup", up); removeEventListener("pointercancel", cleanup); ghost.remove(); activeDrag = null; };
+      const cleanup = (ev) => {
+        if (ev && ev.pointerId !== undefined && ev.pointerId !== pid) return; removeEventListener("pointermove", mv); removeEventListener("pointerup", up); removeEventListener("pointercancel", cleanup); ghost.remove(); activeDrag = null; };
       const up = (ev) => {
+        if (ev.pointerId !== pid) return;
         cleanup();
         if (disposed) return;
         const r = engine.canvas.getBoundingClientRect();
@@ -511,14 +516,14 @@ export function create(engine) {
     },
     unmountPanel() { activeDrag?.(); overlay.remove(); tray.remove(); labelLayer.remove(); },
     dispose() { disposed = true; activeDrag?.(); M.feeding = false; overlay.remove(); tray.remove(); labelLayer.remove(); },
-    update(dt, t) {
+    update(dt, t, rdt = dt) {
       const d = L.running ? dt * L.speed : 0;
       M.step(d);
       const c = M.counts();
       if (c.na.out >= 12 && c.na.out >= 3 * Math.max(1, c.na.in)) naPeak = true;
       G.update(d, t, { hover, inspectHTML });
-      uiTimer -= dt;
-      explainTimer -= dt;
+      uiTimer -= rdt;
+      explainTimer -= rdt;
       if (uiTimer <= 0) { uiTimer = 0.2; updateChips(c); drawPanelChart(c); }
       if (explainTimer <= 0) { explainTimer = 0.5; updateExplain(c); }
       missions.update();

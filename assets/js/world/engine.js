@@ -29,6 +29,8 @@ export function formatLength(m) {
   return `${+(m * 1e9).toPrecision(3)} nm`;
 }
 
+const safe = (f) => { try { return f(); } catch (err) { console.error(err); } };
+
 /** Free GPU memory for everything under `root` (skips resources marked userData.shared). */
 export function disposeTree(root) {
   const seen = new Set();
@@ -221,9 +223,10 @@ export class Engine {
     const active = new Set();      // pointer ids currently down
     let multi = false;             // a multi-touch gesture is in progress: never treat it as a tap
     let lastClick = { t: 0, x: 0, y: 0 };
+    let holdLock = false;   // a consumed press became multi-touch: re-enable orbiting only once all fingers lift
     cv.addEventListener("pointerdown", (e) => {
       active.add(e.pointerId);
-      if (active.size > 1) { multi = true; if (down?.handled) this.current?.onPointerUp?.(e); this.controls.enabled = true; down = null; return; }
+      if (active.size > 1) { multi = true; if (down?.handled) { safe(() => this.current?.onPointerUp?.(e)); holdLock = true; } down = null; return; }
       multi = false;
       if (this.busy) return;
       down = { id: e.pointerId, x: e.clientX, y: e.clientY, b: e.button, travel: 0 };
@@ -241,6 +244,7 @@ export class Engine {
     cv.addEventListener("pointerleave", () => { this.pointer.inside = false; this.setHover(null); });
     const end = (e, cancelled) => {
       active.delete(e.pointerId);
+      if (!active.size && holdLock) { holdLock = false; this.controls.enabled = true; }
       if (!down || e.pointerId !== down.id) { if (!active.size) multi = false; return; }
       if (down.handled) { this.current?.onPointerUp?.(e); this.controls.enabled = true; }
       else if (!cancelled && !multi && down.travel <= 6 && down.b === 0 && !this.busy) {
@@ -261,7 +265,7 @@ export class Engine {
     cv.addEventListener("lostpointercapture", (e) => { if (down && e.pointerId === down.id && down.handled) end(e, true); });
     // keyboard: arrows orbit, +/- zoom, Enter dives into the selection, Escape/Backspace goes up
     cv.addEventListener("keydown", (e) => {
-      if (this.busy) return;
+      if (this.busy || e.ctrlKey || e.metaKey || e.altKey) return;
       const k = e.key, c = this.controls, off = this.camera.position.clone().sub(c.target);
       const sph = new THREE.Spherical().setFromVector3(off);
       let used = true;
@@ -271,8 +275,8 @@ export class Engine {
       else if (k === "ArrowDown") sph.phi = clamp(sph.phi + 0.1, c.minPolarAngle + 0.01, c.maxPolarAngle - 0.01);
       else if (k === "+" || k === "=") sph.radius = clamp(sph.radius * 0.85, c.minDistance, c.maxDistance);
       else if (k === "-" || k === "_") sph.radius = clamp(sph.radius / 0.85, c.minDistance, c.maxDistance);
-      else if (k === "Enter" && this.selected?.portal) { this.dive(this.selected.portal); return; }
-      else if ((k === "Escape" || k === "Backspace") && this.stack.length > 1) { this.up(); return; }
+      else if (k === "Enter" && this.selected?.portal) { e.preventDefault(); this.dive(this.selected.portal); return; }
+      else if ((k === "Escape" || k === "Backspace") && this.stack.length > 1) { e.preventDefault(); this.up(); return; }
       else used = false;
       if (used) { e.preventDefault(); this.userMoved = true; this.camera.position.copy(c.target).add(off.setFromSpherical(sph)); c.update(); }
     });
@@ -389,6 +393,7 @@ export class Engine {
   /** Animate camera/target to a new framing. */
   fly(target, pos, dur = 0.9) {
     if (this.flight) { const f = this.flight; this.flight = null; f.res(); }
+    if (!this.busy) this.userMoved = true;   // a level asked for this view (e.g. "Show me", tours): keep it on resize
     if (this.reducedMotion) dur = Math.min(dur, 0.05);
     return new Promise((res) => {
       const t0 = this.controls.target.clone(), p0 = this.camera.position.clone();
@@ -421,11 +426,22 @@ export class Engine {
       await this.fly(C, C.clone().addScaledVector(dir, r * 1.05), 0.4);
       await fadeP;
       const inst = await loading;
-      this.unmount(parent.inst);
-      parent.inst.onPause?.();
-      this.stack.push({ id: portal.to, inst, portal, saved, dir });
+      try {
+        this.unmount(parent.inst);
+        safe(() => parent.inst.onPause?.());
+        this.stack.push({ id: portal.to, inst, portal, saved, dir });
+        this.mount(inst);
+      } catch (err) {
+        // roll back to the parent exactly as it was
+        if (this.stack.at(-1)?.inst === inst) this.stack.pop();
+        safe(() => this.unmount(inst));
+        safe(() => inst.dispose?.());
+        safe(() => disposeTree(inst.root));
+        this.mount(parent.inst);
+        safe(() => parent.inst.onResume?.());
+        throw err;
+      }
       swapped = true;
-      this.mount(inst);
       const v = inst.view;
       this.userMoved = false;
       if (inst.entryRadius) {
@@ -468,12 +484,12 @@ export class Engine {
       for (let i = 0; i < levels && this.stack.length > 1; i++) {
         await this.fadeTo(1, 320);
         const top = this.stack.pop();         // swap only once the screen is covered
-        this.unmount(top.inst);
-        top.inst.dispose?.();
-        disposeTree(top.inst.root);
         const parent = this.stack.at(-1);
-        this.mount(parent.inst);
-        parent.inst.onResume?.();
+        safe(() => this.unmount(top.inst));
+        try { this.mount(parent.inst); } catch (err) { this.stack.push(top); this.mount(top.inst); throw err; }
+        safe(() => parent.inst.onResume?.());
+        safe(() => top.inst.dispose?.());       // child is freed only after the parent is back
+        safe(() => disposeTree(top.inst.root));
         const C = top.portal.center().clone(), r = top.portal.radius;
         const dir = this.camera.position.clone().sub(this.controls.target).normalize();
         this.controls.target.copy(C);
@@ -560,7 +576,8 @@ export class Engine {
       const hit = this.pick(this.pointer.x, this.pointer.y);
       this.setHover(hit ? hit.object : null);
     }
-    L?.update?.(this.paused ? 0 : dt, t);
+    if (!this.paused) this.simT = (this.simT || 0) + dt;
+    L?.update?.(this.paused ? 0 : dt, this.simT || 0, dt);   // (sim dt, sim time, real dt for UI refresh)
     if (this.hoverInfo && this.pointer.inside && !this.busy) {
       const r = this.canvas.getBoundingClientRect();
       this.tip.innerHTML = this.hoverInfo.title + (this.hoverInfo.portal ? `<small>double-click or zoom in to enter</small>` : "");

@@ -7,6 +7,11 @@ import { lens, BANDS } from "./lens.js";
 export const LEVELS = {
   cell: { title: "Plant cell", load: () => import("./levels/cell.js") },
   membrane: { title: "Cell membrane", load: () => import("../../../sims/membrane-transport/level.js") },
+  chloroplast: { title: "Chloroplast", load: () => import("./levels/chloroplast.js") },
+  thylakoid: { title: "Thylakoid membrane", load: () => import("../../../sims/photosynthesis/level.js") },
+  mitochondrion: { title: "Mitochondrion", load: () => import("./levels/mitochondrion.js") },
+  cristae: { title: "Inner membrane (cristae)", load: () => import("../../../sims/atp-synthase/level.js") },
+  enzymes: { title: "Enzymes in the cytosol", load: () => import("../../../sims/enzymes/level.js") },
 };
 
 /**

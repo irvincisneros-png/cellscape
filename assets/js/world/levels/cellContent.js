@@ -82,6 +82,15 @@ export const ORGANELLES = {
     },
     inputs: { "y7-8": "building materials", y11: "cellulose (made at the membrane) + matrix from Golgi vesicles" }, outputs: "support, shape", feeds: "the whole plant's structure",
   },
+  cytosol: {
+    name: { "y7-8": "Cytoplasm", "y9-10": "Cytosol (cytoplasm)" }, color: "#fbbf24", portal: "enzymes", sim: "enzymes",
+    role: {
+      "y7-8": "The jelly-like fluid that fills the cell. Thousands of <strong>enzymes</strong> work here, speeding up the cell's chemical reactions.",
+      "y9-10": "The fluid part of the cytoplasm, packed with <strong>enzymes</strong> — biological catalysts that speed up reactions without being used up. Glycolysis happens here.",
+      y11: "Aqueous, crowded with proteins (~20–30% by mass). Site of glycolysis and many metabolic pathways, each step catalysed by a specific enzyme whose activity depends on temperature, pH, substrate concentration and inhibitors.",
+    },
+    inputs: "substrates (e.g. glucose)", outputs: "products of enzyme-catalysed reactions", feeds: "every organelle",
+  },
   peroxisome: {
     name: "Peroxisome", color: "#facc15", band: "y11",
     role: "Breaks down harmful hydrogen peroxide with the enzyme catalase, and helps recycle by-products of photosynthesis (photorespiration).",
@@ -144,14 +153,18 @@ export function narrative(m, band) {
   const on = m.on, F = m.flux, out = [];
   const E = y7 ? "energy (ATP)" : "ATP";
   const photo = F.photo || 0, resp = F.resp || 0, o2 = F.o2Out || 0, mob = F.mobilise || 0, store = F.store || 0;
-  const gas = Math.abs(o2) < 0.15 ? (y7 ? "Oxygen going in and out is about balanced." : "Net O₂ exchange is about zero — photosynthesis and respiration are roughly balanced (compensation point).")
-    : o2 > 0 ? (y7 ? "Overall, the cell is <strong>giving out oxygen</strong>." : `Net O₂ is <strong>leaving</strong> the cell (${o2.toFixed(1)}/s): photosynthesis is faster than respiration.`)
-    : (y7 ? "Overall, the cell is <strong>taking in oxygen</strong>." : `Net O₂ is <strong>entering</strong> the cell (${(-o2).toFixed(1)}/s): respiration is faster than photosynthesis.`);
-  if (photo < 0.15) {
-    out.push(on.chloroplast
-      ? (y7 ? `There's <strong>not enough light</strong>, so the chloroplasts have stopped making glucose.` : `<strong>No photosynthesis</strong> right now (light ${m.light.toFixed(0)}%).`)
-      : `Chloroplasts are <strong>off</strong>: no new glucose is being made.`);
-  } else if (m.light > 60 && m.co2Out < 10 && on.chloroplast) out.push(`Plenty of light but very little <strong>CO₂</strong> — CO₂ is now the <strong>limiting factor</strong> for photosynthesis.`);
+  // net gas exchange and the photosynthesis/respiration balance are reported separately: right after a change,
+  // O₂ made earlier can still be diffusing out even though respiration is now faster
+  const balance = photo > resp * 1.1 ? "photosynthesis is faster than respiration" : resp > photo * 1.1 ? "respiration is faster than photosynthesis" : "photosynthesis and respiration are about balanced";
+  const lag = (o2 > 0.15 && photo < resp) || (o2 < -0.15 && photo > resp);
+  const gas = Math.abs(o2) < 0.15 ? (y7 ? "Oxygen going in and out is about balanced." : `Net O₂ exchange is about zero (${balance}).`)
+    : lag ? (y7 ? `Oxygen is still ${o2 > 0 ? "leaving" : "coming in"} from before, but that is about to reverse.` : `Net O₂ is still ${o2 > 0 ? "leaving" : "entering"} (${Math.abs(o2).toFixed(1)}/s) as the cell catches up — but now ${balance}, so this will reverse.`)
+    : o2 > 0 ? (y7 ? "Overall, the cell is <strong>giving out oxygen</strong>." : `Net O₂ is <strong>leaving</strong> the cell (${o2.toFixed(1)}/s): ${balance}.`)
+    : (y7 ? "Overall, the cell is <strong>taking in oxygen</strong>." : `Net O₂ is <strong>entering</strong> the cell (${(-o2).toFixed(1)}/s): ${balance}.`);
+  const co2Limited = m.light > 30 && m.co2Out < 10 && m.co2 < 10;
+  if (!on.chloroplast) out.push(`Chloroplasts are <strong>off</strong>: no new glucose is being made.`);
+  else if (co2Limited) out.push(`Plenty of light but very little <strong>CO₂</strong> — CO₂ is the <strong>limiting factor</strong>, so photosynthesis is ${photo < 0.15 ? "almost stopped" : "slow"}.`);
+  else if (photo < 0.15) out.push(y7 ? `There's <strong>not enough light</strong>, so the chloroplasts have stopped making glucose.` : `<strong>Almost no photosynthesis</strong> right now — light (${m.light.toFixed(0)}%) is limiting.`);
   else out.push(y7
     ? `<strong>Chloroplasts</strong> are using light to make <strong>glucose and oxygen</strong>.`
     : `Chloroplasts are photosynthesising (${photo.toFixed(1)}/s). Mitochondria use the sugar and O₂ to make ATP; their CO₂ is reused by the chloroplasts.`);
@@ -164,13 +177,17 @@ export function narrative(m, band) {
     : `<strong>Mitochondria off</strong>: only glycolysis/fermentation in the cytosol makes ATP (a tiny amount). ATP ${m.atp.toFixed(0)}% → pumps, transcription, translation and shipping stall.`);
   else if (resp > 0.3 && m.atp > 80 && !y7) out.push(`ATP is high, so respiration has slowed — it runs on demand.`);
   else if (m.atp < 15) out.push(`${E} is very low, so everything that needs energy is slowing down.`);
-  if (!on.pores) out.push(`<strong>Nuclear pores blocked</strong>: new mRNA is trapped in the nucleus (${m.mrna.toFixed(0)}%). Ribosomes keep reading the mRNA already outside until it breaks down, then protein production stops.`);
-  if (!on.nucleus) out.push(`<strong>Transcription off</strong>: no new mRNA. The mRNA already made still leaves the nucleus and is read until it breaks down.`);
+  if (!on.pores) out.push(`<strong>Nuclear pores blocked</strong>: ${on.nucleus ? `new mRNA is trapped in the nucleus (${m.mrna.toFixed(0)}%)` : "no mRNA can leave the nucleus"}. Ribosomes keep reading the mRNA already outside until it breaks down, then protein production stops.`);
+  if (!on.nucleus) out.push(on.pores ? `<strong>Transcription off</strong>: no new mRNA. The mRNA already made still leaves the nucleus and is read until it breaks down.` : `<strong>Transcription off</strong> as well: no new mRNA is being made.`);
   if (!on.er) out.push(`<strong>Ribosomes/ER off</strong>: mRNA arrives but no secreted proteins are made.`);
   if (!on.golgi) out.push(`<strong>Golgi off</strong>: proteins pile up in the ER and nothing is shipped to the membrane.`);
   const w = F.water || 0;
-  if (m.outside > 25) out.push(y7 ? `The cell is sitting in <strong>salty water</strong>, so water is drawn out of the vacuole.` : `The surrounding solution is concentrated (more negative water potential), so water leaves the vacuole by osmosis${m.turgor < 30 ? " — the protoplast pulls away from the wall (plasmolysis)" : ""}.`);
-  if (!on.pumps) out.push(y7 ? `<strong>Pumps off</strong>: dissolved substances leak away, so the cell slowly loses water${w < -0.2 ? " — it's happening now" : ""}.` : `<strong>Pumps off</strong>: solutes leak out, so the turgor the cell can sustain falls; water ${w < -0.2 ? "is leaving" : "has left"} by osmosis (turgor ${m.turgor.toFixed(0)}%).`);
+  const wDir = w < -0.2 ? "out" : w > 0.2 ? "in" : "none";
+  if (m.outside > 25) out.push(y7
+    ? `The cell is sitting in <strong>salty water</strong>. ${wDir === "out" ? "Water is being drawn out of the vacuole." : wDir === "in" ? "Water is moving back in." : "Water in and out has balanced."}`
+    : `The surrounding solution is concentrated (more negative water potential). ${wDir === "out" ? "Water is leaving the vacuole by osmosis" : wDir === "in" ? "Water is moving back in by osmosis" : "Net water movement has stopped — the water potentials are balanced"}${m.turgor < 30 ? " — the protoplast has pulled away from the wall (plasmolysis)" : ""}.`);
+  else if (wDir === "in" && m.turgor < 70) out.push(y7 ? `Water is flowing back into the vacuole, so the cell is firming up.` : `Water is re-entering the vacuole by osmosis; turgor is recovering (${m.turgor.toFixed(0)}%).`);
+  if (!on.pumps) out.push(y7 ? `<strong>Pumps off</strong>: dissolved substances leak away, so the cell slowly loses water${wDir === "out" ? " — it's happening now" : ""}.` : `<strong>Pumps off</strong>: solutes leak out, so the turgor the cell can sustain falls; water ${wDir === "out" ? "is leaving" : wDir === "in" ? "is moving back in" : "has stopped moving"} (turgor ${m.turgor.toFixed(0)}%).`);
   if (!on.aquaporins) out.push(`<strong>Aquaporins off</strong>: water can still cross the lipid bilayer, but much more slowly.`);
   return out;
 }
