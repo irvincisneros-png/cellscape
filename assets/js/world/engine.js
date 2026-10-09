@@ -25,6 +25,8 @@ const DEFAULT_ENV = {
 };
 
 export function formatLength(m) {
+  if (m >= 1) return `${+m.toPrecision(3)} m`;
+  if (m >= 1e-2) return `${+(m * 1e2).toPrecision(3)} cm`;
   if (m >= 1e-3) return `${+(m * 1e3).toPrecision(3)} mm`;
   if (m >= 1e-6) return `${+(m * 1e6).toPrecision(3)} µm`;
   return `${+(m * 1e9).toPrecision(3)} nm`;
@@ -623,6 +625,9 @@ export class Engine {
 
   updateScale() {
     if (!this.scaleEl) return;
+    const hide = this.current?.showScale === false;   // stylised, non-spatial levels (e.g. the inheritance lab)
+    this.scaleEl.style.display = hide ? "none" : "";
+    if (hide) return;
     const d = this.camera.position.distanceTo(this.controls.target);
     const wUnits = 2 * d * Math.tan(THREE.MathUtils.degToRad(this.camera.fov / 2)) * this.camera.aspect;
     const wm = wUnits * this.metersPerUnit();
