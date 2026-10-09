@@ -7,6 +7,10 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Space+Grotesk:wght@500;600&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="../../assets/css/cellscape.css" />
+  <link rel="stylesheet" href="../../assets/css/world.css" />
+  <script type="importmap">
+    { "imports": { "three": "../../assets/vendor/three/build/three.module.js", "three/addons/": "../../assets/vendor/three/examples/jsm/" } }
+  </script>
   <style>
     .chip.lim { border-color: currentColor; }
     .chip.lim b { color: inherit; }
@@ -35,10 +39,20 @@
     </header>
     <main class="stage" id="stage">
       <canvas id="canvas" aria-label="Photosynthesis: Inside the Chloroplast simulation. A thylakoid membrane with photosystem II, cytochrome b6f, photosystem I and ATP synthase, a draggable lamp, the Calvin cycle in the stroma and a pondweed bubble counter."></canvas>
+      <div id="labels"></div>
       <div class="stage-overlay" id="overlay"></div>
     </main>
     <aside class="panel" id="panel"></aside>
   </div>
-  <script type="module" src="./sim.js"></script>
+  <script type="module">
+    // three.js needs WebGL2; without it (or if 3D fails to start) use the 2D version of this simulation
+    let gl = false;
+    try { gl = !!document.createElement("canvas").getContext("webgl2") && sessionStorage.getItem("cs2d") !== "1"; } catch { gl = false; }
+    const fallback = () => { document.getElementById("labels")?.remove(); import("./sim2d.js"); };
+    if (!gl) fallback();
+    else import("../../assets/js/world/shell.js")
+      .then((m) => m.boot({ start: "thylakoid", root: "../../" }))
+      .catch((e) => { console.error(e); try { sessionStorage.setItem("cs2d", "1"); } catch {} location.reload(); });
+  </script>
 </body>
 </html>
