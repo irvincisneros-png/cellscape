@@ -12,6 +12,11 @@ export const LEVELS = {
   mitochondrion: { title: "Mitochondrion", load: () => import("./levels/mitochondrion.js") },
   cristae: { title: "Inner membrane (cristae)", load: () => import("../../../sims/atp-synthase/level.js") },
   enzymes: { title: "Enzymes in the cytosol", load: () => import("../../../sims/enzymes/level.js") },
+  nucleus: { title: "Nucleus", load: () => import("./levels/nucleus.js") },
+  chromatin: { title: "Chromosome & chromatin", load: () => import("./levels/chromatin.js") },
+  dna: { title: "DNA double helix", load: () => import("./levels/dna.js") },
+  expression: { title: "DNA to protein", load: () => import("../../../sims/protein-synthesis/level.js") },
+  folding: { title: "Protein folding", load: () => import("./levels/folding.js") },
 };
 
 /**
@@ -92,8 +97,10 @@ export async function boot(opts) {
   // ---------- syllabus card: the dot points this level covers at the current year level ----------
   let syl = null;
   try { syl = await (await fetch(`${root}content/syllabus.json`)).json(); } catch { /* offline: card hidden */ }
-  const dotParam = new URLSearchParams(location.search).get("dot");
-  const focusDot = syl && dotParam ? syl.dotpoints.find((d) => d.id === dotParam) : null;
+  // ?dot=<id> (official) or ?code=Y7-3.2.3 (the school's own Year + outcome numbering)
+  const qs = new URLSearchParams(location.search);
+  const dotParam = qs.get("dot"), codeParam = qs.get("code")?.replace(/^y/i, "Y").replace("-", " ");
+  const focusDot = syl ? syl.dotpoints.find((d) => (dotParam && d.id === dotParam) || (codeParam && d.school_code === codeParam)) : null;
   if (focusDot) lens.set(focusDot.band);
   const esc = (t) => String(t).replace(/[&<>]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" })[c]);
   const sylCard = K.card(panelEl, "Syllabus links");
@@ -113,7 +120,7 @@ export async function boot(opts) {
     const items = syl.dotpoints.filter((d) => d.band === band && (!ver || d.syllabus === ver) && d.topics.some((t) => L.topics.includes(t)));
     const toggle = stage6 ? `<div class="segmented" style="margin-bottom:8px">${["Biology 11–12 (2025)", "Biology Stage 6 (2017)"].map((v) => `<button type="button" data-v="${v}" aria-pressed="${v === ver}">${v.includes("2025") ? "New (2025)" : "Current (2017)"}</button>`).join("")}</div>` : "";
     sylBody.innerHTML = toggle + (items.length
-      ? `<ul style="margin:0;padding-left:18px;font-size:0.82rem;color:var(--ink-dim);display:flex;flex-direction:column;gap:6px">${items.map((d) => `<li${focusDot?.id === d.id ? ' style="color:var(--ink);font-weight:600"' : ""}>${esc(d.text)} <span style="color:var(--ink-faint)">(${esc(d.outcome)})</span>${d.subpoints?.length ? `<ul style="padding-left:16px;margin:4px 0 0">${d.subpoints.map((sp) => `<li>${esc(typeof sp === "string" ? sp : sp.text || "")}</li>`).join("")}</ul>` : ""}</li>`).join("")}</ul>`
+      ? `<ul style="margin:0;padding-left:18px;font-size:0.82rem;color:var(--ink-dim);display:flex;flex-direction:column;gap:6px">${items.map((d) => `<li${focusDot?.id === d.id ? ' style="color:var(--ink);font-weight:600"' : ""}>${d.school_code ? `<b style="color:var(--accent)">${esc(d.school_code)}</b> ` : ""}${esc(d.text)} <span style="color:var(--ink-faint)">(${esc(d.outcome)})</span>${d.subpoints?.length ? `<ul style="padding-left:16px;margin:4px 0 0">${d.subpoints.map((sp) => `<li>${esc(typeof sp === "string" ? sp : sp.text || "")}</li>`).join("")}</ul>` : ""}</li>`).join("")}</ul>`
       : `<p>No ${BANDS.find((b) => b.id === band).label} dot points map directly to this level — try another year level.</p>`);
     sylBody.querySelectorAll("[data-v]").forEach((b) => b.addEventListener("click", () => { sylVersion = b.dataset.v; renderSyllabus(); }));
   }

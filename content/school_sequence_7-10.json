@@ -1,0 +1,3749 @@
+[
+ {
+  "year": 7,
+  "code": "1.1.1",
+  "fa": null,
+  "sub": null,
+  "text": "Discuss that the purpose of science is to build knowledge and understanding of the world and the Universe through observation, experimentation and analysis"
+ },
+ {
+  "year": 7,
+  "code": "1.1.2",
+  "fa": null,
+  "sub": null,
+  "text": "Recognise how scientific knowledge can be represented in branches of biology, chemistry, physics and geology, and consider how modern scientific knowledge is interdisciplinary and transdisciplinary"
+ },
+ {
+  "year": 7,
+  "code": "1.1.3",
+  "fa": null,
+  "sub": null,
+  "text": "Explore why scientific research is usually collaborative and builds on the work of others"
+ },
+ {
+  "year": 7,
+  "code": "1.1.4",
+  "fa": null,
+  "sub": null,
+  "text": "Identify that scientific theories and laws are based on repeated experiments and observations that describe or predict a range of natural phenomena"
+ },
+ {
+  "year": 7,
+  "code": "1.2.1",
+  "fa": null,
+  "sub": null,
+  "text": "Identify that the practice of science involves using the Working scientifically processes"
+ },
+ {
+  "year": 7,
+  "code": "1.2.2",
+  "fa": null,
+  "sub": null,
+  "text": "Use a variety of analog and digital measuring devices in scientific investigations to compare the range, sensitivity and accuracy of observations provided by those instruments"
+ },
+ {
+  "year": 7,
+  "code": "1.2.3",
+  "fa": null,
+  "sub": null,
+  "text": "Compare and contrast the accuracy and reliability of observations made using the senses with those obtained using measuring equipment"
+ },
+ {
+  "year": 7,
+  "code": "1.2.4",
+  "fa": null,
+  "sub": null,
+  "text": "Explain how observations of natural phenomena can be used to make inferences and testable predictions"
+ },
+ {
+  "year": 7,
+  "code": "1.2.5",
+  "fa": null,
+  "sub": null,
+  "text": "Explore the different approaches scientists use in scientific research, including systematic observations and controlled experiments"
+ },
+ {
+  "year": 7,
+  "code": "1.2.6",
+  "fa": null,
+  "sub": null,
+  "text": "Follow a sequence of instructions to safely conduct an investigation, and use scientific tools and instruments to observe how changing the independent variable of the investigation can cause a change in its dependent variable"
+ },
+ {
+  "year": 7,
+  "code": "1.2.7",
+  "fa": null,
+  "sub": null,
+  "text": "Conduct an investigation using scientific tools and instruments to make a series of observations over time"
+ },
+ {
+  "year": 7,
+  "code": "1.2.8",
+  "fa": null,
+  "sub": null,
+  "text": "Tabulate and graph data from an investigation to identify trends, patterns and relationships, and draw conclusions"
+ },
+ {
+  "year": 7,
+  "code": "1.3.1",
+  "fa": null,
+  "sub": null,
+  "text": "Compare historical and current solar system models to show how models are modified or rejected due to new scientific evidence"
+ },
+ {
+  "year": 7,
+  "code": "1.3.2",
+  "fa": null,
+  "sub": null,
+  "text": "Explain that predictable and observable phenomena on the Earth are caused by the relative positions of the Sun, the Earth and the Moon"
+ },
+ {
+  "year": 7,
+  "code": "1.3.3",
+  "fa": null,
+  "sub": null,
+  "text": "Use physical models or virtual simulations to explain the cyclic patterns of lunar phases and eclipses of the Sun and Moon"
+ },
+ {
+  "year": 7,
+  "code": "1.4.1",
+  "fa": null,
+  "sub": null,
+  "text": "Investigate the similarities between Aboriginal and Torres Strait Islander accounts and mainstream scientific explanations about the phases of the Moon and how the phases affect tides"
+ },
+ {
+  "year": 7,
+  "code": "1.4.2",
+  "fa": null,
+  "sub": null,
+  "text": "Explain how Aboriginal and Torres Strait Islander Peoples use stars to identify specific weather phenomena"
+ },
+ {
+  "year": 7,
+  "code": "1.4.3",
+  "fa": null,
+  "sub": null,
+  "text": "Describe how Aboriginal and/or Torres Strait Islander Peoples predicted seasonal phenomena based on their observations of the stars and phases of the Moon to predict animal behaviour, plant cycles and tidal changes"
+ },
+ {
+  "year": 7,
+  "code": "1.5.1",
+  "fa": null,
+  "sub": null,
+  "text": "Investigate how a recent advancement in science has increased knowledge of the world and the Universe"
+ },
+ {
+  "year": 7,
+  "code": "2.1.1",
+  "fa": [
+   "2",
+   "Forces"
+  ],
+  "sub": [
+   "2.1",
+   "Forces in action"
+  ],
+  "text": "Explain forces as either direct (contact) or indirect (non-contact)"
+ },
+ {
+  "year": 7,
+  "code": "2.1.2",
+  "fa": [
+   "2",
+   "Forces"
+  ],
+  "sub": [
+   "2.1",
+   "Forces in action"
+  ],
+  "text": "Conduct a practical investigation on the effects of a range of direct and indirect forces"
+ },
+ {
+  "year": 7,
+  "code": "2.1.3",
+  "fa": [
+   "2",
+   "Forces"
+  ],
+  "sub": [
+   "2.1",
+   "Forces in action"
+  ],
+  "text": "Use force diagrams to model balanced and unbalanced forces"
+ },
+ {
+  "year": 7,
+  "code": "2.1.4",
+  "fa": [
+   "2",
+   "Forces"
+  ],
+  "sub": [
+   "2.1",
+   "Forces in action"
+  ],
+  "text": "Analyse force diagrams to make predictions"
+ },
+ {
+  "year": 7,
+  "code": "2.1.5",
+  "fa": [
+   "2",
+   "Forces"
+  ],
+  "sub": [
+   "2.1",
+   "Forces in action"
+  ],
+  "text": "Examine the relationship between force and energy"
+ },
+ {
+  "year": 7,
+  "code": "2.1.6",
+  "fa": [
+   "2",
+   "Forces"
+  ],
+  "sub": [
+   "2.1",
+   "Forces in action"
+  ],
+  "text": "Describe the electrostatic and gravitational forces exerted between objects"
+ },
+ {
+  "year": 7,
+  "code": "2.1.7",
+  "fa": [
+   "2",
+   "Forces"
+  ],
+  "sub": [
+   "2.1",
+   "Forces in action"
+  ],
+  "text": "Use the concept of forces to describe the motion of objects in orbit"
+ },
+ {
+  "year": 7,
+  "code": "2.1.8",
+  "fa": [
+   "2",
+   "Forces"
+  ],
+  "sub": [
+   "2.1",
+   "Forces in action"
+  ],
+  "text": "Define weight force as the mass x the acceleration due to gravity (g) (F=mg )"
+ },
+ {
+  "year": 7,
+  "code": "2.1.9",
+  "fa": [
+   "2",
+   "Forces"
+  ],
+  "sub": [
+   "2.1",
+   "Forces in action"
+  ],
+  "text": "Perform calculations using the equation F=mg to solve for unknowns"
+ },
+ {
+  "year": 7,
+  "code": "2.2.1",
+  "fa": [
+   "2",
+   "Forces"
+  ],
+  "sub": [
+   "2.2",
+   "Magnets in everyday life"
+  ],
+  "text": "Describe how magnets attract or repel each other based on their polarity"
+ },
+ {
+  "year": 7,
+  "code": "2.2.2",
+  "fa": [
+   "2",
+   "Forces"
+  ],
+  "sub": [
+   "2.2",
+   "Magnets in everyday life"
+  ],
+  "text": "Conduct a practical investigation to test the effect of distance on the action of a magnet"
+ },
+ {
+  "year": 7,
+  "code": "2.2.3",
+  "fa": [
+   "2",
+   "Forces"
+  ],
+  "sub": [
+   "2.2",
+   "Magnets in everyday life"
+  ],
+  "text": "Observe and map the magnetic fields of magnets"
+ },
+ {
+  "year": 7,
+  "code": "2.2.4",
+  "fa": [
+   "2",
+   "Forces"
+  ],
+  "sub": [
+   "2.2",
+   "Magnets in everyday life"
+  ],
+  "text": "Conduct a practical investigation to construct electromagnets and compare their strength"
+ },
+ {
+  "year": 7,
+  "code": "2.3.1",
+  "fa": [
+   "2",
+   "Forces"
+  ],
+  "sub": [
+   "2.3",
+   "Simple machines in everyday life"
+  ],
+  "text": "Explore the role of simple machines, from now and in the past, as used in everyday life"
+ },
+ {
+  "year": 7,
+  "code": "2.3.2",
+  "fa": [
+   "2",
+   "Forces"
+  ],
+  "sub": [
+   "2.3",
+   "Simple machines in everyday life"
+  ],
+  "text": "Conduct a series of practical investigations using simple machines to investigate the action of forces"
+ },
+ {
+  "year": 7,
+  "code": "2.3.3",
+  "fa": [
+   "2",
+   "Forces"
+  ],
+  "sub": [
+   "2.3",
+   "Simple machines in everyday life"
+  ],
+  "text": "Investigate how simple machines, such as levers and pulleys, are used to change the magnitude of force needed when performing a task"
+ },
+ {
+  "year": 7,
+  "code": "2.3.4",
+  "fa": [
+   "2",
+   "Forces"
+  ],
+  "sub": [
+   "2.3",
+   "Simple machines in everyday life"
+  ],
+  "text": "Identify examples of Aboriginal and Torres Strait Islander Peoples’ application of Knowledge about forces"
+ },
+ {
+  "year": 7,
+  "code": "2.3.5",
+  "fa": [
+   "2",
+   "Forces"
+  ],
+  "sub": [
+   "2.3",
+   "Simple machines in everyday life"
+  ],
+  "text": "Investigate how simple machines can solve everyday issues"
+ },
+ {
+  "year": 7,
+  "code": "2.4.1",
+  "fa": [
+   "2",
+   "Forces"
+  ],
+  "sub": [
+   "2.4",
+   "Forces - in Context"
+  ],
+  "text": "Investigate examples of forces and magnetism in familiar contexts"
+ },
+ {
+  "year": 7,
+  "code": "3.1.1",
+  "fa": [
+   "3",
+   "Cells & Classification"
+  ],
+  "sub": [
+   "3.1",
+   "Classification of living things"
+  ],
+  "text": "Describe the characteristics of living things"
+ },
+ {
+  "year": 7,
+  "code": "3.1.2",
+  "fa": [
+   "3",
+   "Cells & Classification"
+  ],
+  "sub": [
+   "3.1",
+   "Classification of living things"
+  ],
+  "text": "Discuss the role and importance of classification in ordering and organising the diversity of life on Earth"
+ },
+ {
+  "year": 7,
+  "code": "3.1.3",
+  "fa": [
+   "3",
+   "Cells & Classification"
+  ],
+  "sub": [
+   "3.1",
+   "Classification of living things"
+  ],
+  "text": "Classify species using scientific conventions from the binomial system of classification, including kingdom, phylum, class, order, family, genus and species"
+ },
+ {
+  "year": 7,
+  "code": "3.1.4",
+  "fa": [
+   "3",
+   "Cells & Classification"
+  ],
+  "sub": [
+   "3.1",
+   "Classification of living things"
+  ],
+  "text": "Conduct an investigation to observe and identify the similarities and differences of structural features within and between groups of organisms"
+ },
+ {
+  "year": 7,
+  "code": "3.1.5",
+  "fa": [
+   "3",
+   "Cells & Classification"
+  ],
+  "sub": [
+   "3.1",
+   "Classification of living things"
+  ],
+  "text": "Investigate how organisms in an Australian habitat are adapted to their environment and document findings in a written scientific report"
+ },
+ {
+  "year": 7,
+  "code": "3.1.6",
+  "fa": [
+   "3",
+   "Cells & Classification"
+  ],
+  "sub": [
+   "3.1",
+   "Classification of living things"
+  ],
+  "text": "Interpret dichotomous keys to identify organisms surveyed in an Australian habitat"
+ },
+ {
+  "year": 7,
+  "code": "3.1.7",
+  "fa": [
+   "3",
+   "Cells & Classification"
+  ],
+  "sub": [
+   "3.1",
+   "Classification of living things"
+  ],
+  "text": "Explain how plants and animals are classified in Aboriginal and Torres Strait Islander Cultures based on their uses, forms and functions"
+ },
+ {
+  "year": 7,
+  "code": "3.2.1",
+  "fa": [
+   "3",
+   "Cells & Classification"
+  ],
+  "sub": [
+   "3.2",
+   "Cells"
+  ],
+  "text": "Outline cell theory"
+ },
+ {
+  "year": 7,
+  "code": "3.2.2",
+  "fa": [
+   "3",
+   "Cells & Classification"
+  ],
+  "sub": [
+   "3.2",
+   "Cells"
+  ],
+  "text": "Identify which cell structures and organelles are common in plant and animal cells"
+ },
+ {
+  "year": 7,
+  "code": "3.2.3",
+  "fa": [
+   "3",
+   "Cells & Classification"
+  ],
+  "sub": [
+   "3.2",
+   "Cells"
+  ],
+  "text": "Describe the functions of the cell membrane, cytoplasm, nucleus containing DNA, mitochondria and chloroplasts"
+ },
+ {
+  "year": 7,
+  "code": "3.2.4",
+  "fa": [
+   "3",
+   "Cells & Classification"
+  ],
+  "sub": [
+   "3.2",
+   "Cells"
+  ],
+  "text": "Compare the structure of plant and animal cells to identify similarities and differences"
+ },
+ {
+  "year": 7,
+  "code": "3.2.5",
+  "fa": [
+   "3",
+   "Cells & Classification"
+  ],
+  "sub": [
+   "3.2",
+   "Cells"
+  ],
+  "text": "Conduct an investigation to observe and record the similarities and differences between different cells, including fungi, bacteria, plant and animal cells, using microscopes and/or images obtained from microscopes"
+ },
+ {
+  "year": 7,
+  "code": "3.2.6",
+  "fa": [
+   "3",
+   "Cells & Classification"
+  ],
+  "sub": [
+   "3.2",
+   "Cells"
+  ],
+  "text": "Identify cellular respiration via mitochondria, and photosynthesis via chloroplasts, as examples of important processes that take place in specialised organelles"
+ },
+ {
+  "year": 7,
+  "code": "3.2.7",
+  "fa": [
+   "3",
+   "Cells & Classification"
+  ],
+  "sub": [
+   "3.2",
+   "Cells"
+  ],
+  "text": "Draw single-celled organisms observed under a microscope"
+ },
+ {
+  "year": 7,
+  "code": "3.2.8",
+  "fa": [
+   "3",
+   "Cells & Classification"
+  ],
+  "sub": [
+   "3.2",
+   "Cells"
+  ],
+  "text": "Describe the role of specialised cells in multicellular organisms and explain why they are needed"
+ },
+ {
+  "year": 7,
+  "code": "3.2.9",
+  "fa": [
+   "3",
+   "Cells & Classification"
+  ],
+  "sub": [
+   "3.2",
+   "Cells"
+  ],
+  "text": "Represent the arrangement of specialised cells in tissues and in organs"
+ },
+ {
+  "year": 7,
+  "code": "3.2.10",
+  "fa": [
+   "3",
+   "Cells & Classification"
+  ],
+  "sub": [
+   "3.2",
+   "Cells"
+  ],
+  "text": "Examine the relationship between structure and function for a range of specialised cells"
+ },
+ {
+  "year": 7,
+  "code": "3.2.11",
+  "fa": [
+   "3",
+   "Cells & Classification"
+  ],
+  "sub": [
+   "3.2",
+   "Cells"
+  ],
+  "text": "Conduct a practical investigation to observe and compare prepared slides of specialised cells"
+ },
+ {
+  "year": 7,
+  "code": "3.3.1",
+  "fa": [
+   "3",
+   "Cells & Classification"
+  ],
+  "sub": [
+   "3.3",
+   "Cells and Classification - in Context"
+  ],
+  "text": "Cells and classification in context"
+ },
+ {
+  "year": 7,
+  "code": "4.1.1",
+  "fa": [
+   "4",
+   "Solutions and Mixtures"
+  ],
+  "sub": [
+   "4.1",
+   "Properties of matter"
+  ],
+  "text": "Identify the 3 main states of matter and how they are represented in the movement of water on earth"
+ },
+ {
+  "year": 7,
+  "code": "4.1.2",
+  "fa": [
+   "4",
+   "Solutions and Mixtures"
+  ],
+  "sub": [
+   "4.1",
+   "Properties of matter"
+  ],
+  "text": "Conduct an investigation to measure and graph the temperature of water to identify the changes of state as heated over time"
+ },
+ {
+  "year": 7,
+  "code": "4.1.3",
+  "fa": [
+   "4",
+   "Solutions and Mixtures"
+  ],
+  "sub": [
+   "4.1",
+   "Properties of matter"
+  ],
+  "text": "Represent changes in the state of matter in terms of particle arrangement and movement"
+ },
+ {
+  "year": 7,
+  "code": "4.1.4",
+  "fa": [
+   "4",
+   "Solutions and Mixtures"
+  ],
+  "sub": [
+   "4.1",
+   "Properties of matter"
+  ],
+  "text": "Compare the properties of matter in different states, including the relative strength of attractive forces between solid, liquid and gas particles, to explain differences in the behaviours of the 3 states of matter"
+ },
+ {
+  "year": 7,
+  "code": "4.2.1",
+  "fa": [
+   "4",
+   "Solutions and Mixtures"
+  ],
+  "sub": [
+   "4.2",
+   "Properties of water"
+  ],
+  "text": "Investigate the other physical properties of water, such as density, buoyancy and surface tension"
+ },
+ {
+  "year": 7,
+  "code": "4.2.3",
+  "fa": [
+   "4",
+   "Solutions and Mixtures"
+  ],
+  "sub": [
+   "4.2",
+   "Properties of water"
+  ],
+  "text": "Determine the volume and mass of regular-shaped and irregular-shaped objects to calculate their density using the formula  p=m/v"
+ },
+ {
+  "year": 7,
+  "code": "4.2.2",
+  "fa": [
+   "4",
+   "Solutions and Mixtures"
+  ],
+  "sub": [
+   "4.2",
+   "Properties of water"
+  ],
+  "text": "Conduct a practical investigation and select appropriate equipment to measure the density of water and other substances, and record the results in a table to compare the calculated density with SI data"
+ },
+ {
+  "year": 7,
+  "code": "4.3.1",
+  "fa": [
+   "4",
+   "Solutions and Mixtures"
+  ],
+  "sub": [
+   "4.3",
+   "Solutions"
+  ],
+  "text": "Investigate what substances dissolve in water and discuss findings using key terms, including soluble, insoluble, solubility, solute, solvent and solution"
+ },
+ {
+  "year": 7,
+  "code": "4.3.2",
+  "fa": [
+   "4",
+   "Solutions and Mixtures"
+  ],
+  "sub": [
+   "4.3",
+   "Solutions"
+  ],
+  "text": "Conduct and document a practical investigation to measure solubility of different solutes in water, and present data using tables and relevant graphs"
+ },
+ {
+  "year": 7,
+  "code": "4.3.3",
+  "fa": [
+   "4",
+   "Solutions and Mixtures"
+  ],
+  "sub": [
+   "4.3",
+   "Solutions"
+  ],
+  "text": "Qualitatively investigate the effect of temperature on solubility"
+ },
+ {
+  "year": 7,
+  "code": "4.3.4",
+  "fa": [
+   "4",
+   "Solutions and Mixtures"
+  ],
+  "sub": [
+   "4.3",
+   "Solutions"
+  ],
+  "text": "Describe how solutions can be modelled using particle theory"
+ },
+ {
+  "year": 7,
+  "code": "4.3.5",
+  "fa": [
+   "4",
+   "Solutions and Mixtures"
+  ],
+  "sub": [
+   "4.3",
+   "Solutions"
+  ],
+  "text": "Compare the properties of dilute, concentrated, saturated and supersaturated solutions"
+ },
+ {
+  "year": 7,
+  "code": "4.4.1",
+  "fa": [
+   "4",
+   "Solutions and Mixtures"
+  ],
+  "sub": [
+   "4.4",
+   "Separating mixtures"
+  ],
+  "text": "Distinguish between atoms, mixtures and compounds and explain their properties using particle theory"
+ },
+ {
+  "year": 7,
+  "code": "4.4.2",
+  "fa": [
+   "4",
+   "Solutions and Mixtures"
+  ],
+  "sub": [
+   "4.4",
+   "Separating mixtures"
+  ],
+  "text": "Classify matter as pure substances, including elements and compounds, and impure substances, including mixtures based on their particle composition"
+ },
+ {
+  "year": 7,
+  "code": "4.4.3",
+  "fa": [
+   "4",
+   "Solutions and Mixtures"
+  ],
+  "sub": [
+   "4.4",
+   "Separating mixtures"
+  ],
+  "text": "Explain how the physical properties of substances are used to separate mixtures"
+ },
+ {
+  "year": 7,
+  "code": "4.4.4",
+  "fa": [
+   "4",
+   "Solutions and Mixtures"
+  ],
+  "sub": [
+   "4.4",
+   "Separating mixtures"
+  ],
+  "text": "Conduct a series of practical investigations to explore common techniques to separate mixtures"
+ },
+ {
+  "year": 7,
+  "code": "4.4.5",
+  "fa": [
+   "4",
+   "Solutions and Mixtures"
+  ],
+  "sub": [
+   "4.4",
+   "Separating mixtures"
+  ],
+  "text": "Investigate techniques used by Aboriginal and/or Torres Strait Islander Peoples to separate mixtures"
+ },
+ {
+  "year": 7,
+  "code": "4.4.6",
+  "fa": [
+   "4",
+   "Solutions and Mixtures"
+  ],
+  "sub": [
+   "4.4",
+   "Separating mixtures"
+  ],
+  "text": "Investigate an industrial separation technique"
+ },
+ {
+  "year": 7,
+  "code": "4.5.1",
+  "fa": [
+   "4",
+   "Solutions and Mixtures"
+  ],
+  "sub": [
+   "4.5",
+   "Solutions and mixtures - in Context"
+  ],
+  "text": "Model how a body of water can become polluted, and plan and conduct a practical investigation that attempts to remove the pollutants"
+ },
+ {
+  "year": 8,
+  "code": "5.1.1",
+  "fa": [
+   "5",
+   "Living Systems"
+  ],
+  "sub": [
+   "5.1",
+   "Body Systems"
+  ],
+  "text": "Explain the interrelationship among cells, tissues and organs"
+ },
+ {
+  "year": 8,
+  "code": "5.1.2",
+  "fa": [
+   "5",
+   "Living Systems"
+  ],
+  "sub": [
+   "5.1",
+   "Body Systems"
+  ],
+  "text": "Identify the role of the digestive, circulatory, respiratory and excretory systems of humans, and name the major organs"
+ },
+ {
+  "year": 8,
+  "code": "5.1.3",
+  "fa": [
+   "5",
+   "Living Systems"
+  ],
+  "sub": [
+   "5.1",
+   "Body Systems"
+  ],
+  "text": "Draw or annotate representations of models of organ systems to describe their processes and functions"
+ },
+ {
+  "year": 8,
+  "code": "5.1.4",
+  "fa": [
+   "5",
+   "Living Systems"
+  ],
+  "sub": [
+   "5.1",
+   "Body Systems"
+  ],
+  "text": "Describe how the structures of organ systems, and the specialised cells within these systems, enable them to carry out their functions"
+ },
+ {
+  "year": 8,
+  "code": "5.1.5",
+  "fa": [
+   "5",
+   "Living Systems"
+  ],
+  "sub": [
+   "5.1",
+   "Body Systems"
+  ],
+  "text": "Explain how a disorder or disease affecting the components of a body system, or the removal of any component in the body system, impacts on the overall functioning of the system and the organism as a whole"
+ },
+ {
+  "year": 8,
+  "code": "5.1.6",
+  "fa": [
+   "5",
+   "Living Systems"
+  ],
+  "sub": [
+   "5.1",
+   "Body Systems"
+  ],
+  "text": "Describe how the components of each body system interact to allow the efficient functioning of an organism"
+ },
+ {
+  "year": 8,
+  "code": "5.2.1",
+  "fa": [
+   "5",
+   "Living Systems"
+  ],
+  "sub": [
+   "5.2",
+   "Plant systems"
+  ],
+  "text": "Determine the role, structure and function of the components of a plant, including the xylem and phloem, in maintaining plants as multicellular organisms"
+ },
+ {
+  "year": 8,
+  "code": "5.2.2",
+  "fa": [
+   "5",
+   "Living Systems"
+  ],
+  "sub": [
+   "5.2",
+   "Plant systems"
+  ],
+  "text": "Use scientific tools and instruments to observe the specialised cells and tissues involved in the structure and function of plants"
+ },
+ {
+  "year": 8,
+  "code": "5.3.1",
+  "fa": [
+   "5",
+   "Living Systems"
+  ],
+  "sub": [
+   "5.3",
+   "Ecosystems"
+  ],
+  "text": "Identify the components that make up an ecosystem"
+ },
+ {
+  "year": 8,
+  "code": "5.3.2",
+  "fa": [
+   "5",
+   "Living Systems"
+  ],
+  "sub": [
+   "5.3",
+   "Ecosystems"
+  ],
+  "text": "Investigate the interactions of biotic and abiotic factors in an ecosystem"
+ },
+ {
+  "year": 8,
+  "code": "5.3.3",
+  "fa": [
+   "5",
+   "Living Systems"
+  ],
+  "sub": [
+   "5.3",
+   "Ecosystems"
+  ],
+  "text": "Identify how matter and energy are cycled through an ecosystem"
+ },
+ {
+  "year": 8,
+  "code": "5.3.4",
+  "fa": [
+   "5",
+   "Living Systems"
+  ],
+  "sub": [
+   "5.3",
+   "Ecosystems"
+  ],
+  "text": "Create a food web and ecological energy pyramid based on local area observations to describe how matter and energy move through an ecosystem"
+ },
+ {
+  "year": 8,
+  "code": "5.3.5",
+  "fa": [
+   "5",
+   "Living Systems"
+  ],
+  "sub": [
+   "5.3",
+   "Ecosystems"
+  ],
+  "text": "Create written texts to explain how energy pyramids show the amount of energy or matter at each trophic level"
+ },
+ {
+  "year": 8,
+  "code": "5.3.6",
+  "fa": [
+   "5",
+   "Living Systems"
+  ],
+  "sub": [
+   "5.3",
+   "Ecosystems"
+  ],
+  "text": "Examine secondary-source data on the factors that change populations, including the introduction of a new species to an ecosystem, to identify trends, patterns and relationships, and draw conclusions"
+ },
+ {
+  "year": 8,
+  "code": "5.4.1",
+  "fa": [
+   "5",
+   "Living Systems"
+  ],
+  "sub": [
+   "5.4",
+   "Living systems - in Context"
+  ],
+  "text": "Investigate factors that lead to a species becoming endangered or extinct to explain why Australia has some of the world’s highest rates of species population decline and extinction"
+ },
+ {
+  "year": 8,
+  "code": "6.1.1",
+  "fa": [
+   "6",
+   "Periodic Table and Atomic Structure"
+  ],
+  "sub": [
+   "6.1",
+   "Classification of matter"
+  ],
+  "text": "Identify some common elements in everyday objects"
+ },
+ {
+  "year": 8,
+  "code": "6.1.2",
+  "fa": [
+   "6",
+   "Periodic Table and Atomic Structure"
+  ],
+  "sub": [
+   "6.1",
+   "Classification of matter"
+  ],
+  "text": "Conduct a series of investigations to identify and compare the physical properties of metals, non-metals and metalloids"
+ },
+ {
+  "year": 8,
+  "code": "6.1.3",
+  "fa": [
+   "6",
+   "Periodic Table and Atomic Structure"
+  ],
+  "sub": [
+   "6.1",
+   "Classification of matter"
+  ],
+  "text": "Explain how the properties of some common elements, compounds and alloys relate to their use(s)"
+ },
+ {
+  "year": 8,
+  "code": "6.2.1",
+  "fa": [
+   "6",
+   "Periodic Table and Atomic Structure"
+  ],
+  "sub": [
+   "6.2",
+   "Atomic structure"
+  ],
+  "text": "Identify the atom as the smallest unit of an element that retains the properties of that element"
+ },
+ {
+  "year": 8,
+  "code": "6.2.2",
+  "fa": [
+   "6",
+   "Periodic Table and Atomic Structure"
+  ],
+  "sub": [
+   "6.2",
+   "Atomic structure"
+  ],
+  "text": "Identify protons, neutrons and electrons as subatomic particles"
+ },
+ {
+  "year": 8,
+  "code": "6.2.3",
+  "fa": [
+   "6",
+   "Periodic Table and Atomic Structure"
+  ],
+  "sub": [
+   "6.2",
+   "Atomic structure"
+  ],
+  "text": "Describe the location, relative charge and mass of protons, neutrons and electrons using the planetary atomic model"
+ },
+ {
+  "year": 8,
+  "code": "6.2.4",
+  "fa": [
+   "6",
+   "Periodic Table and Atomic Structure"
+  ],
+  "sub": [
+   "6.2",
+   "Atomic structure"
+  ],
+  "text": "Outline how models of atomic structure have changed over time"
+ },
+ {
+  "year": 8,
+  "code": "6.2.5",
+  "fa": [
+   "6",
+   "Periodic Table and Atomic Structure"
+  ],
+  "sub": [
+   "6.2",
+   "Atomic structure"
+  ],
+  "text": "Explain how observations made possible by new technologies have led to a more detailed understanding of atomic structure"
+ },
+ {
+  "year": 8,
+  "code": "6.3.1",
+  "fa": [
+   "6",
+   "Periodic Table and Atomic Structure"
+  ],
+  "sub": [
+   "6.3",
+   "Periodic table"
+  ],
+  "text": "Outline patterns and relationships found in the periodic table, including reactivity"
+ },
+ {
+  "year": 8,
+  "code": "6.3.2",
+  "fa": [
+   "6",
+   "Periodic Table and Atomic Structure"
+  ],
+  "sub": [
+   "6.3",
+   "Periodic table"
+  ],
+  "text": "Predict the properties of elements based on their position and location on the periodic table"
+ },
+ {
+  "year": 8,
+  "code": "6.3.3",
+  "fa": [
+   "6",
+   "Periodic Table and Atomic Structure"
+  ],
+  "sub": [
+   "6.3",
+   "Periodic table"
+  ],
+  "text": "Identify the unique symbol of a range of elements"
+ },
+ {
+  "year": 8,
+  "code": "6.3.4",
+  "fa": [
+   "6",
+   "Periodic Table and Atomic Structure"
+  ],
+  "sub": [
+   "6.3",
+   "Periodic table"
+  ],
+  "text": "Use the periodic table to identify the elements in some common compounds"
+ },
+ {
+  "year": 8,
+  "code": "6.3.5",
+  "fa": [
+   "6",
+   "Periodic Table and Atomic Structure"
+  ],
+  "sub": [
+   "6.3",
+   "Periodic table"
+  ],
+  "text": "Investigate some tests that could be used to identify metal and non-metal elements"
+ },
+ {
+  "year": 8,
+  "code": "6.3.6",
+  "fa": [
+   "6",
+   "Periodic Table and Atomic Structure"
+  ],
+  "sub": [
+   "6.3",
+   "Periodic table"
+  ],
+  "text": "Model the atomic structure of the first 18 elements to identify that atomic structure changes with increasing atomic number"
+ },
+ {
+  "year": 8,
+  "code": "6.3.7",
+  "fa": [
+   "6",
+   "Periodic Table and Atomic Structure"
+  ],
+  "sub": [
+   "6.3",
+   "Periodic table"
+  ],
+  "text": "Describe how the historical development of the periodic table demonstrated understanding of the chemical and physical properties of elements"
+ },
+ {
+  "year": 8,
+  "code": "6.4.1",
+  "fa": [
+   "6",
+   "Periodic Table and Atomic Structure"
+  ],
+  "sub": [
+   "6.4",
+   "Periodic table and atomic structure - in Context"
+  ],
+  "text": "Investigate how the properties and availability of materials, including metals, alloys and compounds, influence their uses"
+ },
+ {
+  "year": 8,
+  "code": "7.1.2",
+  "fa": [
+   "6",
+   "Periodic Table and Atomic Structure"
+  ],
+  "sub": [
+   "7.1",
+   "Energy transfers"
+  ],
+  "text": "Describe, using the terms ‘potential energy’ (PE) or ‘kinetic energy’ (KE), how systems can store different forms of energy, including thermal, elastic, chemical and gravitational energy"
+ },
+ {
+  "year": 8,
+  "code": "7.1.3",
+  "fa": [
+   "6",
+   "Periodic Table and Atomic Structure"
+  ],
+  "sub": [
+   "7.1",
+   "Energy transfers"
+  ],
+  "text": "Identify examples of how energy can change from one form into another"
+ },
+ {
+  "year": 8,
+  "code": "7.1.4",
+  "fa": [
+   "6",
+   "Periodic Table and Atomic Structure"
+  ],
+  "sub": [
+   "7.1",
+   "Energy transfers"
+  ],
+  "text": "Use practical investigations and representations to illustrate energy transformations in a system"
+ },
+ {
+  "year": 8,
+  "code": "7.1.1",
+  "fa": [
+   "6",
+   "Periodic Table and Atomic Structure"
+  ],
+  "sub": [
+   "7.1",
+   "Energy transfers"
+  ],
+  "text": "Identify conduction, convection and radiation as different ways that energy can be transferred, and distinguish between these forms"
+ },
+ {
+  "year": 8,
+  "code": "7.1.5",
+  "fa": [
+   "6",
+   "Periodic Table and Atomic Structure"
+  ],
+  "sub": [
+   "7.1",
+   "Energy transfers"
+  ],
+  "text": "Define open and closed systems to describe how energy is transferred into and out of systems, and how it cycles within a system"
+ },
+ {
+  "year": 8,
+  "code": "7.1.6",
+  "fa": [
+   "6",
+   "Periodic Table and Atomic Structure"
+  ],
+  "sub": [
+   "7.1",
+   "Energy transfers"
+  ],
+  "text": "Apply the law of conservation of energy to familiar examples"
+ },
+ {
+  "year": 8,
+  "code": "7.1.7",
+  "fa": [
+   "6",
+   "Periodic Table and Atomic Structure"
+  ],
+  "sub": [
+   "7.1",
+   "Energy transfers"
+  ],
+  "text": "Use representations to illustrate energy transformations, including how radiant energy from the Sun can be transformed into a different form of energy"
+ },
+ {
+  "year": 8,
+  "code": "7.2.1",
+  "fa": [
+   "6",
+   "Periodic Table and Atomic Structure"
+  ],
+  "sub": [
+   "7.2",
+   "Chemical change"
+  ],
+  "text": "Undertake experiments to identify the indicators of physical and chemical changes"
+ },
+ {
+  "year": 8,
+  "code": "7.2.2",
+  "fa": [
+   "6",
+   "Periodic Table and Atomic Structure"
+  ],
+  "sub": [
+   "7.2",
+   "Chemical change"
+  ],
+  "text": "Describe the initial and final changes that are observed in a chemical reaction, including writing a word equation to represent a chemical reaction"
+ },
+ {
+  "year": 8,
+  "code": "7.2.3",
+  "fa": [
+   "6",
+   "Periodic Table and Atomic Structure"
+  ],
+  "sub": [
+   "7.2",
+   "Chemical change"
+  ],
+  "text": "Investigate and observe energy changes in different chemical reactions"
+ },
+ {
+  "year": 8,
+  "code": "7.2.4",
+  "fa": [
+   "6",
+   "Periodic Table and Atomic Structure"
+  ],
+  "sub": [
+   "7.2",
+   "Chemical change"
+  ],
+  "text": "Conduct a practical investigation to model cellular processes, including respiration and photosynthesis, and document findings in a written report"
+ },
+ {
+  "year": 8,
+  "code": "7.3.1",
+  "fa": [
+   "6",
+   "Periodic Table and Atomic Structure"
+  ],
+  "sub": [
+   "7.3",
+   "Geological change"
+  ],
+  "text": "Describe the processes associated with the movement of tectonic plates"
+ },
+ {
+  "year": 8,
+  "code": "7.3.2",
+  "fa": [
+   "6",
+   "Periodic Table and Atomic Structure"
+  ],
+  "sub": [
+   "7.3",
+   "Geological change"
+  ],
+  "text": "Identify the evidence used to develop the theory of plate tectonics"
+ },
+ {
+  "year": 8,
+  "code": "7.3.3",
+  "fa": [
+   "6",
+   "Periodic Table and Atomic Structure"
+  ],
+  "sub": [
+   "7.3",
+   "Geological change"
+  ],
+  "text": "Identify that earthquakes and volcanoes are natural phenomena that provide evidence of geological changes in the Earth’s crust and surface"
+ },
+ {
+  "year": 8,
+  "code": "7.3.4",
+  "fa": [
+   "6",
+   "Periodic Table and Atomic Structure"
+  ],
+  "sub": [
+   "7.3",
+   "Geological change"
+  ],
+  "text": "Describe how Aboriginal and/or Aboriginal and Torres Strait Islander Cultural accounts provide evidence of earthquakes and volcanoes onCountry or under the sea"
+ },
+ {
+  "year": 8,
+  "code": "7.3.5",
+  "fa": [
+   "6",
+   "Periodic Table and Atomic Structure"
+  ],
+  "sub": [
+   "7.3",
+   "Geological change"
+  ],
+  "text": "Conduct investigations or simulations to compare the observable properties of different types of minerals and rocks"
+ },
+ {
+  "year": 8,
+  "code": "7.3.6",
+  "fa": [
+   "6",
+   "Periodic Table and Atomic Structure"
+  ],
+  "sub": [
+   "7.3",
+   "Geological change"
+  ],
+  "text": "Use the rock cycle to explain the geological processes that lead to the formation and transformation of different types of rocks"
+ },
+ {
+  "year": 8,
+  "code": "7.3.7",
+  "fa": [
+   "6",
+   "Periodic Table and Atomic Structure"
+  ],
+  "sub": [
+   "7.3",
+   "Geological change"
+  ],
+  "text": "Model the formation of fossils and explain how fossils show evidence that different organisms existed at different times in the past"
+ },
+ {
+  "year": 8,
+  "code": "7.3.8",
+  "fa": [
+   "6",
+   "Periodic Table and Atomic Structure"
+  ],
+  "sub": [
+   "7.3",
+   "Geological change"
+  ],
+  "text": "Recognise that the law of superposition allows scientists to determine the relative age of rock strata"
+ },
+ {
+  "year": 8,
+  "code": "7.3.9",
+  "fa": [
+   "6",
+   "Periodic Table and Atomic Structure"
+  ],
+  "sub": [
+   "7.3",
+   "Geological change"
+  ],
+  "text": "Describe the elemental composition of the Earth and one or more other planets"
+ },
+ {
+  "year": 8,
+  "code": "7.4.1",
+  "fa": [
+   "6",
+   "Periodic Table and Atomic Structure"
+  ],
+  "sub": [
+   "7.4",
+   "Change - in Context"
+  ],
+  "text": "Observe or design a chain reaction machine to represent energy stores and explain the transfers in the system"
+ },
+ {
+  "year": 8,
+  "code": "8.1.1",
+  "fa": [
+   "8",
+   "Data Science 1"
+  ],
+  "sub": [
+   "8.1",
+   "Data"
+  ],
+  "text": "Examine a range of sources of data and their applications"
+ },
+ {
+  "year": 8,
+  "code": "8.1.2",
+  "fa": [
+   "8",
+   "Data Science 1"
+  ],
+  "sub": [
+   "8.1",
+   "Data"
+  ],
+  "text": "Examine the digital footprint created by different online activities to recognise the importance of engaging safely with digital systems"
+ },
+ {
+  "year": 8,
+  "code": "8.1.3",
+  "fa": [
+   "8",
+   "Data Science 1"
+  ],
+  "sub": [
+   "8.1",
+   "Data"
+  ],
+  "text": "Recognise that data science is an interdisciplinary field that uses statistics, scientific methods and processes, algorithms and systems to develop knowledge by extracting or extrapolating insights from data"
+ },
+ {
+  "year": 8,
+  "code": "8.2.1",
+  "fa": [
+   "8",
+   "Data Science 1"
+  ],
+  "sub": [
+   "8.2",
+   "Scientific models"
+  ],
+  "text": "Compare and contrast scientific inquiries of natural phenomena with nonscientific approaches"
+ },
+ {
+  "year": 8,
+  "code": "8.2.2",
+  "fa": [
+   "8",
+   "Data Science 1"
+  ],
+  "sub": [
+   "8.2",
+   "Scientific models"
+  ],
+  "text": "Identify that a scientific model is a representation based on data and observations of real-world phenomena"
+ },
+ {
+  "year": 8,
+  "code": "8.2.3",
+  "fa": [
+   "8",
+   "Data Science 1"
+  ],
+  "sub": [
+   "8.2",
+   "Scientific models"
+  ],
+  "text": "Identify examples of the types of models used by scientists"
+ },
+ {
+  "year": 8,
+  "code": "8.2.4",
+  "fa": [
+   "8",
+   "Data Science 1"
+  ],
+  "sub": [
+   "8.2",
+   "Scientific models"
+  ],
+  "text": "Analyse a model to identify data and trends, and generate predictions"
+ },
+ {
+  "year": 8,
+  "code": "8.2.4",
+  "fa": [
+   "8",
+   "Data Science 1"
+  ],
+  "sub": [
+   "8.2",
+   "Scientific models"
+  ],
+  "text": "Identify that computer-based models enable phenomena to be simulated, and variables can be easily changed to investigate their effect"
+ },
+ {
+  "year": 8,
+  "code": "8.3.1",
+  "fa": [
+   "8",
+   "Data Science 1"
+  ],
+  "sub": [
+   "8.3",
+   "Applications of models"
+  ],
+  "text": "Identify data and observations used by scientists for the development of a model"
+ },
+ {
+  "year": 8,
+  "code": "8.3.2",
+  "fa": [
+   "8",
+   "Data Science 1"
+  ],
+  "sub": [
+   "8.3",
+   "Applications of models"
+  ],
+  "text": "Outline how scientists develop workable theories from models"
+ },
+ {
+  "year": 8,
+  "code": "8.4.1",
+  "fa": [
+   "8",
+   "Data Science 1"
+  ],
+  "sub": [
+   "8.4",
+   "Collecting, using and analysing datasets"
+  ],
+  "text": "Formulate and investigate scientific questions that can be addressed with data"
+ },
+ {
+  "year": 8,
+  "code": "8.4.2",
+  "fa": [
+   "8",
+   "Data Science 1"
+  ],
+  "sub": [
+   "8.4",
+   "Collecting, using and analysing datasets"
+  ],
+  "text": "Conduct repeated experimental trials to calculate and compare the mean and range of data collected by different groups to discuss the accuracy and reliability of experimental data"
+ },
+ {
+  "year": 8,
+  "code": "8.4.3",
+  "fa": [
+   "8",
+   "Data Science 1"
+  ],
+  "sub": [
+   "8.4",
+   "Collecting, using and analysing datasets"
+  ],
+  "text": "Analyse data collected from a range of student investigations to look for patterns and test whether data is consistent with an initial prediction"
+ },
+ {
+  "year": 8,
+  "code": "8.4.4",
+  "fa": [
+   "8",
+   "Data Science 1"
+  ],
+  "sub": [
+   "8.4",
+   "Collecting, using and analysing datasets"
+  ],
+  "text": "Mean, Range and mode comparison"
+ },
+ {
+  "year": 8,
+  "code": "8.5.1",
+  "fa": [
+   "8",
+   "Data Science 1"
+  ],
+  "sub": [
+   "8.5",
+   "Data science 1 - in Context"
+  ],
+  "text": "Create a model that can be used to explain an observable phenomenon"
+ },
+ {
+  "year": 9,
+  "code": "1.1.1",
+  "fa": [
+   "1",
+   "Energy"
+  ],
+  "sub": [
+   "1.1",
+   "Law of conservation of energy"
+  ],
+  "text": "Use the law of conservation of energy, and calculations, to explain that total energy is maintained in energy transfers and transformations in a closed system"
+ },
+ {
+  "year": 9,
+  "code": "1.2.1",
+  "fa": [
+   "1",
+   "Energy"
+  ],
+  "sub": [
+   "1.1",
+   "Law of conservation of energy"
+  ],
+  "text": "Identify different types of energy sources"
+ },
+ {
+  "year": 9,
+  "code": "1.1.2",
+  "fa": [
+   "1",
+   "Energy"
+  ],
+  "sub": [
+   "1.1",
+   "Law of conservation of energy"
+  ],
+  "text": "Explain efficiency in relation to energy transfers"
+ },
+ {
+  "year": 9,
+  "code": "1.1.3",
+  "fa": [
+   "1",
+   "Energy"
+  ],
+  "sub": [
+   "1.1",
+   "Law of conservation of energy"
+  ],
+  "text": "Explain how to improve energy efficiency in energy transfers and transformations"
+ },
+ {
+  "year": 9,
+  "code": "1.2.1",
+  "fa": [
+   "1",
+   "Energy"
+  ],
+  "sub": [
+   "1.2",
+   "Sources of energy"
+  ],
+  "text": "Identify different types of energy sources"
+ },
+ {
+  "year": 9,
+  "code": "1.2.2",
+  "fa": [
+   "1",
+   "Energy"
+  ],
+  "sub": [
+   "1.2",
+   "Sources of energy"
+  ],
+  "text": "Describe how electrical energy can be produced from different types of sources"
+ },
+ {
+  "year": 9,
+  "code": "1.2.3",
+  "fa": [
+   "1",
+   "Energy"
+  ],
+  "sub": [
+   "1.2",
+   "Sources of energy"
+  ],
+  "text": "Evaluate the advantages and disadvantages of using renewable and non-renewable sources of energy to generate electricity, including efficiency, economical and technological considerations"
+ },
+ {
+  "year": 9,
+  "code": "1.3.1",
+  "fa": [
+   "1",
+   "Energy"
+  ],
+  "sub": [
+   "1.3",
+   "Electrical energy"
+  ],
+  "text": "Identify the elements of a complete circuit"
+ },
+ {
+  "year": 9,
+  "code": "1.3.2",
+  "fa": [
+   "1",
+   "Energy"
+  ],
+  "sub": [
+   "1.3",
+   "Electrical energy"
+  ],
+  "text": "Construct circuits and draw circuit diagrams that contain several components to show the flow of electricity through a complete circuit"
+ },
+ {
+  "year": 9,
+  "code": "1.3.3",
+  "fa": [
+   "1",
+   "Energy"
+  ],
+  "sub": [
+   "1.3",
+   "Electrical energy"
+  ],
+  "text": "Measure and compare voltage and current at different points in series and parallel circuits"
+ },
+ {
+  "year": 9,
+  "code": "1.3.4",
+  "fa": [
+   "1",
+   "Energy"
+  ],
+  "sub": [
+   "1.3",
+   "Electrical energy"
+  ],
+  "text": "Conduct an investigation to determine the relationship between voltage (V),current (I), and resistance (R), as described by Ohm’s law (V=IR)"
+ },
+ {
+  "year": 9,
+  "code": "1.3.5",
+  "fa": [
+   "1",
+   "Energy"
+  ],
+  "sub": [
+   "1.3",
+   "Electrical energy"
+  ],
+  "text": "Conduct an investigation to compare the energy transformed over time in model circuits or appliances"
+ },
+ {
+  "year": 9,
+  "code": "1.3.6",
+  "fa": [
+   "1",
+   "Energy"
+  ],
+  "sub": [
+   "1.3",
+   "Electrical energy"
+  ],
+  "text": "Investigate the energy star ratings of a range of appliances and explain the criteria used to determine these ratings"
+ },
+ {
+  "year": 9,
+  "code": "1.4.1",
+  "fa": [
+   "1",
+   "Energy"
+  ],
+  "sub": [
+   "1.4",
+   "Global future energy needs"
+  ],
+  "text": "Evaluate ways to optimise current energy use"
+ },
+ {
+  "year": 9,
+  "code": "1.4.2",
+  "fa": [
+   "1",
+   "Energy"
+  ],
+  "sub": [
+   "1.4",
+   "Global future energy needs"
+  ],
+  "text": "Examine data to identify past trends in energy use, and predict possible future demands, at a state, national and global level"
+ },
+ {
+  "year": 9,
+  "code": "1.4.3",
+  "fa": [
+   "1",
+   "Energy"
+  ],
+  "sub": [
+   "1.4",
+   "Global future energy needs"
+  ],
+  "text": "Explain reasons for the development of alternative sources of energy"
+ },
+ {
+  "year": 9,
+  "code": "1.6.1",
+  "fa": [
+   "1",
+   "Energy"
+  ],
+  "sub": [
+   "1.4",
+   "Global future energy needs"
+  ],
+  "text": "Use data, evidence and research to evaluate the development of alternative energy sources to meet and reduce global energy demand"
+ },
+ {
+  "year": 9,
+  "code": "2.1.1",
+  "fa": [
+   "2",
+   "Disease"
+  ],
+  "sub": [
+   "2.1",
+   "Homeostasis"
+  ],
+  "text": "Identify the importance of maintaining stable internal conditions in the body"
+ },
+ {
+  "year": 9,
+  "code": "2.1.2",
+  "fa": [
+   "2",
+   "Disease"
+  ],
+  "sub": [
+   "2.1",
+   "Homeostasis"
+  ],
+  "text": "Investigate examples of an organism’s observable response to a stimuli"
+ },
+ {
+  "year": 9,
+  "code": "2.1.3",
+  "fa": [
+   "2",
+   "Disease"
+  ],
+  "sub": [
+   "2.1",
+   "Homeostasis"
+  ],
+  "text": "Identify the role of feedback loops in maintaining homeostasis"
+ },
+ {
+  "year": 9,
+  "code": "2.1.4",
+  "fa": [
+   "2",
+   "Disease"
+  ],
+  "sub": [
+   "2.1",
+   "Homeostasis"
+  ],
+  "text": "Compare and contrast the responses of the nervous and endocrine systems"
+ },
+ {
+  "year": 9,
+  "code": "2.1.5",
+  "fa": [
+   "2",
+   "Disease"
+  ],
+  "sub": [
+   "2.1",
+   "Homeostasis"
+  ],
+  "text": "Describe how the nervous and endocrine systems coordinate the body’s response to stimuli"
+ },
+ {
+  "year": 9,
+  "code": "2.2.1",
+  "fa": [
+   "2",
+   "Disease"
+  ],
+  "sub": [
+   "2.2",
+   "Infectious and non-infectious diseases"
+  ],
+  "text": "Distinguish between infectious and non-infectious diseases"
+ },
+ {
+  "year": 9,
+  "code": "2.2.2",
+  "fa": [
+   "2",
+   "Disease"
+  ],
+  "sub": [
+   "2.2",
+   "Infectious and non-infectious diseases"
+  ],
+  "text": "Identify causes of non-infectious and infectious diseases"
+ },
+ {
+  "year": 9,
+  "code": "2.2.3",
+  "fa": [
+   "2",
+   "Disease"
+  ],
+  "sub": [
+   "2.2",
+   "Infectious and non-infectious diseases"
+  ],
+  "text": "Compare the features and incidences of epidemics, endemics and pandemics"
+ },
+ {
+  "year": 9,
+  "code": "2.2.4",
+  "fa": [
+   "2",
+   "Disease"
+  ],
+  "sub": [
+   "2.2",
+   "Infectious and non-infectious diseases"
+  ],
+  "text": "Investigate data relating to a common non-infectious disease affecting Australians today"
+ },
+ {
+  "year": 9,
+  "code": "2.2.5",
+  "fa": [
+   "2",
+   "Disease"
+  ],
+  "sub": [
+   "2.2",
+   "Infectious and non-infectious diseases"
+  ],
+  "text": "Use modelling to investigate how infectious diseases can be spread"
+ },
+ {
+  "year": 9,
+  "code": "2.2.6",
+  "fa": [
+   "2",
+   "Disease"
+  ],
+  "sub": [
+   "2.2",
+   "Infectious and non-infectious diseases"
+  ],
+  "text": "Identify how the body prevents the entry of pathogens and describe how it responds to pathogens that enter the body"
+ },
+ {
+  "year": 9,
+  "code": "2.2.7",
+  "fa": [
+   "2",
+   "Disease"
+  ],
+  "sub": [
+   "2.2",
+   "Infectious and non-infectious diseases"
+  ],
+  "text": "Outline how a vaccination stimulates the body to produce antibodies to fight infection"
+ },
+ {
+  "year": 9,
+  "code": "2.3.1",
+  "fa": [
+   "2",
+   "Disease"
+  ],
+  "sub": [
+   "2.3",
+   "Disease control and prevention"
+  ],
+  "text": "Describe ways to reduce the incidence of non-infectious diseases"
+ },
+ {
+  "year": 9,
+  "code": "2.3.2",
+  "fa": [
+   "2",
+   "Disease"
+  ],
+  "sub": [
+   "2.3",
+   "Disease control and prevention"
+  ],
+  "text": "Assess ways to reduce the incidence and spread of infectious diseases"
+ },
+ {
+  "year": 9,
+  "code": "2.3.3",
+  "fa": [
+   "2",
+   "Disease"
+  ],
+  "sub": [
+   "2.3",
+   "Disease control and prevention"
+  ],
+  "text": "Investigate Aboriginal and/or Torres Strait Islander Peoples’ use of plants to prevent or control disease"
+ },
+ {
+  "year": 9,
+  "code": "2.3.4",
+  "fa": [
+   "2",
+   "Disease"
+  ],
+  "sub": [
+   "2.3",
+   "Disease control and prevention"
+  ],
+  "text": "Analyse data about immunisation programs and the occurrence of infectious diseases to identify trends, patterns and relationships, and document conclusions in a written text"
+ },
+ {
+  "year": 9,
+  "code": "2.4.1",
+  "fa": [
+   "2",
+   "Disease"
+  ],
+  "sub": [
+   "2.4",
+   "Disease - in Context"
+  ],
+  "text": "Investigate technological advances developed in Australia to address disease, disorders or physical trauma in the human body"
+ },
+ {
+  "year": 9,
+  "code": "3.1.1",
+  "fa": [
+   "3",
+   "Materials"
+  ],
+  "sub": [
+   "3.1",
+   "Resources"
+  ],
+  "text": "Identify the finite nature of the minerals and resources extracted in Australia"
+ },
+ {
+  "year": 9,
+  "code": "3.1.2",
+  "fa": [
+   "3",
+   "Materials"
+  ],
+  "sub": [
+   "3.1",
+   "Resources"
+  ],
+  "text": "Investigate the products produced from Australian minerals and resources"
+ },
+ {
+  "year": 9,
+  "code": "3.1.3",
+  "fa": [
+   "3",
+   "Materials"
+  ],
+  "sub": [
+   "3.1",
+   "Resources"
+  ],
+  "text": "Explain how Aboriginal and Torres Strait Islander Peoples used minerals and resources for a wide range of purposes"
+ },
+ {
+  "year": 9,
+  "code": "3.1.4",
+  "fa": [
+   "3",
+   "Materials"
+  ],
+  "sub": [
+   "3.1",
+   "Resources"
+  ],
+  "text": "Evaluate the environmental impact of extracting and using a named resource and document findings in a written scientific report"
+ },
+ {
+  "year": 9,
+  "code": "3.2.1",
+  "fa": [
+   "3",
+   "Materials"
+  ],
+  "sub": [
+   "3.1",
+   "Resources"
+  ],
+  "text": "Use valency to describe the number of electrons an atom needs to gain, lose or share to achieve a stable electron configuration"
+ },
+ {
+  "year": 9,
+  "code": "3.2.2",
+  "fa": [
+   "3",
+   "Materials"
+  ],
+  "sub": [
+   "3.1",
+   "Resources"
+  ],
+  "text": "Explain noble gas configuration and identify that it occurs during chemical bonding"
+ },
+ {
+  "year": 9,
+  "code": "3.2.3",
+  "fa": [
+   "3",
+   "Materials"
+  ],
+  "sub": [
+   "3.1",
+   "Resources"
+  ],
+  "text": "Describe types of chemical bonds, including ionic, covalent and metallic bonds"
+ },
+ {
+  "year": 9,
+  "code": "3.2.4",
+  "fa": [
+   "3",
+   "Materials"
+  ],
+  "sub": [
+   "3.1",
+   "Resources"
+  ],
+  "text": "Use models to describe the formation of cations and anions"
+ },
+ {
+  "year": 9,
+  "code": "3.2.5",
+  "fa": [
+   "3",
+   "Materials"
+  ],
+  "sub": [
+   "3.1",
+   "Resources"
+  ],
+  "text": "Recognise that some elements exist as diatomic molecules"
+ },
+ {
+  "year": 9,
+  "code": "3.2.6",
+  "fa": [
+   "3",
+   "Materials"
+  ],
+  "sub": [
+   "3.1",
+   "Resources"
+  ],
+  "text": "Construct chemical formulas of some common ionic compounds and covalent molecules"
+ },
+ {
+  "year": 9,
+  "code": "3.2.7",
+  "fa": [
+   "3",
+   "Materials"
+  ],
+  "sub": [
+   "3.1",
+   "Resources"
+  ],
+  "text": "Conduct an investigation to observe and compare the physical and chemical properties of ionic, covalent and metallic substances, and explain how these relate to their uses"
+ },
+ {
+  "year": 9,
+  "code": "3.3.1",
+  "fa": [
+   "3",
+   "Materials"
+  ],
+  "sub": [
+   "3.1",
+   "Resources"
+  ],
+  "text": "Distinguish between organic and inorganic compounds"
+ },
+ {
+  "year": 9,
+  "code": "3.3.2",
+  "fa": [
+   "3",
+   "Materials"
+  ],
+  "sub": [
+   "3.1",
+   "Resources"
+  ],
+  "text": "Describe how hydrocarbons can be separated from crude oil and identify the uses of these products"
+ },
+ {
+  "year": 9,
+  "code": "3.3.3",
+  "fa": [
+   "3",
+   "Materials"
+  ],
+  "sub": [
+   "3.1",
+   "Resources"
+  ],
+  "text": "Use International Union of Pure and Applied Chemistry (IUPAC) nomenclature to name simple organic compounds"
+ },
+ {
+  "year": 9,
+  "code": "3.3.4",
+  "fa": [
+   "3",
+   "Materials"
+  ],
+  "sub": [
+   "3.1",
+   "Resources"
+  ],
+  "text": "Identify and reproduce the structure of simple alkanes C1–C8"
+ },
+ {
+  "year": 9,
+  "code": "3.3.5",
+  "fa": [
+   "3",
+   "Materials"
+  ],
+  "sub": [
+   "3.1",
+   "Resources"
+  ],
+  "text": "Describe the differences between complete and incomplete combustion reactions of hydrocarbons, and use examples from everyday applications to compare the products of the chemical reaction and amount of energy released"
+ },
+ {
+  "year": 9,
+  "code": "3.3.6",
+  "fa": [
+   "3",
+   "Materials"
+  ],
+  "sub": [
+   "3.1",
+   "Resources"
+  ],
+  "text": "Research the uses of hydrocarbon compounds and how this has changed over time"
+ },
+ {
+  "year": 9,
+  "code": "3.4.1",
+  "fa": [
+   "3",
+   "Materials"
+  ],
+  "sub": [
+   "3.1",
+   "Resources"
+  ],
+  "text": "Identify the raw materials used to make polymers"
+ },
+ {
+  "year": 9,
+  "code": "3.4.2",
+  "fa": [
+   "3",
+   "Materials"
+  ],
+  "sub": [
+   "3.1",
+   "Resources"
+  ],
+  "text": "Investigate and describe the properties of a range of polymers"
+ },
+ {
+  "year": 9,
+  "code": "3.4.3",
+  "fa": [
+   "3",
+   "Materials"
+  ],
+  "sub": [
+   "3.1",
+   "Resources"
+  ],
+  "text": "Determine the quantity and types of polymers found in the environment by undertaking a physical survey of the local area"
+ },
+ {
+  "year": 9,
+  "code": "3.4.4",
+  "fa": [
+   "3",
+   "Materials"
+  ],
+  "sub": [
+   "3.1",
+   "Resources"
+  ],
+  "text": "Conduct an investigation to determine the biodegradability of different packaging materials"
+ },
+ {
+  "year": 9,
+  "code": "3.4.5",
+  "fa": [
+   "3",
+   "Materials"
+  ],
+  "sub": [
+   "3.1",
+   "Resources"
+  ],
+  "text": "Investigate case studies to explain the effect of bioaccumulation of microplastics in the environment"
+ },
+ {
+  "year": 9,
+  "code": "3.5.1",
+  "fa": [
+   "3",
+   "Materials"
+  ],
+  "sub": [
+   "3.1",
+   "Resources"
+  ],
+  "text": "Assess the environmental impacts of materials that are used as alternatives to those derived from crude oil"
+ },
+ {
+  "year": 9,
+  "code": "4.1.1",
+  "fa": [
+   "4",
+   "Environmental Sustainability"
+  ],
+  "sub": [
+   "4.1",
+   "Sustainability"
+  ],
+  "text": "Identify the principles and goals of sustainability"
+ },
+ {
+  "year": 9,
+  "code": "4.1.2",
+  "fa": [
+   "4",
+   "Environmental Sustainability"
+  ],
+  "sub": [
+   "4.1",
+   "Sustainability"
+  ],
+  "text": "Apply scientific understanding to propose valid solutions to identified problems relating to sustainability"
+ },
+ {
+  "year": 9,
+  "code": "4.2.1",
+  "fa": [
+   "4",
+   "Environmental Sustainability"
+  ],
+  "sub": [
+   "4.2",
+   "Climate science"
+  ],
+  "text": "Distinguish between climate and weather"
+ },
+ {
+  "year": 9,
+  "code": "4.2.2",
+  "fa": [
+   "4",
+   "Environmental Sustainability"
+  ],
+  "sub": [
+   "4.2",
+   "Climate science"
+  ],
+  "text": "Investigate data to determine what trends are evident in the world’s climate"
+ },
+ {
+  "year": 9,
+  "code": "4.2.3",
+  "fa": [
+   "4",
+   "Environmental Sustainability"
+  ],
+  "sub": [
+   "4.2",
+   "Climate science"
+  ],
+  "text": "Explain how the natural greenhouse effect influences global climate"
+ },
+ {
+  "year": 9,
+  "code": "4.2.4",
+  "fa": [
+   "4",
+   "Environmental Sustainability"
+  ],
+  "sub": [
+   "4.2",
+   "Climate science"
+  ],
+  "text": "Analyse data on global emissions and atmospheric temperatures to explain the enhanced greenhouse effect and its impact on climate and ecosystems"
+ },
+ {
+  "year": 9,
+  "code": "4.2.5",
+  "fa": [
+   "4",
+   "Environmental Sustainability"
+  ],
+  "sub": [
+   "4.2",
+   "Climate science"
+  ],
+  "text": "Identify the advantages and limitations of methods used to reduce greenhouse gas emissions"
+ },
+ {
+  "year": 9,
+  "code": "4.2.6",
+  "fa": [
+   "4",
+   "Environmental Sustainability"
+  ],
+  "sub": [
+   "4.2",
+   "Climate science"
+  ],
+  "text": "Analyse data that shows the relationship between industrialisation and the rise in global temperatures"
+ },
+ {
+  "year": 9,
+  "code": "4.3.1",
+  "fa": [
+   "4",
+   "Environmental Sustainability"
+  ],
+  "sub": [
+   "4.3",
+   "Impacts of present-day climate change"
+  ],
+  "text": "Identify the characteristics of climate change"
+ },
+ {
+  "year": 9,
+  "code": "4.3.2",
+  "fa": [
+   "4",
+   "Environmental Sustainability"
+  ],
+  "sub": [
+   "4.3",
+   "Impacts of present-day climate change"
+  ],
+  "text": "Investigate and report on the consequences of climate change"
+ },
+ {
+  "year": 9,
+  "code": "4.3.3",
+  "fa": [
+   "4",
+   "Environmental Sustainability"
+  ],
+  "sub": [
+   "4.3",
+   "Impacts of present-day climate change"
+  ],
+  "text": "Investigate the effects of climate change on the water cycle and ecosystems"
+ },
+ {
+  "year": 9,
+  "code": "4.3.4",
+  "fa": [
+   "4",
+   "Environmental Sustainability"
+  ],
+  "sub": [
+   "4.3",
+   "Impacts of present-day climate change"
+  ],
+  "text": "Investigate how satellites collect global data, including data on ocean temperatures, sea levels, and forest and ice cover, and examine how this data is used to evaluate the impact of climate change"
+ },
+ {
+  "year": 9,
+  "code": "4.4.1",
+  "fa": [
+   "4",
+   "Environmental Sustainability"
+  ],
+  "sub": [
+   "4.4",
+   "Alternative resource use and recycling"
+  ],
+  "text": "Describe the causes of environmental pollution and discuss its implications"
+ },
+ {
+  "year": 9,
+  "code": "4.4.2",
+  "fa": [
+   "4",
+   "Environmental Sustainability"
+  ],
+  "sub": [
+   "4.4",
+   "Alternative resource use and recycling"
+  ],
+  "text": "Research how Aboriginal and Torres Strait Islander Peoples have developed sustainable harvesting practices and Cultural protocols based on deep ecological understandings"
+ },
+ {
+  "year": 9,
+  "code": "4.4.3",
+  "fa": [
+   "4",
+   "Environmental Sustainability"
+  ],
+  "sub": [
+   "4.4",
+   "Alternative resource use and recycling"
+  ],
+  "text": "Discuss alternatives to the current resource use, including how to reduce, reuse and recycle"
+ },
+ {
+  "year": 9,
+  "code": "4.4.4",
+  "fa": [
+   "4",
+   "Environmental Sustainability"
+  ],
+  "sub": [
+   "4.4",
+   "Alternative resource use and recycling"
+  ],
+  "text": "Describe current processes for recycling materials"
+ },
+ {
+  "year": 9,
+  "code": "4.4.5",
+  "fa": [
+   "4",
+   "Environmental Sustainability"
+  ],
+  "sub": [
+   "4.4",
+   "Alternative resource use and recycling"
+  ],
+  "text": "Investigate how scientists have developed innovative ways to recycle materials"
+ },
+ {
+  "year": 9,
+  "code": "4.5.1",
+  "fa": [
+   "4",
+   "Environmental Sustainability"
+  ],
+  "sub": [
+   "4.5",
+   "Environmental sustainability - in Context"
+  ],
+  "text": "Discuss the link between human activity and one specific environmental pollution concern"
+ },
+ {
+  "year": 10,
+  "code": "5.1.1",
+  "fa": [
+   "5",
+   "Genetics and evolutionary change"
+  ],
+  "sub": [
+   "5.1",
+   "DNA structure and function"
+  ],
+  "text": "Identify that all organisms have information coded in genetic material"
+ },
+ {
+  "year": 10,
+  "code": "5.1.2",
+  "fa": [
+   "5",
+   "Genetics and evolutionary change"
+  ],
+  "sub": [
+   "5.1",
+   "DNA structure and function"
+  ],
+  "text": "Observe and model the arrangement of genetic information in an organism to define and compare the terms DNA, gene, chromosome and genome"
+ },
+ {
+  "year": 10,
+  "code": "5.1.3",
+  "fa": [
+   "5",
+   "Genetics and evolutionary change"
+  ],
+  "sub": [
+   "5.1",
+   "DNA structure and function"
+  ],
+  "text": "Relate the structure of the DNA double helix to its functions"
+ },
+ {
+  "year": 10,
+  "code": "5.1.4",
+  "fa": [
+   "5",
+   "Genetics and evolutionary change"
+  ],
+  "sub": [
+   "5.1",
+   "DNA structure and function"
+  ],
+  "text": "Discuss the nature of scientific discovery by comparing the contributions of scientists involved in the discovery of the double helix structure of DNA"
+ },
+ {
+  "year": 10,
+  "code": "5.2.1",
+  "fa": [
+   "5",
+   "Genetics and evolutionary change"
+  ],
+  "sub": [
+   "5.2",
+   "Variation and inheritance"
+  ],
+  "text": "Outline how genetic information is passed onto offspring by sexual and asexual reproduction"
+ },
+ {
+  "year": 10,
+  "code": "5.2.2",
+  "fa": [
+   "5",
+   "Genetics and evolutionary change"
+  ],
+  "sub": [
+   "5.2",
+   "Variation and inheritance"
+  ],
+  "text": "Identify that multiple genes and multiple environmental factors interact in the development of most traits"
+ },
+ {
+  "year": 10,
+  "code": "5.2.3",
+  "fa": [
+   "5",
+   "Genetics and evolutionary change"
+  ],
+  "sub": [
+   "5.2",
+   "Variation and inheritance"
+  ],
+  "text": "Explain how DNA mutation can result in genetic variation with beneficial, harmful or minimal effects on the functioning of an organism"
+ },
+ {
+  "year": 10,
+  "code": "5.2.4",
+  "fa": [
+   "5",
+   "Genetics and evolutionary change"
+  ],
+  "sub": [
+   "5.2",
+   "Variation and inheritance"
+  ],
+  "text": "Outline the connection between genotypes and phenotypes, using Mendelian inheritance for both plants and animals"
+ },
+ {
+  "year": 10,
+  "code": "5.2.5",
+  "fa": [
+   "5",
+   "Genetics and evolutionary change"
+  ],
+  "sub": [
+   "5.2",
+   "Variation and inheritance"
+  ],
+  "text": "Use pedigrees and Punnett squares to model monogenic gene-trait relationships and make predictions about patterns of inheritance"
+ },
+ {
+  "year": 10,
+  "code": "5.3.1",
+  "fa": [
+   "5",
+   "Genetics and evolutionary change"
+  ],
+  "sub": [
+   "5.3",
+   "Genetic technologies"
+  ],
+  "text": "Identify examples of current and emerging genetic technologies"
+ },
+ {
+  "year": 10,
+  "code": "5.3.2",
+  "fa": [
+   "5",
+   "Genetics and evolutionary change"
+  ],
+  "sub": [
+   "5.3",
+   "Genetic technologies"
+  ],
+  "text": "Discuss applications of genetic technologies in conservation, agriculture, industry and medicine"
+ },
+ {
+  "year": 10,
+  "code": "5.3.3",
+  "fa": [
+   "5",
+   "Genetics and evolutionary change"
+  ],
+  "sub": [
+   "5.3",
+   "Genetic technologies"
+  ],
+  "text": "Discuss the applications of genetic testing and its associated social, economic and ethical implications"
+ },
+ {
+  "year": 10,
+  "code": "5.4.1",
+  "fa": [
+   "5",
+   "Genetics and evolutionary change"
+  ],
+  "sub": [
+   "5.4",
+   "The theory of evolution and evidence of natural selection"
+  ],
+  "text": "Explain how the processes of natural selection and isolation can lead to changes within and between species"
+ },
+ {
+  "year": 10,
+  "code": "5.4.2",
+  "fa": [
+   "5",
+   "Genetics and evolutionary change"
+  ],
+  "sub": [
+   "5.4",
+   "The theory of evolution and evidence of natural selection"
+  ],
+  "text": "Investigate, using evidence, how the complexity and diversity of organisms have changed over geological timescales"
+ },
+ {
+  "year": 10,
+  "code": "5.4.3",
+  "fa": [
+   "5",
+   "Genetics and evolutionary change"
+  ],
+  "sub": [
+   "5.4",
+   "The theory of evolution and evidence of natural selection"
+  ],
+  "text": "Identify and discuss Aboriginal and/or Torres Strait Islander Peoples’ artwork that indicate changes in plants and animals, including megafauna"
+ },
+ {
+  "year": 10,
+  "code": "5.4.4",
+  "fa": [
+   "5",
+   "Genetics and evolutionary change"
+  ],
+  "sub": [
+   "5.4",
+   "The theory of evolution and evidence of natural selection"
+  ],
+  "text": "Discuss how scientists developed and refined the theory of evolution, and explain why an understanding of the origins of species is important"
+ },
+ {
+  "year": 10,
+  "code": "5.5.1",
+  "fa": [
+   "5",
+   "Genetics and evolutionary change"
+  ],
+  "sub": [
+   "5.5",
+   "Genetics and evolutionary change - in Context"
+  ],
+  "text": "Use an ethical framework to construct evidence-based written arguments about the implications of a genetic technology, including the ethical implications of the continued use of the immortal HeLa cell line"
+ },
+ {
+  "year": 10,
+  "code": "6.1.1",
+  "fa": [
+   "6",
+   "Reactions"
+  ],
+  "sub": [
+   "6.1",
+   "Law of conservation of mass"
+  ],
+  "text": "Explain the meaning of the law of conservation of mass"
+ },
+ {
+  "year": 10,
+  "code": "6.1.2",
+  "fa": [
+   "6",
+   "Reactions"
+  ],
+  "sub": [
+   "6.1",
+   "Law of conservation of mass"
+  ],
+  "text": "Conduct a practical investigation to demonstrate the law of conservation of mass in a chemical reaction"
+ },
+ {
+  "year": 10,
+  "code": "6.1.3",
+  "fa": [
+   "6",
+   "Reactions"
+  ],
+  "sub": [
+   "6.1",
+   "Law of conservation of mass"
+  ],
+  "text": "Investigate and explain how mass is conserved in closed systems"
+ },
+ {
+  "year": 10,
+  "code": "6.2.1",
+  "fa": [
+   "6",
+   "Reactions"
+  ],
+  "sub": [
+   "6.2",
+   "Chemical reactions"
+  ],
+  "text": "Use IUPAC naming conventions to construct the chemical formula for common ionic and covalent compounds"
+ },
+ {
+  "year": 10,
+  "code": "6.2.2",
+  "fa": [
+   "6",
+   "Reactions"
+  ],
+  "sub": [
+   "6.2",
+   "Chemical reactions"
+  ],
+  "text": "Represent chemical reactions, by predicting products and writing word and balanced chemical equations with states, as they are encountered"
+ },
+ {
+  "year": 10,
+  "code": "6.2.3",
+  "fa": [
+   "6",
+   "Reactions"
+  ],
+  "sub": [
+   "6.2",
+   "Chemical reactions"
+  ],
+  "text": "Model simple chemical reactions to show that atoms are rearranged and mass is conserved during a reaction"
+ },
+ {
+  "year": 10,
+  "code": "6.2.4",
+  "fa": [
+   "6",
+   "Reactions"
+  ],
+  "sub": [
+   "6.2",
+   "Chemical reactions"
+  ],
+  "text": "Determine the features of reactions by conducting synthesis, decomposition, displacement and neutralisation reactions"
+ },
+ {
+  "year": 10,
+  "code": "6.2.5",
+  "fa": [
+   "6",
+   "Reactions"
+  ],
+  "sub": [
+   "6.2",
+   "Chemical reactions"
+  ],
+  "text": "Identify pH as the measure of acidity and compare the pH of a range of common substances to the pH of pure water"
+ },
+ {
+  "year": 10,
+  "code": "6.2.6",
+  "fa": [
+   "6",
+   "Reactions"
+  ],
+  "sub": [
+   "6.2",
+   "Chemical reactions"
+  ],
+  "text": "Use pH indicators or meters to measure the pH change of neutralisation reactions"
+ },
+ {
+  "year": 10,
+  "code": "6.3.1",
+  "fa": [
+   "6",
+   "Reactions"
+  ],
+  "sub": [
+   "6.3",
+   "Rate of chemical reactions"
+  ],
+  "text": "Investigate and explain how concentration, surface area, temperature and catalysts affect the rate of reactions"
+ },
+ {
+  "year": 10,
+  "code": "6.3.2",
+  "fa": [
+   "6",
+   "Reactions"
+  ],
+  "sub": [
+   "6.3",
+   "Rate of chemical reactions"
+  ],
+  "text": "Conduct a practical investigation to test a measurable hypothesis, with a cause-and-effect relationship, that predicts changes to the rate of a chemical reaction, and graph data that communicates the investigation findings in a scientific report"
+ },
+ {
+  "year": 10,
+  "code": "6.4.1",
+  "fa": [
+   "6",
+   "Reactions"
+  ],
+  "sub": [
+   "6.4",
+   "Nuclear reactions"
+  ],
+  "text": "Outline how the first elements were formed after the Big Bang"
+ },
+ {
+  "year": 10,
+  "code": "6.4.2",
+  "fa": [
+   "6",
+   "Reactions"
+  ],
+  "sub": [
+   "6.4",
+   "Nuclear reactions"
+  ],
+  "text": "Describe the conditions that cause a nucleus to be unstable"
+ },
+ {
+  "year": 10,
+  "code": "6.4.3",
+  "fa": [
+   "6",
+   "Reactions"
+  ],
+  "sub": [
+   "6.4",
+   "Nuclear reactions"
+  ],
+  "text": "Represent alpha and beta reactions as nuclear reactions"
+ },
+ {
+  "year": 10,
+  "code": "6.4.4",
+  "fa": [
+   "6",
+   "Reactions"
+  ],
+  "sub": [
+   "6.4",
+   "Nuclear reactions"
+  ],
+  "text": "Identify that the half-life of a radioactive isotope is the time taken for half of the atoms in a sample to undergo radioactive decay"
+ },
+ {
+  "year": 10,
+  "code": "6.4.5",
+  "fa": [
+   "6",
+   "Reactions"
+  ],
+  "sub": [
+   "6.4",
+   "Nuclear reactions"
+  ],
+  "text": "Evaluate the societal benefits and considerations of using radioisotopes in medicine, industry and environmental monitoring"
+ },
+ {
+  "year": 10,
+  "code": "6.4.6",
+  "fa": [
+   "6",
+   "Reactions"
+  ],
+  "sub": [
+   "6.4",
+   "Nuclear reactions"
+  ],
+  "text": "Describe nuclear fission and nuclear fusion"
+ },
+ {
+  "year": 10,
+  "code": "6.4.7",
+  "fa": [
+   "6",
+   "Reactions"
+  ],
+  "sub": [
+   "6.4",
+   "Nuclear reactions"
+  ],
+  "text": "Outline the impacts on the environment of nuclear reactions, including the raw materials used, the various stages of production and nuclear waste"
+ },
+ {
+  "year": 10,
+  "code": "7.1.1",
+  "fa": [
+   "7",
+   "Waves and motion"
+  ],
+  "sub": [
+   "7.1",
+   "Common properties of waves"
+  ],
+  "text": "Demonstrate that a mechanical wave requires a medium to travel through, while an electromagnetic (EM) wave does not"
+ },
+ {
+  "year": 10,
+  "code": "7.1.2",
+  "fa": [
+   "7",
+   "Waves and motion"
+  ],
+  "sub": [
+   "7.1",
+   "Common properties of waves"
+  ],
+  "text": "Use the wave model to explain how energy is transferred without the net transfer of particles"
+ },
+ {
+  "year": 10,
+  "code": "7.1.3",
+  "fa": [
+   "7",
+   "Waves and motion"
+  ],
+  "sub": [
+   "7.1",
+   "Common properties of waves"
+  ],
+  "text": "Use models to compare and describe the features of transverse and longitudinal waves"
+ },
+ {
+  "year": 10,
+  "code": "7.1.4",
+  "fa": [
+   "7",
+   "Waves and motion"
+  ],
+  "sub": [
+   "7.1",
+   "Common properties of waves"
+  ],
+  "text": "Compare the different wave forms of the electromagnetic spectrum"
+ },
+ {
+  "year": 10,
+  "code": "7.1.5",
+  "fa": [
+   "7",
+   "Waves and motion"
+  ],
+  "sub": [
+   "7.1",
+   "Common properties of waves"
+  ],
+  "text": "Investigate the features of waves, including amplitude, frequency, speed and wavelength by exploring a range of wave types"
+ },
+ {
+  "year": 10,
+  "code": "7.1.6",
+  "fa": [
+   "7",
+   "Waves and motion"
+  ],
+  "sub": [
+   "7.1",
+   "Common properties of waves"
+  ],
+  "text": "Use the formula   to explain the relationship between a wave’s frequency, speed and wavelength"
+ },
+ {
+  "year": 10,
+  "code": "7.1.7",
+  "fa": [
+   "7",
+   "Waves and motion"
+  ],
+  "sub": [
+   "7.1",
+   "Common properties of waves"
+  ],
+  "text": "Analyse data from secondary sources to compare the uses of different EM waves based on their properties"
+ },
+ {
+  "year": 10,
+  "code": "7.2.1",
+  "fa": [
+   "7",
+   "Waves and motion"
+  ],
+  "sub": [
+   "7.2",
+   "Sound waves"
+  ],
+  "text": "Model the transfer of sound energy as compressions and rarefactions in waves"
+ },
+ {
+  "year": 10,
+  "code": "7.2.2",
+  "fa": [
+   "7",
+   "Waves and motion"
+  ],
+  "sub": [
+   "7.2",
+   "Sound waves"
+  ],
+  "text": "Investigate and describe how amplitude and frequency affect the pitch and volume of sound"
+ },
+ {
+  "year": 10,
+  "code": "7.2.3",
+  "fa": [
+   "7",
+   "Waves and motion"
+  ],
+  "sub": [
+   "7.2",
+   "Sound waves"
+  ],
+  "text": "Investigate the Doppler effect of waves"
+ },
+ {
+  "year": 10,
+  "code": "7.2.4",
+  "fa": [
+   "7",
+   "Waves and motion"
+  ],
+  "sub": [
+   "7.2",
+   "Sound waves"
+  ],
+  "text": "Describe how the ear responds to sound waves"
+ },
+ {
+  "year": 10,
+  "code": "7.2.5",
+  "fa": [
+   "7",
+   "Waves and motion"
+  ],
+  "sub": [
+   "7.2",
+   "Sound waves"
+  ],
+  "text": "Investigate and outline the impact of material selection on the transfer of sound energy in Aboriginal and/or Torres Strait Islander Peoples’ traditional musical and communication instruments"
+ },
+ {
+  "year": 10,
+  "code": "7.2.6",
+  "fa": [
+   "7",
+   "Waves and motion"
+  ],
+  "sub": [
+   "7.2",
+   "Sound waves"
+  ],
+  "text": "Describe how sound waves are used in medical diagnosis"
+ },
+ {
+  "year": 10,
+  "code": "7.3.1",
+  "fa": [
+   "7",
+   "Waves and motion"
+  ],
+  "sub": [
+   "7.3",
+   "Light waves"
+  ],
+  "text": "Describe how the eye responds to light"
+ },
+ {
+  "year": 10,
+  "code": "7.3.2",
+  "fa": [
+   "7",
+   "Waves and motion"
+  ],
+  "sub": [
+   "7.3",
+   "Light waves"
+  ],
+  "text": "Investigate the properties of light, including absorption, reflection, refraction and scattering"
+ },
+ {
+  "year": 10,
+  "code": "7.3.3",
+  "fa": [
+   "7",
+   "Waves and motion"
+  ],
+  "sub": [
+   "7.3",
+   "Light waves"
+  ],
+  "text": "Investigate applications of absorption, reflection and refraction in everyday life"
+ },
+ {
+  "year": 10,
+  "code": "7.3.4",
+  "fa": [
+   "7",
+   "Waves and motion"
+  ],
+  "sub": [
+   "7.3",
+   "Light waves"
+  ],
+  "text": "Explain how the electromagnetic spectrum is used to learn about stars"
+ },
+ {
+  "year": 10,
+  "code": "7.4.1",
+  "fa": [
+   "7",
+   "Waves and motion"
+  ],
+  "sub": [
+   "7.4",
+   "Motion"
+  ],
+  "text": "Conduct an investigation to analyse the relationships between distance, time, speed, displacement and velocity"
+ },
+ {
+  "year": 10,
+  "code": "7.4.2",
+  "fa": [
+   "7",
+   "Waves and motion"
+  ],
+  "sub": [
+   "7.4",
+   "Motion"
+  ],
+  "text": "Investigate the motion of objects and represent them using motion diagrams"
+ },
+ {
+  "year": 10,
+  "code": "7.4.3",
+  "fa": [
+   "7",
+   "Waves and motion"
+  ],
+  "sub": [
+   "7.4",
+   "Motion"
+  ],
+  "text": "Conduct investigations to analyse the relationship between distance, time and speed, and draw and analyse a line graph of the results"
+ },
+ {
+  "year": 10,
+  "code": "7.4.4",
+  "fa": [
+   "7",
+   "Waves and motion"
+  ],
+  "sub": [
+   "7.4",
+   "Motion"
+  ],
+  "text": "Conduct an investigation to analyse the relationships between force, mass and acceleration"
+ },
+ {
+  "year": 10,
+  "code": "7.4.5",
+  "fa": [
+   "7",
+   "Waves and motion"
+  ],
+  "sub": [
+   "7.4",
+   "Motion"
+  ],
+  "text": "Investigate applications of Newton’s laws of motion"
+ },
+ {
+  "year": 10,
+  "code": "7.4.6",
+  "fa": [
+   "7",
+   "Waves and motion"
+  ],
+  "sub": [
+   "7.4",
+   "Motion"
+  ],
+  "text": "Determine, using vector analysis, the net force on an object in one dimension"
+ },
+ {
+  "year": 10,
+  "code": "7.4.7",
+  "fa": [
+   "7",
+   "Waves and motion"
+  ],
+  "sub": [
+   "7.4",
+   "Motion"
+  ],
+  "text": "Use mathematical representations, including graphs and the algebraic formulas to quantitatively relate force, distance, time, speed, displacement, acceleration, velocity and mass"
+ },
+ {
+  "year": 10,
+  "code": "7.5.1",
+  "fa": [
+   "7",
+   "Waves and motion"
+  ],
+  "sub": [
+   "7.5",
+   "Waves and motion - in Context"
+  ],
+  "text": "Structure an argument to analyse how waves and motion have changed society"
+ },
+ {
+  "year": 10,
+  "code": "8.1.1",
+  "fa": [
+   "8",
+   "Data science 2"
+  ],
+  "sub": [
+   "8.1",
+   "Investigating questions and claims"
+  ],
+  "text": "Discuss the features of investigable and non-investigable questions, including considerations of available resources"
+ },
+ {
+  "year": 10,
+  "code": "8.1.2",
+  "fa": [
+   "8",
+   "Data science 2"
+  ],
+  "sub": [
+   "8.1",
+   "Investigating questions and claims"
+  ],
+  "text": "Investigate how scientific knowledge is verified and refined by scientists through hypothesis testing and peer review"
+ },
+ {
+  "year": 10,
+  "code": "8.1.3",
+  "fa": [
+   "8",
+   "Data science 2"
+  ],
+  "sub": [
+   "8.1",
+   "Investigating questions and claims"
+  ],
+  "text": "Develop criteria and use them to evaluate whether online content is valid and reliable"
+ },
+ {
+  "year": 10,
+  "code": "8.1.4",
+  "fa": [
+   "8",
+   "Data science 2"
+  ],
+  "sub": [
+   "8.1",
+   "Investigating questions and claims"
+  ],
+  "text": "Identify a claim that can be scientifically tested with an investigation, or series of investigations, to test the claim"
+ },
+ {
+  "year": 10,
+  "code": "8.1.5",
+  "fa": [
+   "8",
+   "Data science 2"
+  ],
+  "sub": [
+   "8.1",
+   "Investigating questions and claims"
+  ],
+  "text": "Explain the evidence and reasoning used to support conclusions about claims, using data from investigations"
+ },
+ {
+  "year": 10,
+  "code": "8.1.6",
+  "fa": [
+   "8",
+   "Data science 2"
+  ],
+  "sub": [
+   "8.1",
+   "Investigating questions and claims"
+  ],
+  "text": "Conduct a written scientific argument showing how a range of evidence supports a claim"
+ },
+ {
+  "year": 10,
+  "code": "8.2.1",
+  "fa": [
+   "8",
+   "Data science 2"
+  ],
+  "sub": [
+   "8.2",
+   "Pseudoscience"
+  ],
+  "text": "Explain the distinction between science and pseudoscience using examples"
+ },
+ {
+  "year": 10,
+  "code": "8.2.2",
+  "fa": [
+   "8",
+   "Data science 2"
+  ],
+  "sub": [
+   "8.2",
+   "Pseudoscience"
+  ],
+  "text": "Identify examples of pseudoscientific claims"
+ },
+ {
+  "year": 10,
+  "code": "8.2.3",
+  "fa": [
+   "8",
+   "Data science 2"
+  ],
+  "sub": [
+   "8.2",
+   "Pseudoscience"
+  ],
+  "text": "Investigate incidences of pseudoscience in popular media"
+ },
+ {
+  "year": 10,
+  "code": "8.2.4",
+  "fa": [
+   "8",
+   "Data science 2"
+  ],
+  "sub": [
+   "8.2",
+   "Pseudoscience"
+  ],
+  "text": "Investigate how data, or its analysis and interpretation, can be distorted to manipulate findings that support specific viewpoints"
+ },
+ {
+  "year": 10,
+  "code": "8.2.5",
+  "fa": [
+   "8",
+   "Data science 2"
+  ],
+  "sub": [
+   "8.2",
+   "Pseudoscience"
+  ],
+  "text": "Determine if an assertion of a claim or theory is pseudoscientific"
+ },
+ {
+  "year": 10,
+  "code": "8.3.1",
+  "fa": [
+   "8",
+   "Data science 2"
+  ],
+  "sub": [
+   "8.3",
+   "Large datasets and scientific argumentation"
+  ],
+  "text": "Outline the features, collection, uses and applications of large datasets"
+ },
+ {
+  "year": 10,
+  "code": "8.3.2",
+  "fa": [
+   "8",
+   "Data science 2"
+  ],
+  "sub": [
+   "8.3",
+   "Large datasets and scientific argumentation"
+  ],
+  "text": "Use available large datasets to develop and test a question"
+ },
+ {
+  "year": 10,
+  "code": "8.3.3",
+  "fa": [
+   "8",
+   "Data science 2"
+  ],
+  "sub": [
+   "8.3",
+   "Large datasets and scientific argumentation"
+  ],
+  "text": "Conduct a descriptive analysis of a large dataset"
+ },
+ {
+  "year": 10,
+  "code": "8.3.4",
+  "fa": [
+   "8",
+   "Data science 2"
+  ],
+  "sub": [
+   "8.3",
+   "Large datasets and scientific argumentation"
+  ],
+  "text": "Identify and outline the benefits of using descriptive statistical analysis techniques to assist in recognising or communicating patterns"
+ },
+ {
+  "year": 10,
+  "code": "8.3.5",
+  "fa": [
+   "8",
+   "Data science 2"
+  ],
+  "sub": [
+   "8.3",
+   "Large datasets and scientific argumentation"
+  ],
+  "text": "Conduct a univariate analysis and a bivariate analysis using large datasets"
+ },
+ {
+  "year": 10,
+  "code": "8.3.6",
+  "fa": [
+   "8",
+   "Data science 2"
+  ],
+  "sub": [
+   "8.3",
+   "Large datasets and scientific argumentation"
+  ],
+  "text": "Recognise the difference between causal and correlational relationships"
+ },
+ {
+  "year": 10,
+  "code": "8.3.7",
+  "fa": [
+   "8",
+   "Data science 2"
+  ],
+  "sub": [
+   "8.3",
+   "Large datasets and scientific argumentation"
+  ],
+  "text": "Explore the role of large datasets and statistical analysis in validating scientific findings"
+ },
+ {
+  "year": 10,
+  "code": "8.4.1",
+  "fa": [
+   "8",
+   "Data science 2"
+  ],
+  "sub": [
+   "8.4",
+   "Data science 2 - in Context"
+  ],
+  "text": "Use data to make evidence-based decisions about a familiar issue and assess the implications of these decisions"
+ }
+]
