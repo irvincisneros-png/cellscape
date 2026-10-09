@@ -42,7 +42,7 @@ You're continuing **CellScape**, a multi-scale 3D cell-biology simulator for NSW
   Organelle and other levels live in `assets/js/world/levels/`. Molecular sim levels live in `sims/<slug>/level.js`, with standalone pages and 2D fallbacks in `sim2d.js`.
 - **Syllabus:** `content/syllabus.json` has 185 NSW dot points (Science 7–10 2023, Biology 2017 and 2025). Junior ones carry my school codes. Links work with `?year=`, `?dot=` and `?code=Y7-3.2.3`.
 - **Shared model gene:** a β-globin fragment in `sims/protein-synthesis/model.js`. Codon 6 GAG→GTG is the sickle-cell mutation.
-- **Tests:** `node tests/inheritanceModel.test.mjs`.
+- **Tests:** `node tests/inheritanceModel.test.mjs` and `node tests/immunityModel.test.mjs`.
 - **Data tool:** `tools/cytoband-to-karyotype.mjs` regenerates karyotype bands from UCSC `cytoBand.txt` (hg38).
 
 ## How to run and verify
@@ -71,13 +71,14 @@ You're continuing **CellScape**, a multi-scale 3D cell-biology simulator for NSW
 
 ## Next steps
 1. Start with a short status check (`git log`, `docs/PLAN.md`).
-2. **Phase 5e, deeper epigenetics:** DNA methylation and histone marks switching genes on and off; X-inactivation and Barr bodies (link to the karyotype); environment effects; correct the "only genetic changes are heritable" framing. Mostly extends `levels/chromatin.js`.
-3. **Phase 6, polish and publish:**
+2. **Check by eye first:** several recent visuals were verified only by node probes because the browser pane was hidden (see `docs/PLAN.md` follow-ups: specialised cells, immunity, light-mode charts).
+3. **Phase 5e, deeper epigenetics:** DNA methylation and histone marks switching genes on and off; X-inactivation and Barr bodies (link to the karyotype); environment effects; correct the "only genetic changes are heritable" framing. Mostly extends `levels/chromatin.js`.
+4. **Phase 6, polish and publish:**
    - real-device QA (Chromebooks, phones, touch);
    - clay style polish on every level;
    - a "Sun and shade leaf" mission (cellarium idea);
    - quiz banks from science-defender (shuffle and de-duplicate first);
    - teacher mode, accessibility and performance tiers;
    - GitHub Pages, **after asking me**.
-4. **Outside CellScape (ask before pushing):** fix the 8 wrong answer keys in my `equilibrium-lost` question bank and the TX/tx bug in my live Year-10 Punnett tool (both listed in the audit).
-5. I may want to play with it and give feedback first. If I do, prioritise my feedback over the plan.
+5. **Outside CellScape (ask before pushing):** fix the 8 wrong answer keys in my `equilibrium-lost` question bank and the TX/tx bug in my live Year-10 Punnett tool (both listed in the audit).
+6. I may want to play with it and give feedback first. If I do, prioritise my feedback over the plan.
