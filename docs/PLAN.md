@@ -48,7 +48,8 @@ The clean-up of the existing repos becomes: put each world under the hub, then r
 | 2. Energy | Chloroplast → thylakoid; mitochondrion → cristae/ATP synthase; enzymes (via cytosol) | ✅ Done |
 | 3. Genetics | Nucleus → chromatin (with epigenetics) → DNA helix (structure, replication) → DNA to protein (mutation lab) → protein folding (sickle-cell) | ✅ Done |
 | 4. Division | 3D mitosis (plant/animal, checkpoints, drugs) and meiosis (crossing over, nondisjunction, fertilisation, Punnett, pedigree) | ✅ Done |
-| 5. Heredity & beyond | Human genes (karyotype, gene → trait), epigenetics in more depth, inheritance beyond meiosis (multi-gene traits, sex linkage, pedigrees), **animal cell** level with toggle, specialised cells, microscopy mode, cell-level immunity | In progress: **5a animal cell ✅** (hepatocyte; plant ⇄ animal morph; glucose/glycogen, osmosis/lysis, mitophagy, albumin secretion; Codex review, 2 rounds, clean). Next: 5b human genes & inheritance (absorbing the Year-10 genetics sims), then microscopy + specialised cells (absorbing LifeLens/Year-7 content); see `docs/AUDIT-other-sims.md` |
+| 5. Heredity & beyond | Human genes (karyotype, gene → trait), epigenetics in more depth, inheritance beyond meiosis (multi-gene traits, sex linkage, pedigrees), **animal cell** level with toggle, specialised cells, microscopy mode, cell-level immunity | In progress: **5a animal cell ✅** (hepatocyte; plant ⇄ animal morph; glucose/glycogen, osmosis/lysis, mitophagy, albumin secretion; Codex review, 2 rounds, clean). **5b human genes & inheritance ✅** (levels `karyotype` + `inheritance`, entered from the nucleus panel; absorbs the Year-10 genetics sims with their bugs fixed; Codex 2 rounds). Next: microscopy mode + specialised cells (absorbing LifeLens/Year-7 content), deeper epigenetics, cell-level immunity; see `docs/AUDIT-other-sims.md` |
+| Art styles | Switchable **Clay model** look (Graphics card → Look). Proof of concept done on plant + animal cells (cutaway diorama); other levels use the generic clay swap | PoC ✅; per-level polish in Phase 6 |
 | 6. Polish & publish | Full browser QA pass on real devices/Chromebooks, review round, performance tiers, accessibility, teacher mode, GitHub Pages | After 5 |
 
 The 2D simulations remain as WebGL fallbacks (`sims/<slug>/sim2d.js`).
@@ -79,4 +80,7 @@ The 2D simulations remain as WebGL fallbacks (`sims/<slug>/sim2d.js`).
   - morph `swapRoot` relies on requestAnimationFrame, so a hidden tab pauses it mid-swap until it's visible again (harmless);
   - portrait: a label can overlap the top chips;
   - "other fuels" respiration term, lysis at 1.6× volume and 20 % non-osmotic volume are teaching-scale (stated on the page).
+- **Karyotype:** band patterns are schematic and partly from memory. Regenerate from UCSC `cytoBand` (hg38) with `tools/cytoband-to-karyotype.mjs` once the owner OKs the download.
+- **Clay style:** molecular levels lose custom shaders/glows; nucleus interior reads grey; animal transporters/microvilli/cytoskeleton hidden; plant ⇄ animal morph only approximate in clay. Clay wall texture slightly grainy.
+- **Inheritance lab:** mutation card links to the protein-synthesis sim (no direct portal to `expression`).
 - **Dev server:** sends no cache headers; edited modules need a cache-busting reload.
