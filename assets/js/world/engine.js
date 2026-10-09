@@ -178,6 +178,7 @@ export class Engine {
   refreshPost() {
     this.bokeh.enabled = this.quality === "high";
     this.bloom.enabled = this.quality !== "low" && !this.style.clay;
+    if (this.scopeActive) this.bokeh.enabled = this.bloom.enabled = false;   // microscope mode draws with its own passes (microscope.js)
   }
 
   setQuality(q) {
@@ -689,7 +690,7 @@ export class Engine {
     this.checkAutoDive();
     this.style.tick(dt);
     this.updateScale();
-    if (this.quality === "low") this.renderer.render(this.scene, this.camera);
+    if (this.quality === "low" && !this.scopeActive) this.renderer.render(this.scene, this.camera);
     else this.composer.render();
     this.autoQuality(dt);
   }

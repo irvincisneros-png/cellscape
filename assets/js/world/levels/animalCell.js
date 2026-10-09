@@ -1748,5 +1748,16 @@ export function create(engine) {
   initMitoStates();
   setMorph(1);
   animate(0, 0);
+  // ---------- microscope mode (microscope.js): what each part is, for the light and electron microscope views ----------
+  // Parts not listed here (neighbouring-cell shells, flows, markers, membrane proteins, actin) are not drawn in microscope mode.
+  const scopeKinds = new Map([[membrane, "membrane"], [riboMesh, "ribosomes"], [freeRibo, "ribosomes"], [cristaeMesh, "cristae"], [centroGroup, "centriole"], [lyCore, "lysosome"], [lyGran, "lysosome"], [pxCore, "peroxisome"], [nucleolus, "nucleolus"], [pores, "pores"]]);
+  for (const ch of nucleus.children) if (!scopeKinds.has(ch) && ch !== nucShell && !ch.userData.sat) scopeKinds.set(ch, "chromatin");   // chromosome tubes and heterochromatin granules
+  level.microscope = {
+    kinds: scopeKinds,
+    tissue: "animal", specimen: "cheek",
+    cellUm: 28, pitch: [30, 30], depthUm: 30,
+    home: new THREE.Vector3(0, 0, 0), temHome: new THREE.Vector3(-1, 1, 0),
+    parts: ["nucleus", "nucleolus", "mitochondrion", "lysosome", "peroxisome", "er", "ribosomes", "golgi", "centriole", "microtubule", "cristae"],
+  };
   return level;
 }

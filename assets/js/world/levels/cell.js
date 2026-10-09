@@ -204,7 +204,8 @@ export function create(engine) {
   const riboGeo = new THREE.BufferGeometry();
   riboGeo.setAttribute("position", new THREE.Float32BufferAttribute(riboPts, 3));
   const riboMat = new THREE.PointsMaterial({ color: "#1e3a8a", size: 0.22, sizeAttenuation: true });
-  root.add(new THREE.Points(riboGeo, riboMat));
+  const ribosomes = new THREE.Points(riboGeo, riboMat);
+  root.add(ribosomes);
 
   // ---------- Golgi ----------
   const golgiMat = physical("#e9c49a", { roughness: 0.45, clearcoat: 0.5, emissive: new THREE.Color("#7c5a3a"), emissiveIntensity: 0.12 });
@@ -966,6 +967,17 @@ export function create(engine) {
       if ((chT -= rdt) <= 0) { chT = 0.5; drawChart(); }
       mission?.update();
     },
+  };
+  // ---------- microscope mode (microscope.js): what each part is, for the light and electron microscope views ----------
+  // Parts not listed here (neighbour shells, plasmodesmata, flows, markers) are not drawn in microscope mode.
+  const scopeKinds = new Map([[wall, "wall"], [membrane, "membrane"], [grana, "grana"], [starchMesh, "starch"], [cristae, "cristae"], [ribosomes, "ribosomes"], [nucleolus, "nucleolus"], [pores, "pores"]]);
+  for (const ch of nucleus.children) if (!scopeKinds.has(ch) && ch !== nucShell) scopeKinds.set(ch, "chromatin");   // the chromosome tubes
+  level.microscope = {
+    kinds: scopeKinds,
+    tissue: "plant", specimen: "onion",          // neighbouring cells to draw; the real micrograph to compare with
+    cellUm: 56, pitch: [59.5, 37.5], depthUm: 34, // this cell's length, the tissue's cell spacing (wall to wall), and its depth, in µm
+    home: new THREE.Vector3(0, 0, 0), temHome: new THREE.Vector3(-16, 2, 0),
+    parts: ["wall", "vacuole", "nucleus", "nucleolus", "chloroplast", "starch", "mitochondrion", "grana", "peroxisome", "er", "ribosomes", "golgi", "cristae"],
   };
   return level;
 }
