@@ -1,7 +1,7 @@
 // Inheritance lab: words. Year-banded text, generated narrative, missions and quiz. Pure (no DOM).
 // Terms used on purpose: genotype / phenotype / allele; "dominant" and "recessive" describe how an allele
 // behaves in a heterozygote, never how common it is.
-import { PRESETS, fraction, crossClasses, ratioString, genoRatioString, chiSquare, PATTERN_NAME, polyStats } from "./inheritanceModel.js";
+import { PRESETS, fraction, crossClasses, ratioString, genoRatioString, chiSquare, PATTERN_NAME, polyStats, polyReach } from "./inheritanceModel.js";
 
 export const MODES = [
   { id: "mono", label: { "y7-8": "One gene", "y9-10": "One gene" }, band: "y7-8", full: "Monohybrid" },
@@ -23,8 +23,8 @@ export const MODE_INTRO = {
     y11: "Multiple alleles with codominance and complete dominance in one system: Iᴬ and Iᴮ encode different glycosyltransferases and are codominant; i encodes no functional enzyme and is recessive to both.",
   },
   xlinked: {
-    "y9-10": "These genes sit on the X chromosome. Males (XY) have only one X, so one recessive allele is enough to show the condition. Females (XX) need two.",
-    y11: "X-linked recessive inheritance. Males are hemizygous, so a single recessive allele is expressed; females are usually protected by a second X. The Y has no matching locus, so an affected father passes his X to every daughter and no son.",
+    "y9-10": "These genes sit on the X chromosome. Males (XY) have only one X, so one recessive allele is enough to show the condition. Females (XX) have two X chromosomes, so they show it less often, but a girl can be affected (XʰXʰ) and carriers can have mild symptoms.",
+    y11: "X-linked recessive inheritance. Males are hemizygous, so a single recessive allele is expressed. Heterozygous females have a second X that often (not always) reduces the effect: random X-inactivation means some carriers have symptoms, and homozygous daughters (XʰXʰ) are affected. The Y has no matching locus, so an affected father passes his X to every daughter (carriers if the mother is not a carrier) and to no son.",
   },
   dihybrid: {
     "y9-10": "Two genes on different chromosomes. Each parent can make four kinds of gamete, so the grid is 4 × 4. When both parents are heterozygous for both genes, the offspring come out near 9 : 3 : 3 : 1.",
@@ -52,8 +52,8 @@ export const PRESET_INFO = {
     name: { "y7-8": "Sickle-cell", "y9-10": "Sickle-cell (HBB)", y11: "Sickle-cell (HBB, β-globin)" },
     pattern: { "y7-8": "Needs a copy from each parent", "y9-10": "Autosomal recessive (for the disease)", y11: "Autosomal; recessive for sickling disease, codominant at the protein level" },
     blurb: {
-      "y7-8": "Red blood cells carry oxygen. In sickle-cell disease some of them bend into a sickle shape and can block tiny blood vessels. A child only gets the disease if they get the sickle version of the gene from BOTH parents. With just one copy a person is a carrier (they have sickle-cell trait) and is usually healthy.",
-      "y9-10": "The HBB gene (chromosome 11) makes the β-globin chain of haemoglobin. Two copies of the HbS allele cause sickle-cell disease. People with one HbA and one HbS (sickle-cell trait) are usually healthy but can pass HbS on.",
+      "y7-8": "Red blood cells carry oxygen. In sickle-cell disease some of them bend into a sickle shape and can block tiny blood vessels. A child only gets sickle-cell anaemia (the most common form of the disease) if they get the sickle version of the gene from BOTH parents. With just one copy a person is a carrier (they have sickle-cell trait) and is usually healthy.",
+      "y9-10": "The HBB gene (chromosome 11) makes the β-globin chain of haemoglobin. In this HbA/HbS model, two copies of the HbS allele (HbSS) cause sickle-cell anaemia, one form of sickle-cell disease (other forms, such as HbSC, pair HbS with a different second allele). People with one HbA and one HbS (sickle-cell trait) are usually healthy but can pass HbS on.",
       y11: "HbS differs from HbA by one base (GAG→GTG, Glu→Val at position 6). Deoxygenated HbS polymerises and distorts red cells. Heterozygotes make both kinds of β-chain, so the alleles are codominant at the molecular level but HbS is recessive for the disease. Heterozygotes are also partly protected from severe Plasmodium falciparum malaria, which helps keep HbS common where malaria is (a balanced polymorphism).",
     },
     aside: { y11: "Heterozygote advantage is a Year 11 idea. It shows how selection can keep a harmful recessive allele common." },
@@ -81,7 +81,7 @@ export const PRESET_INFO = {
     name: { "y7-8": "Milk-sugar digestion", "y9-10": "Lactase persistence (LCT)", y11: "Lactase persistence (LCT/MCM6)" },
     pattern: { "y7-8": "One copy is enough (dominant)", "y9-10": "Autosomal dominant", y11: "Autosomal dominant (regulatory variant)" },
     blurb: {
-      "y7-8": "Most people in the world stop making much of the enzyme lactase after childhood, so milk makes them feel unwell. Some people keep making it. The 'keep making it' version is dominant, but it is not the most common version worldwide.",
+      "y7-8": "Most people in the world make less of the enzyme lactase after childhood. Some feel unwell if they have a lot of milk sugar; it depends on how much. Some people keep making plenty of it. The 'keep making it' version is dominant, but it is not the most common version worldwide.",
       "y9-10": "Lactase breaks down lactose, the sugar in milk. In most people lactase production switches down after childhood. The lactase persistence allele (L) is dominant, but it is the minority condition worldwide. Dominant does not mean common.",
       y11: "Persistence is caused by regulatory variants near LCT (for example in MCM6 in Europeans) that keep the gene switched on in adults. Different variants have arisen independently in different populations that herd milk-producing animals: a case of convergent evolution under selection. A good example of 'dominant does not mean common'.",
     },
@@ -107,8 +107,8 @@ export const PRESET_INFO = {
     name: { "y9-10": "Haemophilia A (F8)", y11: "Haemophilia A (F8)" },
     pattern: { "y9-10": "X-linked recessive", y11: "X-linked recessive" },
     blurb: {
-      "y9-10": "The F8 gene (on the X chromosome) makes clotting factor VIII. Affected people bleed for longer. About 1 in 5,000 boys is born with haemophilia A. A carrier mother (XᴴXʰ) is usually healthy, and each of her sons has a 1 in 2 chance of being affected.",
-      y11: "F8 (Xq28) encodes factor VIII. Males are hemizygous so one recessive allele causes the disease (about 1 in 5,000 males). Carrier females have a second, working X, but because of random X-inactivation some have lower factor VIII and mild bleeding. Affected daughters are possible: an affected father and a carrier mother.",
+      "y9-10": "The F8 gene (on the X chromosome) makes clotting factor VIII. Affected people bleed for longer. About 1 in 5,000 boys is born with haemophilia A. A carrier mother (XᴴXʰ) often has no or mild symptoms, and each of her sons has a 1 in 2 chance of being affected. A daughter can be affected too, if her father is affected and her mother is a carrier.",
+      y11: "F8 (Xq28) encodes factor VIII. Males are hemizygous so one recessive allele causes the disease (about 1 in 5,000 males). Carrier females have a second, working X, but because of random X-inactivation some have lower factor VIII and mild bleeding. Affected daughters (XʰXʰ) occur when an affected father has a daughter with a carrier mother.",
     },
   },
   dmd: {
@@ -134,7 +134,7 @@ export const POLY_INFO = {
     name: { "y9-10": "Eye colour (pigment amount)", y11: "Eye colour (pigment amount)" },
     unit: { "y9-10": "pigment score", y11: "melanin score (arbitrary units)" },
     blurb: {
-      "y9-10": "Eye colour is not a single brown/blue gene. Several genes help control how much pigment the iris makes. OCA2 and HERC2 (on chromosome 15) have the biggest effect, and others add small effects. This simulator uses N identical additive genes as a simple model, so it is a teaching simplification, not a prediction.",
+      "y9-10": "Eye colour is not a single brown/blue gene. Several genes help control how much pigment the iris makes. OCA2 and HERC2 (chromosome 15q12–13) have the biggest effect, and others add small effects. This simulator uses N identical additive genes as a simple model, so it is a teaching simplification, not a prediction.",
       y11: "In people of European ancestry, a regulatory variant in HERC2 that switches OCA2 up or down explains much of the blue/brown difference, but many other loci (such as TYR, SLC24A4 and IRF4) add small effects, and the effects are not all simply additive. Treating colour as N equal additive genes is a model of the shape of the distribution, not of the real genetics.",
     },
   },
@@ -185,7 +185,7 @@ const pct = (p) => `${Math.round(p * 1000) / 10}%`.replace(".0%", "%");
 export const INDEPENDENCE = {
   "y7-8": "Every child is a fresh chance. A family that has had one child with the condition is NOT 'used up', and a family with four children without it is NOT 'due' one.",
   "y9-10": "Each child is an independent event: the chance is the same for every child, whatever happened with the earlier ones. Chance does not 'catch up' or 'even out'.",
-  y11: "Children are independent trials (Bernoulli). Past outcomes do not change the probability for the next child. Observed proportions approach the expected ones as n grows because variation shrinks like √(npq), not because chance compensates.",
+  y11: "Children are independent trials (Bernoulli). Past outcomes do not change the probability for the next child. The SD of the observed proportion shrinks as √(pq/n), so proportions settle near p as n grows, while the SD of the observed count grows as √(npq). Chance never compensates for earlier results.",
 };
 
 // ------------------------------------------------------------------ narrative for crosses (mono, abo, xlinked, dihybrid)
@@ -214,11 +214,14 @@ export function crossNarrative(c) {
     out.push(`<b>Observed (${n} ${n === 1 ? "child" : "children"}):</b> ${bits}.`);
     if (n >= 20 && cs.length > 1) {
       const probs = {}; for (const k of cs) probs[k.id] = k.p;
-      const e = cs.map((k) => k.p * n);
-      let note = n >= 100 ? "The counts are close to what was expected, but almost never exactly equal. The small gaps are chance." : "With few children the counts can wander well away from the expected ratio. Try more children.";
+      const x = chiSquare(counts, probs, n);
+      let note;
       if (sen) {
-        const x = chiSquare(counts, probs, n);
         note = `χ² = ${x.chi2.toFixed(2)} on ${x.df} degree${x.df > 1 ? "s" : ""} of freedom (5% critical value ${x.crit}). ` + (x.fits ? "That is below the critical value: the data are consistent with the expected ratio (this does not prove it)." : "That is above the critical value: unlikely by chance alone if the ratio is right. About 1 run in 20 will do this by chance even when the ratio is exactly right.") + (x.lowExpected ? " Some expected counts are below 5, so χ² is unreliable here." : "");
+      } else if (x.fits) {
+        note = n >= 100 ? "The counts are close to what was expected, but almost never exactly equal. The small gaps are chance." : "These counts are within what chance can do, but small groups wander. Try more children.";
+      } else {
+        note = y7 ? "These counts are far from what was predicted. That would be very unusual from chance alone, so double-check the parents and the prediction." : "These counts are much further from the expected values than chance usually allows. Check the parents' genotypes and the prediction (or run it again): a gap this big is rare by chance alone.";
       }
       out.push(note);
     } else if (n < 20 && cs.length > 1) {
@@ -237,12 +240,19 @@ export function polyNarrative(c) {
   const { band, N, kA, kB, env, st, n, sample, trait } = c;
   const out = [];
   const sen = band === "y11" || band === "y12";
-  const nGeno = Math.pow(3, N);
-  out.push(`<b>${N} gene${N > 1 ? "s" : ""}</b>, each with a + allele (adds to the trait) and a − allele (adds nothing). Each parent has ${kA} and ${kB} + alleles out of ${2 * N}. Expected offspring mean ${st.mean.toFixed(1)} + alleles.${sen ? ` Genetic variance ${st.varG.toFixed(2)}; environmental variance ${st.varE.toFixed(2)}; heritability (broad-sense) H² = ${st.h2.toFixed(2)}.` : ""}`);
-  out.push(N === 1 ? "With one gene there are only three genetic classes (0, 1 or 2 + alleles), so the bars come in steps. Environment blurs the steps a little." : N <= 3 ? `With ${N} genes there are ${2 * N + 1} possible genetic scores (${nGeno} genotypes). The steps are narrower, and the histogram starts to look like a bell.` : `With ${N} genes there are ${2 * N + 1} genetic scores. Many small effects add up, and the distribution is close to a bell (normal) curve.${env > 0 ? " The environment smooths it further." : ""}`);
-  if (n > 0) {
-    out.push(`<b>Observed (${n} offspring):</b> mean ${sample.mean.toFixed(2)}, spread (SD) ${sample.sd.toFixed(2)}. Expected mean ${st.mean.toFixed(2)}, SD ${st.sd.toFixed(2)}.${sen ? ` Observed variance ${(sample.sd ** 2).toFixed(2)} vs expected ${st.varP.toFixed(2)}.` : ""}`);
-    out.push(env > 0 ? `The environment adds variation that is not inherited: two children with the same genes can differ in ${trait}.` : "With the environment slider at zero, every difference comes from genes. Real traits always have an environmental part.");
+  const r = polyReach(N, kA, kB);
+  const h2 = st.h2 == null ? "undefined (there is no variation to explain)" : st.h2.toFixed(2);
+  out.push(`<b>${N} gene${N > 1 ? "s" : ""}</b>, each with a + allele (adds to the trait) and a − allele (adds nothing). Each parent has ${kA} and ${kB} + alleles out of ${2 * N}. Expected offspring mean ${st.mean.toFixed(1)} + alleles.${sen ? ` Genetic variance ${st.varG.toFixed(2)}; environmental variance ${st.varE.toFixed(2)}; heritability (broad-sense) H² = ${h2}.` : ""}`);
+  if (r.segregating === 0) {
+    out.push(`Every child gets exactly ${r.fixed} + alleles, because each parent is homozygous at every gene and so passes on the same alleles every time. There is no segregation, so the genetic variance is zero.${env > 0 ? ` The only differences between children come from the environment, so the spread is the environment's normal curve centred on ${r.fixed}.` : " With no environmental variation either, every child is identical for this trait and there is no curve to draw."}`);
+  } else {
+    const scores = r.max - r.min + 1;
+    const shape = r.segregating <= 2 ? "only a few possible scores, so the bars come in big steps" : r.segregating <= 5 ? "several possible scores: the steps are narrower and the histogram starts to look like a bell" : "many possible scores, and many small effects add up to something close to a bell (normal) curve";
+    out.push(`Children can score from ${r.min} to ${r.max} + alleles (${scores} possible scores, from ${r.segregating} parental alleles that may or may not be passed on): ${shape}.${env > 0 ? " The environment smooths it further." : ""}`);
+  }
+  if (n > 0 && sample) {
+    out.push(`<b>Observed (${n} offspring so far):</b> mean ${sample.mean.toFixed(2)}, spread (SD) ${sample.sd.toFixed(2)}. Expected mean ${st.mean.toFixed(2)}, SD ${st.sd.toFixed(2)}.${sen ? ` Observed variance ${(sample.sd ** 2).toFixed(2)} vs expected ${st.varP.toFixed(2)}.` : ""}`);
+    if (st.varP > 1e-12) out.push(env > 0 ? `The environment adds variation that is not inherited: two children with the same genes can differ in ${trait}.` : "With the environment slider at zero, every difference comes from genes. Real traits always have an environmental part.");
   }
   return out;
 }
@@ -257,7 +267,7 @@ export function patternDiagnosis(an, band) {
   if (pats.length === 1) out.push("Only one of the three patterns fits, so this pedigree settles it (assuming the condition is fully penetrant and nobody has a new mutation).");
   else if (pats.length > 1) {
     const best = an.best;
-    out.push(an.margin >= 8 ? `More than one pattern fits the rules, but <b>${name(best)}</b> is far more likely (about ${an.margin >= 1000 ? "1000+" : Math.round(an.margin)} times, assuming a rare allele). Say 'consistent with', not 'must be'.` : `More than one pattern fits and none is clearly better, so this pedigree can't decide. Real investigators would test the family's DNA.`);
+    out.push(an.margin >= 8 ? `More than one pattern fits the rules, but <b>${name(best)}</b> is far more likely (about ${an.margin >= 1000 ? "1000+" : Math.round(an.margin)} times, assuming a rare allele). Say 'consistent with', not 'must be'. A likelihood ratio is not certainty, and it depends on the assumed allele frequency.` : `More than one pattern fits and none is clearly better, so this pedigree can't decide. Real investigators would test the family's DNA.`);
   }
   for (const n of an.rules.notes) out.push(n);
   if (sen) out.push("Assumptions: full penetrance, no new mutations or mosaicism, accurate diagnoses. X-linked dominant, Y-linked and mitochondrial patterns are not offered here.");

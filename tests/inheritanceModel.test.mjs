@@ -157,4 +157,37 @@ an = M.analysePedigree(ms); ok(!an.consistent.includes("XR"), "affected mother +
 const tp = mk([{ l: "I-1", s: "M", a: 1 }, { l: "I-2", s: "F", a: 1 }, { l: "II-1", s: "F", f: 0, m: 1 }]);
 an = M.analysePedigree(tp); ok(an.consistent.length === 1 && an.consistent[0] === "AD", "both affected, unaffected child -> AD only"); 
 // AD pedigree has no skipped generations; AR skip
+
+// --- Codex round 1 regressions
+{ // 1. a student's assignment must match ONE complete consistent solution, not just per-person possibilities
+  const r = M.generatePedigree("XR", 7919);
+  const assign = [0, 1, 0, 1, 1, 0, 0, 1, 0, 0, 1, 1];
+  const poss = r.analysis.fit.XR.possible;
+  const chk = M.checkAssignment(r.ped, "XR", assign.map((c, i) => (r.ped[i].sex === "M" && c === 2 ? 1 : c)), poss);
+  const indiv = assign.every((c, i) => poss[i].has(c) || poss[i].has(r.ped[i].sex === "M" && c === 2 ? 1 : c));
+  console.log("seed 7919 repro: individually possible =", chk.individual.every(Boolean), "joint =", chk.joint);
+  ok(chk.individual.every(Boolean) && !chk.joint, "repro: each genotype possible alone but jointly impossible");
+  ok(chk.ok.filter(Boolean).length < chk.ok.length, "some persons are flagged");
+  // the true genotypes are always accepted as a whole
+  const t = M.checkAssignment(r.ped, "XR", r.truth, poss);
+  ok(t.joint && t.ok.every(Boolean), "true assignment accepted");
+  ok(M.assignmentFeasible(r.ped, "XR", r.ped.map(() => null)), "empty assignment feasible");
+}
+{ // 4. loci have arm and band
+  for (const id of [...M.MODE_PRESETS.mono, ...M.MODE_PRESETS.abo, ...M.MODE_PRESETS.xlinked]) { const l = M.PRESETS[id].locus; ok(l && (l.arm === "p" || l.arm === "q") && l.f >= 0 && l.f <= 1 && l.cen > 0.1 && l.cen < 0.6 && l.text.startsWith(M.PRESETS[id].chr + l.arm), "locus " + id); }
+  const L = (id) => M.PRESETS[id].locus;
+  ok(L("sickle").arm === "p" && L("huntington").arm === "p" && L("dmd").arm === "p", "HBB, HTT, DMD on p arm");
+  ok(["cf", "lactose", "mc1r", "abo", "haemophilia"].every((id) => L(id).arm === "q"), "CFTR, LCT, MC1R, ABO, F8 on q arm");
+  ok(L("huntington").f > 0.9 && L("haemophilia").f > 0.9, "HTT near p-terminus, F8 near q-terminus");
+  ok(M.PRESETS.haemophilia.locus.text === "Xq28" && M.PRESETS.dmd.locus.text === "Xp21.2" && M.PRESETS.cf.locus.text === "7q31.2", "band names");
+}
+{ // 11. polygenic with no segregation
+  const r = M.polyReach(6, 12, 0);
+  ok(r.segregating === 0 && r.min === 6 && r.max === 6, "all-plus x all-minus: every child scores 6");
+  const s0 = M.polyStats(6, 12, 0, 0);
+  eq(s0.varG, 0, "no segregation variance"); ok(s0.h2 === null, "h2 undefined when total variance is 0");
+  eq(M.polyStats(6, 12, 0, 1).h2, 0, "h2 = 0 with only environment");
+  const het = M.polyReach(3, 3, 3); ok(het.segregating === 6 && het.min === 0 && het.max === 6, "all-heterozygous reach");
+  for (let i = 0; i < 200; i++) { const c = M.polyChild(6, 12, 0, 0); ok(c.g === 6 && c.e === 0, "deterministic child"); }
+}
 console.log("TESTS PASSED:", pass);

@@ -19,7 +19,7 @@ const ABO_COL = { A: "#f87171", B: "#60a5fa", i: "#cbd5e1" };
 const HOMOLOGUE = ["#a5d8ff", "#ffc9e3"];
 const PS = 1.2, BOARD_Z = 3.0, PAR_Z = -0.3, KID_Z0 = 5.05, KCAP = 150, ROWS = 4;
 const SHORT = {
-  sickle: { u: "No sickling", t: "Trait", d: "Disease" }, cf: { u: "Unaffected", d: "CF" }, huntington: { u: "Unaffected", d: "HD" }, lactose: { p: "Persistent", n: "Non-persistent" },
+  sickle: { u: "No sickling", t: "Trait", d: "Anaemia (SS)" }, cf: { u: "Unaffected", d: "CF" }, huntington: { u: "Unaffected", d: "HD" }, lactose: { p: "Persistent", n: "Non-persistent" },
   mc1r: { n: "Not red", r: "Red hair" }, abo: { A: "A", B: "B", AB: "AB", O: "O" },
   haemophilia: { Fu: "Girl", Fc: "Carrier girl", Fa: "Affected girl", Mu: "Boy", Ma: "Affected boy" }, dmd: { Fu: "Girl", Fc: "Carrier girl", Fa: "Affected girl", Mu: "Boy", Ma: "Affected boy" },
   peas: { RY: "Round yellow", Ry: "Round green", rY: "Wrinkled yellow", ry: "Wrinkled green" },
@@ -87,11 +87,19 @@ export function create(engine) {
 
   const startPreset = engine.inheritancePreset;
   engine.inheritancePreset = null;
+  let notice = "";
+  const MODE_BAND = Object.fromEntries(T.MODES.map((m) => [m.id, m.band]));
   function applyPreset(id) {
-    const mode = M.modeForPreset(id);
+    let mode = M.modeForPreset(id);
     if (!mode) return;
+    if (!lens.atLeast(MODE_BAND[mode])) {
+      // this kind of cross is Year 9+: say so and show the closest one-gene trait
+      const near = mode === "poly" ? "mc1r" : mode === "abo" ? "lactose" : "cf";
+      notice = `That one (${T.pickBand("y9-10", mode === "poly" ? T.POLY_INFO.eyes.name : T.PRESET_INFO[id].name)}) is a Year 9+ topic, so here is the closest one-gene trait: ${T.pickBand("y7-8", T.PRESET_INFO[near].name).toLowerCase()}. Switch to Years 9\u201310 to explore it.`;
+      id = near; mode = "mono";
+    }
+    if (mode === "poly") { st.mode = "poly"; st.poly.trait = "eyes"; return; }
     st.mode = mode;
-    if (mode === "poly") { st.poly.trait = "eyes"; return; }
     st.preset = id; S.presets.add(id);
     const d = M.PRESETS[id].defaults;
     st.father = Array.isArray(d.father) ? [...d.father] : d.father;
@@ -233,6 +241,8 @@ export function create(engine) {
     // bubbles sit in front of the chest, nudged toward the middle so the chromosomes face the camera
   }
 
+  /** position (fraction from the top, p arm on top) of a gene's locus on its chromosome, from its arm and how far along the arm it lies */
+  const locusPos = (l) => (l.arm === "p" ? l.cen * (1 - l.f) : l.cen + (1 - l.cen) * l.f);
   function alleleColor(sp, geneIdx, a) {
     if (sp.id === "abo") return ABO_COL[a];
     const g = sp.genes ? sp.genes[geneIdx] : sp;
@@ -264,6 +274,10 @@ export function create(engine) {
       clearHolder(p);
       const geno = w === 0 ? st.father : st.mother;
       const add = (c, x, y = 0, rotY = 0) => { c.group.position.set(x, y, 0); p.holder.add(c.group); p.chroms.push(c); return c; };
+      const armLabels = (c, len) => {
+        mkLabel("parent", "p", "inh-cap", (out) => { out.set(0, len / 2 + 0.07, 0); c.group.localToWorld(out); });
+        mkLabel("parent", "q", "inh-cap", (out) => { out.set(0, -len / 2 - 0.07, 0); c.group.localToWorld(out); });
+      };
       const labelBand = (c, text, side) => {
         const b = c.bands[0]; if (!b) return;
         mkLabel("parent", text, "inh-allele", (out) => b.mesh.getWorldPosition(out), side * 30, 0);
@@ -278,19 +292,19 @@ export function create(engine) {
         add(mk(0), -0.12); add(mk(1), 0.12);
       } else if (st.mode === "xlinked") {
         const sp = spec, [d, r] = sp.alleles;
-        const xBands = (a) => [{ pos: 0.7, color: a === d ? ALLELE_COL[0][0] : ALLELE_COL[0][1] }];
+        const LC = sp.locus, xBands = (a) => [{ pos: locusPos(LC), color: a === d ? ALLELE_COL[0][0] : ALLELE_COL[0][1] }];
         if (w === 0) {
-          const x = chromosome(0.7, 0.055, 0.4, HOMOLOGUE[0], xBands(geno));
+          const x = chromosome(0.7, 0.055, LC.cen, HOMOLOGUE[0], xBands(geno));
           const y = chromosome(0.34, 0.05, 0.3, "#9ca3af", []);
           add(x, -0.12); add(y, 0.12, -0.18);
-          labelBand(x, sp.fmt[geno], -1);
+          labelBand(x, sp.fmt[geno], -1); armLabels(x, 0.7);
           mkLabel("parent", "Y", "inh-allele", (out) => { y.body.getWorldPosition(out); }, 24, 0);
           mkLabel("parent", "X", "inh-cap", (out) => { x.body.getWorldPosition(out); out.y += 0.42; });
         } else {
           const a = geno[0], b = geno[1];
-          const x1 = chromosome(0.7, 0.055, 0.4, HOMOLOGUE[0], xBands(a)), x2 = chromosome(0.7, 0.055, 0.4, HOMOLOGUE[1], xBands(b));
+          const x1 = chromosome(0.7, 0.055, LC.cen, HOMOLOGUE[0], xBands(a)), x2 = chromosome(0.7, 0.055, LC.cen, HOMOLOGUE[1], xBands(b));
           add(x1, -0.12); add(x2, 0.12);
-          labelBand(x1, sp.fmt[a], -1); labelBand(x2, sp.fmt[b], 1);
+          labelBand(x1, sp.fmt[a], -1); labelBand(x2, sp.fmt[b], 1); armLabels(x1, 0.7);
           mkLabel("parent", "X", "inh-cap", (out) => { x1.body.getWorldPosition(out); out.y += 0.42; }, 0, 0);
           mkLabel("parent", "X", "inh-cap", (out) => { x2.body.getWorldPosition(out); out.y += 0.42; }, 0, 0);
         }
@@ -306,10 +320,11 @@ export function create(engine) {
         }
       } else {
         const sp = spec, gt = geno[0];
-        const c1 = chromosome(0.74, 0.058, 0.4, HOMOLOGUE[0], [{ pos: 0.62, color: alleleColor(sp, 0, gt[0]) }]);
-        const c2 = chromosome(0.74, 0.058, 0.4, HOMOLOGUE[1], [{ pos: 0.62, color: alleleColor(sp, 0, gt[1]) }]);
+        const LC = sp.locus, lp = locusPos(LC);
+        const c1 = chromosome(0.74, 0.058, LC.cen, HOMOLOGUE[0], [{ pos: lp, color: alleleColor(sp, 0, gt[0]) }]);
+        const c2 = chromosome(0.74, 0.058, LC.cen, HOMOLOGUE[1], [{ pos: lp, color: alleleColor(sp, 0, gt[1]) }]);
         add(c1, -0.13); add(c2, 0.13);
-        labelBand(c1, sp.fmt[gt[0]], -1); labelBand(c2, sp.fmt[gt[1]], 1);
+        labelBand(c1, sp.fmt[gt[0]], -1); labelBand(c2, sp.fmt[gt[1]], 1); armLabels(c1, 0.74);
       }
       // parent name tag
       const who = w === 0 ? "Father" : "Mother";
@@ -693,7 +708,7 @@ export function create(engine) {
   }
   function buildCurve() {
     if (curve) { gHist.remove(curve); curve.geometry.dispose(); curve = null; }
-    if (!hist) return;
+    if (!hist || hist.st.sd < 1e-9) return;   // no variation at all: there is no curve to draw
     const pts = [];
     for (let k = 0; k <= 80; k++) {
       const v = hist.lo + ((hist.hi - hist.lo) * k) / 80;
@@ -711,9 +726,8 @@ export function create(engine) {
     }
     const vals = []; for (let i = 0; i < n; i++) { const c = M.polyChild(N, kA, kB, env); vals.push(c.g + c.e); }
     const fin = M.histogram(vals, lo, hi, nb), maxC = Math.max(...fin);
-    const mean = vals.reduce((a, b) => a + b, 0) / n, sdo = Math.sqrt(vals.reduce((a, b) => a + (b - mean) ** 2, 0) / n);
-    hist = { vals, lo, hi, nb, w: (hi - lo) / nb, cur: new Array(nb).fill(0), cursor: 0, unit: HMAX / Math.max(maxC, 12), final: fin, st: stt, h: new Float32Array(NB), mean, sd: sdo, n };
-    if (REDUCED()) { hist.cursor = n; hist.cur = fin.slice(); for (let b = 0; b < nb; b++) hist.h[b] = fin[b] * hist.unit; }
+    hist = { vals, lo, hi, nb, w: (hi - lo) / nb, cur: new Array(nb).fill(0), cursor: 0, unit: HMAX / Math.max(maxC, 12), final: fin, st: stt, h: new Float32Array(NB), mean: 0, sd: 0, sum: 0, sum2: 0, n };
+    if (REDUCED()) { hist.cur = fin.slice(); for (let b = 0; b < nb; b++) hist.h[b] = fin[b] * hist.unit; polyAdvance(n); }
     buildCurve(); polyTicks(); writeBars();
     if (n >= 500) { S.polyN.add(N); if (N >= 4) S.poly500N4 = true; }
     dirtyPanel = true;
@@ -728,12 +742,22 @@ export function create(engine) {
     }
     bars.instanceMatrix.needsUpdate = true; if (bars.instanceColor) bars.instanceColor.needsUpdate = true;
   }
+  /** reveal offspring up to index `upto`, keeping running mean / SD of just the revealed ones */
+  function polyAdvance(upto) {
+    for (; hist.cursor < upto; hist.cursor++) {
+      const v = hist.vals[hist.cursor], b = Math.min(hist.nb - 1, Math.max(0, Math.floor((v - hist.lo) / hist.w)));
+      hist.cur[b]++; hist.sum += v; hist.sum2 += v * v;
+    }
+    const k = hist.cursor;
+    hist.mean = k ? hist.sum / k : 0;
+    hist.sd = k ? Math.sqrt(Math.max(0, hist.sum2 / k - hist.mean * hist.mean)) : 0;
+  }
   function updatePoly(dt, realDt) {
     if (!hist) return;
     let moving = false;
     if (hist.cursor < hist.n) {
       const upto = Math.min(hist.n, hist.cursor + Math.max(1, Math.round(380 * Math.max(dt, 0))));
-      for (; hist.cursor < upto; hist.cursor++) { const b = Math.min(hist.nb - 1, Math.max(0, Math.floor((hist.vals[hist.cursor] - hist.lo) / hist.w))); hist.cur[b]++; }
+      polyAdvance(upto);
       moving = true; dirtyPanel = true;
     }
     const k = 1 - Math.exp(-10 * Math.max(dt, 0));
@@ -749,6 +773,7 @@ export function create(engine) {
   const pedMatA = share(physical("#f472b6", { roughness: 0.35, emissive: new THREE.Color("#f472b6"), emissiveIntensity: 0.25 }));
   const lineMat = share(new THREE.MeshStandardMaterial({ color: "#8fb7e8", emissive: "#8fb7e8", emissiveIntensity: 0.4, roughness: 0.5 }));
   const boxGeo = share(new THREE.BoxGeometry(1, 1, 1));
+  const pedBackGeo = share(new THREE.PlaneGeometry(14.6, 4.9)), pedBackMat = share(glass("#7aa7d9", { rim: "#9bd0ff", rimStrength: 0.4, minAlpha: 0.05, maxAlpha: 0.25 }));
   const sqGeo = share(new THREE.BoxGeometry(0.66, 0.66, 0.14));
   const ciGeo = share((() => { const g = new THREE.CylinderGeometry(0.37, 0.37, 0.14, 40); g.rotateX(Math.PI / 2); return g; })());
   const ringG = share(new THREE.RingGeometry(0.5, 0.57, 48));
@@ -773,7 +798,7 @@ export function create(engine) {
     pedMeshes = []; pedRings = []; ped.sel = -1; selPed.visible = false;
     if (!fam) return;
     const P = fam.ped;
-    const back = new THREE.Mesh(share(new THREE.PlaneGeometry(14.6, 4.9)), share(glass("#7aa7d9", { rim: "#9bd0ff", rimStrength: 0.4, minAlpha: 0.05, maxAlpha: 0.25 })));
+    const back = new THREE.Mesh(pedBackGeo, pedBackMat);
     back.position.set(0, 1.85, -0.16); gPed.add(back);
     const seg = (x1, y1, x2, y2) => {
       const m = new THREE.Mesh(boxGeo, lineMat); m.position.set((x1 + x2) / 2, (y1 + y2) / 2, 0);
@@ -833,28 +858,36 @@ export function create(engine) {
   }
   function checkAssign() {
     const pat = fam.pattern, poss = fam.analysis.fit[pat].possible;
-    ped.checked = fam.ped.map((p, i) => ped.assign[i] != null && poss[i].has(ped.assign[i]));
-    const given = ped.assign.filter((a) => a != null).length, good = ped.checked.filter(Boolean).length;
+    const res = M.checkAssignment(fam.ped, pat, ped.assign, poss);
+    ped.checked = res.ok;
+    const given = ped.assign.filter((a) => a != null).length, good = res.ok.filter(Boolean).length;
     const forced = fam.ped.filter((p, i) => poss[i].size === 1).length;
-    ped.feedback = given === 0 ? "Click a person, then choose a genotype for them." :
-      `<p>${good} of ${given} genotypes you gave ${good === 1 ? "is" : "are"} possible for this family. ${good < given ? "Red marks a genotype that cannot be right (it would break the rules for this pattern)." : "Green means it is possible, not necessarily certain."}</p><p>${forced} ${forced === 1 ? "person's" : "people's"} genotype can be worked out for certain. For the others, more than one genotype fits — for example an unaffected person in an autosomal recessive family could be AA or Aa unless a child or a parent tells you.</p>`;
+    const indivBad = ped.assign.filter((a, i) => a != null && !res.individual[i]).length;
+    let msg;
+    if (given === 0) msg = "Click a person, then choose a genotype for them.";
+    else if (res.joint && good === given) msg = `<p>All ${given} genotype${given === 1 ? "" : "s"} you gave fit together as one complete explanation of this family. Green means possible, not necessarily certain.</p>`;
+    else if (indivBad === 0) msg = `<p>Each genotype you gave is possible on its own, but they cannot all be true together: no complete set of genotypes for the family agrees with all of them. Red marks the ones that clash with the genotypes accepted before them (reading the tree from the top).</p>`;
+    else msg = `<p>${good} of ${given} genotypes you gave fit this family. Red marks a genotype that cannot be right (it would break the rules for this pattern, or clash with another genotype you gave).</p>`;
+    ped.feedback = msg + (given ? `<p>${forced} ${forced === 1 ? "person's" : "people's"} genotype can be worked out for certain. For the others, more than one genotype fits \u2014 for example an unaffected person in an autosomal recessive family could be AA or Aa unless a child or a parent tells you.</p>` : "");
     refreshPedLabels(); dirtyPanel = true;
   }
+  const diag = () => T.patternDiagnosis(fam.analysis, lens.band).map((x) => `<p>${x}</p>`).join("");
   function answerPattern(p) {
     const an = fam.analysis, truth = fam.pattern, name = T.PED_INFO[p].name;
     ped.tries++;
-    if (p === truth) {
+    const accepted = p === truth || (st.ped.ambiguous && an.consistent.includes(p));   // hard mode: any pattern the data allow is correct
+    if (accepted) {
       ped.answered = true; S.pedSolved++; S.patternsSolved.add(p);
-      ped.feedback = `<p><b>Yes: ${name}.</b> ${an.decisive ? "It is the only one of the three patterns that fits these phenotypes." : "Be careful with the word 'must': other patterns also fit, but this one is the most likely explanation."}</p>` + T.patternDiagnosis(an, lens.band).map((x) => `<p>${x}</p>`).join("");
+      ped.feedback = `<p><b>Yes: ${name}.</b> ${an.decisive ? "It is the only one of the three patterns that fits these phenotypes." : "It fits the data, but other patterns fit too, so say 'consistent with' rather than 'must be'."}</p><p class="hint">How this family was generated: ${T.PED_INFO[truth].name}. What the phenotypes alone support is listed below.</p>` + diag();
     } else if (!an.consistent.includes(p)) {
       ped.feedback = `<p><b>Not ${name}.</b> ${an.rules[p].why[0] || "No way to give the family genotypes that fits."}</p><p>Look at the rule that was broken, then try another pattern.</p>`;
     } else {
       ped.answered = true;
-      ped.feedback = `<p><b>${name} is consistent with this family</b>, but it was made as <b>${T.PED_INFO[truth].name}</b>. ${an.margin >= 8 ? `${T.PED_INFO[truth].name} is much more likely, though.` : "A pedigree like this can't tell them apart: that's normal for small families."}</p>` + T.patternDiagnosis(an, lens.band).map((x) => `<p>${x}</p>`).join("");
+      ped.feedback = `<p><b>${name} is consistent with this family's phenotypes</b>, but the family was generated as <b>${T.PED_INFO[truth].name}</b>. A pedigree alone can't always tell them apart.</p>` + diag();
     }
-    refreshPedLabels(); dirtyPanel = true; buildPedPanel && buildPedPanel();
+    refreshPedLabels(); dirtyPanel = true; buildPedPanel();
   }
-  function revealPattern() { ped.answered = true; ped.revealed = true; ped.feedback = `<p>This family was made as <b>${T.PED_INFO[fam.pattern].name}</b>.</p>` + T.patternDiagnosis(fam.analysis, lens.band).map((x) => `<p>${x}</p>`).join(""); refreshPedLabels(); dirtyPanel = true; buildPedPanel && buildPedPanel(); }
+  function revealPattern() { ped.answered = true; ped.revealed = true; ped.feedback = `<p>This family was generated as <b>${T.PED_INFO[fam.pattern].name}</b>. What the phenotypes alone support:</p>` + diag(); refreshPedLabels(); dirtyPanel = true; buildPedPanel(); }
 
   function setPickables() {
     pickables.length = 0;
@@ -913,7 +946,7 @@ export function create(engine) {
     gStage.visible = m !== "pedigree";
     selMark.visible = false;
     refreshCross(true);
-    if (m === "poly" && !hist) breed();
+    if (m === "poly") breed();    // parents were reset, so the old histogram no longer matches
     if (m === "pedigree" && !fam) newFamily();
     if (m === "pedigree") { ped.sel = -1; selPed.visible = false; }
     setPickables();
@@ -953,7 +986,7 @@ export function create(engine) {
   const sen = () => lens.atLeast("y11");
   const h = (html, tag = "div", cls = "") => { const e = document.createElement(tag); if (cls) e.className = cls; e.innerHTML = html; return e; };
   const pct = (p) => `${Math.round(p * 1000) / 10}%`;
-  const availableModes = () => T.MODES.filter((m) => lens.atLeast(m.band) || m.id === st.mode);
+  const availableModes = () => T.MODES.filter((m) => lens.atLeast(m.band));
 
   function buildModeCard() {
     const modes = availableModes();
@@ -966,6 +999,7 @@ export function create(engine) {
       });
       c.appendChild(g);
     }
+    if (notice) c.appendChild(h(notice, "p", "inh-note"));
     const intro = h("", "p", "");
     intro.id = "inh-intro"; intro.style.marginTop = "8px"; c.appendChild(intro);
     if (modes.length === 1) c.appendChild(h("More kinds of crosses unlock in Years 9–10.", "p", "hint"));
@@ -1084,7 +1118,7 @@ export function create(engine) {
     const nm = T.pickBand(bandName(), info.name);
     const pt = info.pattern ? T.pickBand(bandName(), info.pattern) : "";
     ac.appendChild(h(`<b style="color:var(--ink)">${nm}</b>${pt ? ` · <span style="color:var(--accent)">${pt}</span>` : ""}`, "p"));
-    const spec_ = spec.gene ? `<span class="inh-gene">${spec.gene}</span>${spec.chr ? ` · chromosome ${spec.chr}` : ""}` : "";
+    const spec_ = spec.gene ? `<span class="inh-gene">${spec.gene}</span>${spec.locus ? ` · ${spec.locus.text} (${spec.locus.arm === "p" ? "short" : "long"} arm)` : spec.chr ? ` · chromosome ${spec.chr}` : ""}` : "";
     if (spec_ && !y7()) ac.appendChild(h(spec_, "p", "hint"));
     ac.appendChild(h(T.pickBand(bandName(), info.blurb), "p"));
     if (info.note) ac.appendChild(h(T.pickBand(bandName(), info.note), "p", "hint"));
@@ -1092,7 +1126,7 @@ export function create(engine) {
     if (st.preset === "mc1r" && st.mode === "mono") ac.appendChild(h("<b>Simplified:</b> real hair colour depends on many genes, so this one-gene model is a teaching simplification.", "p", "inh-note"));
     if (st.mode === "dihybrid") ac.appendChild(h(`<b>Linked genes break this.</b> Independent assortment only holds for genes on different chromosomes (or far apart on one). Genes close together on the same chromosome are linked and are usually inherited together; crossing over is what separates them. <a href="${engine.root}sims/meiosis/index.html" style="color:var(--accent)">See crossing over in the Meiosis lab ▸</a>`, "p", "inh-note"));
     if (st.mode === "abo") ac.appendChild(h("A person with blood group A (or B) could have one or two copies of that allele: the phenotype doesn't tell you the genotype. Group O is always <i>ii</i>.", "p", "inh-note"));
-    if (st.mode === "xlinked") ac.appendChild(h("<b>Criss-cross inheritance:</b> an affected father passes his X to all his daughters (who become carriers) and his Y to his sons, so he never passes it to a son. A carrier mother passes it to about half her sons and half her daughters.", "p", "inh-note"));
+    if (st.mode === "xlinked") ac.appendChild(h("<b>Criss-cross inheritance:</b> an affected father passes his X to all his daughters (carriers if the mother is not a carrier, affected if she is one too) and his Y to his sons, so he never passes it to a son. A carrier mother passes it to about half her sons and half her daughters. Carrier females can sometimes have symptoms (random X-inactivation).", "p", "inh-note"));
     if (!y7()) ac.appendChild(h("Dominant and recessive describe how an allele behaves in a heterozygote. They say nothing about how common the allele is.", "p", "hint"));
     if (st.mode === "mono" && st.preset === "sickle" && !y7()) mutationCard();
     if (sen()) {
@@ -1172,7 +1206,7 @@ export function create(engine) {
     const ac = K.card(dyn, "About this trait");
     ac.appendChild(h(`<b style="color:var(--ink)">${T.pickBand(bandName(), info.name)}</b>`, "p"));
     ac.appendChild(h(T.pickBand(bandName(), info.blurb), "p"));
-    if (st.poly.trait === "eyes") ac.appendChild(h("Eye colour is not a single brown/blue gene. OCA2 and HERC2 (chromosome 15) are the major genes, but several others contribute, so it is not a simple Mendelian trait.", "p", "inh-note"));
+    if (st.poly.trait === "eyes") ac.appendChild(h("Eye colour is not a single brown/blue gene. OCA2 and HERC2 (chromosome 15q12–13) are the major genes, but several others contribute, so it is not a simple Mendelian trait.", "p", "inh-note"));
     ac.appendChild(h("The genes in this model are drawn on one chromosome pair for simplicity. Real genes affecting a trait are usually scattered over many chromosomes.", "p", "hint"));
     addWords();
   }
@@ -1180,12 +1214,12 @@ export function create(engine) {
     if (!polyBody || st.mode !== "poly") return;
     const { N, kA, kB, env } = st.poly, stt = M.polyStats(N, kA, kB, env);
     const u = y7() ? "" : "";
-    let html = `<table class="inh-tbl"><tr><th></th><th class="n">Expected</th>${hist ? '<th class="n">Observed</th>' : ""}</tr>
-      <tr><td>Mean (+ alleles)</td><td class="n">${stt.mean.toFixed(2)}</td>${hist ? `<td class="n">${hist.mean.toFixed(2)}</td>` : ""}</tr>
-      <tr><td>Spread (SD)</td><td class="n">${stt.sd.toFixed(2)}</td>${hist ? `<td class="n">${hist.sd.toFixed(2)}</td>` : ""}</tr>
-      ${sen() ? `<tr><td>Genetic variance</td><td class="n">${stt.varG.toFixed(2)}</td><td></td></tr><tr><td>Environmental variance</td><td class="n">${stt.varE.toFixed(2)}</td><td></td></tr><tr><td>Heritability H²</td><td class="n">${stt.h2.toFixed(2)}</td><td></td></tr>` : ""}</table>`;
+    let html = `<table class="inh-tbl"><tr><th></th><th class="n">Expected</th>${hist && hist.cursor ? '<th class="n">Observed</th>' : ""}</tr>
+      <tr><td>Mean (+ alleles)</td><td class="n">${stt.mean.toFixed(2)}</td>${hist && hist.cursor ? `<td class="n">${hist.mean.toFixed(2)}</td>` : ""}</tr>
+      <tr><td>Spread (SD)</td><td class="n">${stt.sd.toFixed(2)}</td>${hist && hist.cursor ? `<td class="n">${hist.sd.toFixed(2)}</td>` : ""}</tr>
+      ${sen() ? `<tr><td>Genetic variance</td><td class="n">${stt.varG.toFixed(2)}</td><td></td></tr><tr><td>Environmental variance</td><td class="n">${stt.varE.toFixed(2)}</td><td></td></tr><tr><td>Heritability H²</td><td class="n">${stt.h2 == null ? "undefined" : stt.h2.toFixed(2)}</td><td></td></tr>` : ""}</table>`;
     if (polyBody._h !== html) { polyBody._h = html; polyBody.innerHTML = html; }
-    const paras = T.polyNarrative({ band: bandName(), N, kA, kB, env, st: stt, n: hist ? hist.cursor : 0, sample: hist ? { mean: hist.mean, sd: hist.sd } : null, trait: st.poly.trait === "eyes" ? "iris colour" : "height" });
+    const paras = T.polyNarrative({ band: bandName(), N, kA, kB, env, st: stt, n: hist ? hist.cursor : 0, sample: hist && hist.cursor ? { mean: hist.mean, sd: hist.sd } : null, trait: st.poly.trait === "eyes" ? "iris colour" : "height" });
     const nh = paras.map((p) => `<p>${p}</p>`).join("");
     if (narrBody && narrBody._h !== nh) { narrBody._h = nh; narrBody.innerHTML = nh; }
   }
@@ -1301,7 +1335,7 @@ export function create(engine) {
     if (!chips) return;
     const dot = (c) => `<i class="dot" style="background:${c}"></i>`;
     if (st.mode === "poly") {
-      chips.a(`${dot("#5eead4")}Genes <b>${st.poly.N}</b>`); chips.b(hist ? `${dot("#fde68a")}Offspring <b>${hist.cursor}</b>` : ""); chips.c(hist ? `${dot("#a78bfa")}Mean <b>${hist.mean.toFixed(2)}</b> · SD <b>${hist.sd.toFixed(2)}</b>` : "");
+      chips.a(`${dot("#5eead4")}Genes <b>${st.poly.N}</b>`); chips.b(hist ? `${dot("#fde68a")}Offspring <b>${hist.cursor}</b>` : ""); chips.c(hist && hist.cursor ? `${dot("#a78bfa")}Mean <b>${hist.mean.toFixed(2)}</b> · SD <b>${hist.sd.toFixed(2)}</b>` : "");
     } else if (st.mode === "pedigree") {
       const aff = fam ? fam.ped.filter((p) => p.affected).length : 0;
       chips.a(`${dot("#f472b6")}Affected <b>${aff}</b> of ${fam ? fam.ped.length : 0}`); chips.b(`${dot("#5eead4")}Pattern <b>${!fam ? "" : st.ped.mystery && !ped.answered ? "?" : T.PED_INFO[fam.pattern].name}</b>`); chips.c("");
@@ -1364,7 +1398,7 @@ export function create(engine) {
     onResize() { layoutParents(); },
     onLens() {
       const ok = T.MODES.some((m) => m.id === st.mode && lens.atLeast(m.band));
-      if (!ok) setMode("mono", true);
+      if (!ok) { notice = "That kind of cross is a Year 9+ topic, so you are back on the one-gene crosses."; setMode("mono", true); } else if (lens.atLeast("y9-10")) notice = "";
       panelBuild(); dirtyPanel = true;
       if (!ok) flyToView();
     },
@@ -1405,7 +1439,7 @@ export function create(engine) {
 
   // ------------------------------------------------------------------ initial state
     layoutParents();
+  if (startPreset === "eyes" && lens.atLeast("y9-10")) { st.mode = "poly"; st.poly.trait = "eyes"; }
   setMode(st.mode, true);
-  if (startPreset === "eyes") { st.mode = "poly"; st.poly.trait = "eyes"; setMode("poly", true); }
   return level;
 }

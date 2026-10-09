@@ -27,16 +27,18 @@ const cls = (id, label, geno, color, aff = 0) => ({ id, label, geno, color, aff 
 export const PRESETS = {
   sickle: {
     id: "sickle", mode: "mono", kind: "auto",
+    locus: { arm: "p", f: 0.9, cen: 0.38, text: "11p15.4" },
     gene: "HBB", chr: "11", alleles: ["A", "S"],
     fmt: { A: sup("Hb", "A"), S: sup("Hb", "S") }, name: { A: "HbA", S: "HbS" },
     classes: [cls("u", { "y7-8": "No sickle cells", "y9-10": "Unaffected", y11: "Unaffected (HbA only)" }, ["AA"], C.teal, 0),
       cls("t", { "y7-8": "Sickle-cell trait (carrier)", "y9-10": "Sickle-cell trait (carrier)", y11: "Sickle-cell trait (HbA + HbS)" }, ["AS"], C.amber, 1),
-      cls("d", { "y7-8": "Sickle-cell disease", "y9-10": "Sickle-cell disease", y11: "Sickle-cell disease (HbS only)" }, ["SS"], C.pink, 2)],
+      cls("d", { "y7-8": "Sickle-cell disease", "y9-10": "Sickle-cell anaemia (HbSS)", y11: "Sickle-cell anaemia (HbSS, HbS only)" }, ["SS"], C.pink, 2)],
     defaults: { father: ["AS"], mother: ["AS"] },
     affectedClass: "d", recessive: true,
   },
   cf: {
     id: "cf", mode: "mono", kind: "auto",
+    locus: { arm: "q", f: 0.35, cen: 0.38, text: "7q31.2" },
     gene: "CFTR", chr: "7", alleles: ["C", "c"], fmt: { C: "C", c: "c" }, name: { C: "C", c: "c" },
     classes: [cls("u", { "y7-8": "Does not have CF", "y9-10": "Unaffected", y11: "Unaffected" }, ["CC", "Cc"], C.teal, 0),
       cls("d", { "y7-8": "Has cystic fibrosis", "y9-10": "Cystic fibrosis", y11: "Cystic fibrosis" }, ["cc"], C.pink, 2)],
@@ -45,6 +47,7 @@ export const PRESETS = {
   },
   huntington: {
     id: "huntington", mode: "mono", kind: "auto",
+    locus: { arm: "p", f: 0.97, cen: 0.27, text: "4p16.3" },
     gene: "HTT", chr: "4", alleles: ["H", "h"], fmt: { H: "H", h: "h" }, name: { H: "H", h: "h" },
     classes: [cls("u", { "y7-8": "Will not develop HD", "y9-10": "Unaffected", y11: "Unaffected" }, ["hh"], C.teal, 0),
       cls("d", { "y7-8": "Will develop HD (later in life)", "y9-10": "Huntington's disease (late onset)", y11: "Huntington's disease (late onset)" }, ["HH", "Hh"], C.violet, 2)],
@@ -53,14 +56,16 @@ export const PRESETS = {
   },
   lactose: {
     id: "lactose", mode: "mono", kind: "auto",
+    locus: { arm: "q", f: 0.2, cen: 0.39, text: "2q21.3" },
     gene: "LCT (regulatory region)", chr: "2", alleles: ["L", "l"], fmt: { L: "L", l: "l" }, name: { L: "L", l: "l" },
-    classes: [cls("p", { "y7-8": "Can digest milk sugar as an adult", "y9-10": "Lactase persistence", y11: "Lactase persistence" }, ["LL", "Ll"], C.sky, 0),
-      cls("n", { "y7-8": "Cannot digest milk sugar as an adult", "y9-10": "Lactase non-persistence", y11: "Lactase non-persistence" }, ["ll"], C.sand, 0)],
+    classes: [cls("p", { "y7-8": "Keeps making lactase as an adult", "y9-10": "Lactase persistence", y11: "Lactase persistence" }, ["LL", "Ll"], C.sky, 0),
+      cls("n", { "y7-8": "Makes less lactase as an adult", "y9-10": "Reduced lactase in adulthood (lactase non-persistence)", y11: "Reduced lactase in adulthood (lactase non-persistence)" }, ["ll"], C.sand, 0)],
     defaults: { father: ["Ll"], mother: ["Ll"] },
     affectedClass: null, recessive: false,
   },
   mc1r: {
     id: "mc1r", mode: "mono", kind: "auto",
+    locus: { arm: "q", f: 0.98, cen: 0.42, text: "16q24.3" },
     gene: "MC1R", chr: "16", alleles: ["R", "r"], fmt: { R: "R", r: "r" }, name: { R: "R", r: "r" },
     classes: [cls("n", { "y7-8": "Not red hair", "y9-10": "Not red hair", y11: "Not red hair" }, ["RR", "Rr"], C.tan, 0),
       cls("r", { "y7-8": "Red hair", "y9-10": "Red hair", y11: "Red hair" }, ["rr"], C.orange, 0)],
@@ -69,6 +74,7 @@ export const PRESETS = {
   },
   abo: {
     id: "abo", mode: "abo", kind: "auto",
+    locus: { arm: "q", f: 0.95, cen: 0.35, text: "9q34.2" },
     gene: "ABO", chr: "9", alleles: ["A", "B", "i"], fmt: { A: sup("I", "A"), B: sup("I", "B"), i: "i" }, name: { A: "I^A", B: "I^B", i: "i" },
     classes: [cls("A", { "y7-8": "Blood group A", "y9-10": "Blood group A", y11: "Blood group A" }, ["AA", "Ai"], C.red, 0),
       cls("B", { "y7-8": "Blood group B", "y9-10": "Blood group B", y11: "Blood group B" }, ["BB", "Bi"], C.blue, 0),
@@ -79,12 +85,14 @@ export const PRESETS = {
   },
   haemophilia: {
     id: "haemophilia", mode: "xlinked", kind: "x",
+    locus: { arm: "q", f: 0.97, cen: 0.4, text: "Xq28" },
     gene: "F8", chr: "X", alleles: ["H", "h"], fmt: { H: "H", h: "h" }, name: { H: "H", h: "h" },
     classes: xClasses("Haemophilia A", C),
     defaults: { father: "H", mother: "Hh" },
   },
   dmd: {
     id: "dmd", mode: "xlinked", kind: "x",
+    locus: { arm: "p", f: 0.55, cen: 0.4, text: "Xp21.2" },
     gene: "DMD", chr: "X", alleles: ["D", "d"], fmt: { D: "D", d: "d" }, name: { D: "D", d: "d" },
     classes: xClasses("Duchenne muscular dystrophy", C),
     defaults: { father: "D", mother: "Dd" },
@@ -93,7 +101,7 @@ export const PRESETS = {
 function xClasses(cond, C) {
   return [
     cls("Fu", { "y7-8": "Girl, not affected", "y9-10": "Daughter, unaffected", y11: "Daughter, unaffected (XᴴXᴴ)" }, ["F:dom"], C.teal, 0),
-    cls("Fc", { "y7-8": "Girl, carrier", "y9-10": "Daughter, carrier", y11: "Daughter, heterozygous carrier" }, ["F:het"], C.amber, 1),
+    cls("Fc", { "y7-8": "Girl, carrier", "y9-10": "Daughter, carrier (may have mild symptoms)", y11: "Daughter, heterozygous carrier (variable symptoms)" }, ["F:het"], C.amber, 1),
     cls("Fa", { "y7-8": "Girl, has " + cond, "y9-10": "Daughter, affected", y11: "Daughter, affected (homozygous)" }, ["F:rec"], C.pink, 2),
     cls("Mu", { "y7-8": "Boy, not affected", "y9-10": "Son, unaffected", y11: "Son, unaffected" }, ["M:dom"], C.sky, 0),
     cls("Ma", { "y7-8": "Boy, has " + cond, "y9-10": "Son, affected", y11: "Son, affected (hemizygous)" }, ["M:rec"], C.violet, 2),
@@ -274,7 +282,13 @@ export function polyStats(N, kA, kB, envSd) {
   let varG = 0, mean = 0;
   for (const k of [kA, kB]) for (const c of polyLoci(N, k)) { const p = c / 2; mean += p; varG += p * (1 - p); }
   const varE = envSd * envSd, varP = varG + varE;
-  return { mean, varG, varE, varP, sd: Math.sqrt(varP), h2: varP > 0 ? varG / varP : 1 };
+  return { mean, varG, varE, varP, sd: Math.sqrt(varP), h2: varP > 1e-12 ? varG / varP : null };
+}
+/** Which genetic scores can offspring reach? fixed = + alleles every child gets; segregating = parental alleles that may or may not be passed on. */
+export function polyReach(N, kA, kB) {
+  let fixed = 0, segregating = 0;
+  for (const k of [kA, kB]) for (const c of polyLoci(N, k)) { if (c === 2) fixed++; else if (c === 1) segregating++; }
+  return { min: fixed, max: fixed + segregating, fixed, segregating };
 }
 function normal(R) { let u = 0; while (u === 0) u = R(); return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * R()); }
 /** one offspring: genetic score (count of + alleles) plus a normally distributed environmental effect */
@@ -341,12 +355,13 @@ function transmit(pat, sex, c, cf, cm) {
 }
 
 /** Enumerate every genotype assignment consistent with the pedigree's phenotypes under pattern `pat`. */
-export function enumerate(ped, pat, onLeaf) {
+export function enumerate(ped, pat, onLeaf, fixed = null) {
   const n = ped.length, g = new Array(n);
   const rec = (i, w) => {
     if (i === n) { onLeaf(g, w); return; }
     const p = ped[i];
     for (const c of genoChoices(pat, p.sex)) {
+      if (fixed && fixed[i] != null && fixed[i] !== c) continue;
       if (affectedC(pat, p.sex, c) !== p.affected) continue;
       const pr = p.f == null ? prior(pat, p.sex, c) : transmit(pat, p.sex, c, g[p.f], g[p.m]);
       if (pr <= 0) continue;
@@ -355,6 +370,39 @@ export function enumerate(ped, pat, onLeaf) {
     }
   };
   rec(0, 1);
+}
+/** Is there at least one COMPLETE consistent genotype assignment that agrees with every non-null entry of `assign`? */
+export function assignmentFeasible(ped, pat, assign) {
+  let found = false;
+  const fixed = assign.map((a) => (a == null ? null : a));
+  const n = ped.length, g = new Array(n);
+  const rec = (i) => {
+    if (found) return;
+    if (i === n) { found = true; return; }
+    const p = ped[i];
+    for (const c of genoChoices(pat, p.sex)) {
+      if (fixed[i] != null && fixed[i] !== c) continue;
+      if (affectedC(pat, p.sex, c) !== p.affected) continue;
+      const pr = p.f == null ? prior(pat, p.sex, c) : transmit(pat, p.sex, c, g[p.f], g[p.m]);
+      if (pr <= 0) continue;
+      g[i] = c; rec(i + 1);
+    }
+  };
+  rec(0);
+  return found;
+}
+/** Check a student's (partial) assignment: per-person individually possible, and jointly consistent.
+ *  Returns { ok[i] (accepted greedily in order so the accepted set is jointly feasible), individual[i], joint } */
+export function checkAssignment(ped, pat, assign, possible) {
+  const individual = ped.map((p, i) => assign[i] != null && possible[i].has(assign[i]));
+  const joint = assignmentFeasible(ped, pat, assign.map((a, i) => (individual[i] ? a : null)));
+  const ok = ped.map(() => false), acc = ped.map(() => null);
+  for (let i = 0; i < ped.length; i++) {
+    if (!individual[i]) continue;
+    acc[i] = assign[i];
+    if (assignmentFeasible(ped, pat, acc)) ok[i] = true; else acc[i] = null;
+  }
+  return { ok, individual, joint };
 }
 /** likelihood of the observed phenotypes under a pattern, and which genotypes each person could have */
 export function pedigreeFit(ped, pat) {
