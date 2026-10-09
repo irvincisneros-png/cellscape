@@ -71,7 +71,7 @@ export const PRESET_INFO = {
     name: { "y7-8": "Huntington's disease", "y9-10": "Huntington's disease (HTT)", y11: "Huntington's disease (HTT)" },
     pattern: { "y7-8": "One copy is enough (dominant)", "y9-10": "Autosomal dominant, late onset", y11: "Autosomal dominant; late onset; CAG repeat expansion" },
     blurb: {
-      "y7-8": "In Huntington's disease one copy of the gene is enough. Symptoms usually begin in adulthood, so people often have children before they know. A child of an affected parent has a 1 in 2 chance.",
+      "y7-8": "In Huntington's disease one copy of the gene is enough. Symptoms usually begin in adulthood, so people often have children before they know. If one parent has one copy and the other has none, each child has a 1 in 2 chance.",
       "y9-10": "The HTT gene (chromosome 4) has a stretch of repeated CAG. The disease allele (H) is dominant, so one copy is enough. Symptoms usually start between about 30 and 50, so many people have children before they know they carry it.",
       y11: "A CAG repeat expansion in HTT (36 or more repeats; 40 or more gives full penetrance) adds a long polyglutamine tract to huntingtin. Onset is usually in mid-life and age of onset falls as the repeat gets longer. The expansion can lengthen when passed on, especially from fathers (anticipation).",
     },
@@ -303,7 +303,7 @@ export const MISSIONS = [
 // ------------------------------------------------------------------ quiz
 export const QUIZ = [
   // Years 7-8
-  { maxBand: "y7-8", q: "A boy gets two versions of every gene. Where do they come from?", options: ["Both from his mother", "One from his mother and one from his father", "Both from his father", "From his grandparents only"], answer: 1, why: "Each parent passes on one version of each gene, so a child gets one from each parent." },
+  { maxBand: "y7-8", q: "A girl gets two versions of each gene that is not on the X or Y chromosome. Where do they come from?", options: ["Both from her mother", "One from her mother and one from her father", "Both from her father", "From her grandparents only"], answer: 1, why: "Each parent passes on one version of each gene, so a child gets one from each parent." },
   { maxBand: "y7-8", q: "Two parents are carriers of cystic fibrosis. What is the chance that a child has CF?", options: ["0", "1 in 4", "1 in 2", "Every child"], answer: 1, why: "Each parent gives the CF version with a 1 in 2 chance, so both together is 1 in 2 × 1 in 2 = 1 in 4." },
   { maxBand: "y7-8", q: "A family already has one child with cystic fibrosis. Both parents are carriers. What is the chance that the next child has it?", options: ["0, because they have already had one", "1 in 4, the same as every child", "1 in 2", "Certain"], answer: 1, why: "Each child is a new chance. The earlier children do not change it." },
   { maxBand: "y7-8", q: "What is a carrier?", options: ["Someone who has the condition", "Someone with one copy of a recessive version who does not have the condition", "Someone who can catch the condition", "Someone with no copies"], answer: 1, why: "Carriers have one recessive allele that is hidden by the other copy. They can pass it on." },

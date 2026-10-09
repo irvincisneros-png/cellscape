@@ -503,6 +503,7 @@ export function create(engine) {
     if (!cross) return [];
     if (spec.id === "abo") return [["#f87171", "IᴬIᴬ"], ["#fb923c", "Iᴬi"], ["#60a5fa", "IᴮIᴮ"], ["#38bdf8", "Iᴮi"], ["#c084fc", "IᴬIᴮ"], ["#cbd5e1", "ii"]];
     if (spec.mode === "dihybrid") return [];
+    if (spec.kind === "x") return [["#60a5fa", "dominant allele only (a boy has just one X)"], ["#fbbf24", "girl with one of each (carrier)"], ["#c084fc", "recessive allele only (girl: both X)"]];
     return [["#60a5fa", "two dominant alleles"], ["#fbbf24", "one of each"], ["#c084fc", "two recessive alleles"]];
   }
   function seedKind(cell) { return spec.mode === "dihybrid" ? (cell.cls[0] === "R" ? 1 : 2) : 0; }
@@ -1065,7 +1066,7 @@ export function create(engine) {
           const opts = M.genotypeOptions(gn.alleles).map((g) => ({ value: g, label: M.fmtGeno(spec, g, gi) }));
           K.segmented(wrap, opts, (who === 0 ? st.father : st.mother)[gi], (v) => { (who === 0 ? st.father : st.mother)[gi] = v; onPick(); }).el.style.marginTop = gi ? "4px" : "0";
         });
-        else wrap.appendChild(h(M.fmtGeno(spec, "Rr", 0) + M.fmtGeno(spec, "Yy", 1) + ` (heterozygous for both genes)`, "div", "inh-gene"));
+        else wrap.appendChild(h(genoHtml(who), "div", "inh-gene"));
       } else {
         const opts = M.genotypeOptions(spec.alleles).map((g) => ({ value: g, label: M.fmtGeno(spec, g) }));
         K.segmented(wrap, opts, (who === 0 ? st.father : st.mother)[0], (v) => { (who === 0 ? st.father : st.mother)[0] = v; onPick(); });
@@ -1126,7 +1127,7 @@ export function create(engine) {
     if (st.preset === "mc1r" && st.mode === "mono") ac.appendChild(h("<b>Simplified:</b> real hair colour depends on many genes, so this one-gene model is a teaching simplification.", "p", "inh-note"));
     if (st.mode === "dihybrid") ac.appendChild(h(`<b>Linked genes break this.</b> Independent assortment only holds for genes on different chromosomes (or far apart on one). Genes close together on the same chromosome are linked and are usually inherited together; crossing over is what separates them. <a href="${engine.root}sims/meiosis/index.html" style="color:var(--accent)">See crossing over in the Meiosis lab ▸</a>`, "p", "inh-note"));
     if (st.mode === "abo") ac.appendChild(h("A person with blood group A (or B) could have one or two copies of that allele: the phenotype doesn't tell you the genotype. Group O is always <i>ii</i>.", "p", "inh-note"));
-    if (st.mode === "xlinked") ac.appendChild(h("<b>Criss-cross inheritance:</b> an affected father passes his X to all his daughters (carriers if the mother is not a carrier, affected if she is one too) and his Y to his sons, so he never passes it to a son. A carrier mother passes it to about half her sons and half her daughters. Carrier females can sometimes have symptoms (random X-inactivation).", "p", "inh-note"));
+    if (st.mode === "xlinked") ac.appendChild(h("<b>Criss-cross inheritance:</b> an affected father passes his X to all his daughters (carriers if the mother is not a carrier, affected if she is one too) and his Y to his sons, so he never passes it to a son. So with an affected father and a carrier mother, half the daughters are affected (X<sup>h</sup>X<sup>h</sup>) and half are carriers; with a mother who is not a carrier, all daughters are carriers. A carrier mother passes it to about half her sons and half her daughters. Carrier females can sometimes have symptoms (random X-inactivation).", "p", "inh-note"));
     if (!y7()) ac.appendChild(h("Dominant and recessive describe how an allele behaves in a heterozygote. They say nothing about how common the allele is.", "p", "hint"));
     if (st.mode === "mono" && st.preset === "sickle" && !y7()) mutationCard();
     if (sen()) {
@@ -1303,7 +1304,11 @@ export function create(engine) {
       for (const b of selCard.querySelectorAll("[data-g]")) b.addEventListener("click", () => assignGeno(i, b.dataset.g === "x" ? null : +b.dataset.g));
       return;
     }
-    if (ud.kind === "parent") {
+    if (ud.kind === "parent" && st.mode === "poly") {
+      const w = ud.who, k = w === 0 ? st.poly.kA : st.poly.kB, N = st.poly.N, loci = M.polyLoci(N, k), het = loci.filter((c) => c === 1).length;
+      html = `<h2>Selected</h2><p style="color:var(--ink);font-weight:600;margin-bottom:4px">${w === 0 ? "Father" : "Mother"}</p><div class="io"><b>Genes</b><span>${k} + alleles out of ${2 * N} (${loci.filter((c) => c === 2).length} genes ++, ${het} genes +\u2212, ${loci.filter((c) => c === 0).length} genes \u2212\u2212)</span><b>Passes on</b><span>one allele of each gene: always + at ++ genes, always \u2212 at \u2212\u2212 genes, a coin flip at the ${het} +\u2212 gene${het === 1 ? "" : "s"}.</span></div>`;
+      const o = parents[w].g.position; selMark.position.set(o.x, 0.03, o.z); selMark.scale.setScalar(1.8); selMark.visible = true;
+    } else if (ud.kind === "parent" && cross) {
       const w = ud.who, g = genoHtml(w);
       html = `<h2>Selected</h2><p style="color:var(--ink);font-weight:600;margin-bottom:4px">${w === 0 ? "Father" : "Mother"}</p>
         <div class="io"><b>Genotype</b><span class="inh-gene">${g}</span><b>Phenotype</b><span>${phenoOfParent(w)}</span><b>Makes</b><span>${gametesText(w)} of ${w === 0 ? "sperm" : "eggs"}</span></div>
@@ -1398,6 +1403,7 @@ export function create(engine) {
     onResize() { layoutParents(); },
     onLens() {
       const ok = T.MODES.some((m) => m.id === st.mode && lens.atLeast(m.band));
+      if (st.mode === "dihybrid" && !lens.atLeast("y11") && (st.father.join("") !== "RrYy" || st.mother.join("") !== "RrYy")) { st.father = ["Rr", "Yy"]; st.mother = ["Rr", "Yy"]; refreshCross(); }
       if (!ok) { notice = "That kind of cross is a Year 9+ topic, so you are back on the one-gene crosses."; setMode("mono", true); } else if (lens.atLeast("y9-10")) notice = "";
       panelBuild(); dirtyPanel = true;
       if (!ok) flyToView();

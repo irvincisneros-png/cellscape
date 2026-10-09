@@ -152,7 +152,7 @@ export const GENES = [
     id: "htt", sym: "HTT", chr: 4, loc: "4p16.3", bands: ["p16.3"], preset: "huntington", color: "#a78bfa", pattern: "autosomal dominant",
     codes: "huntingtin, a protein found in nerve cells",
     trait: { "y7-8": "A changed copy slowly damages nerve cells, usually showing up in adulthood (Huntington's disease).", "y9-10": "Huntington's disease: a repeated CAG triplet becomes too long, making a harmful huntingtin protein. Symptoms usually start in adulthood.", y11: "Huntington's disease, caused by an expanded CAG repeat (36 or more repeats; about 40 or more is fully penetrant). The extra glutamines make the protein toxic to neurons. Longer repeats tend to mean earlier onset (anticipation, especially via the father)." },
-    inherit: { "y7-8": "Only one changed copy is needed (dominant), so a child of an affected parent has a 1 in 2 chance.", "y9-10": "Autosomal dominant: one copy is enough. A child of an affected parent has a 50% chance of inheriting it.", y11: "Autosomal dominant with age-dependent penetrance: symptoms usually appear in adulthood, so the allele can be passed on before it is known." },
+    inherit: { "y7-8": "Only one changed copy is needed (dominant), so if one parent has one changed copy and the other has none, each child has a 1 in 2 chance.", "y9-10": "Autosomal dominant: one copy is enough. If the affected parent has one copy (Hh) and the other parent has none (hh), a child has a 50% chance of inheriting it (HH × hh would give all children; Hh × Hh, 3 in 4).", y11: "Autosomal dominant with age-dependent penetrance: symptoms usually appear in adulthood, so the allele can be passed on before it is known." },
     note: "",
   },
   {
