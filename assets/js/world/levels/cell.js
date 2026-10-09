@@ -683,6 +683,7 @@ export function create(engine) {
   let uiT = 0, exT = 0, chT = 0;
   const level = {
     title: "Plant cell",
+    model: M,   // read by child levels (e.g. the nucleus uses the cell's ATP)
     topics: ["cell-structure", "organelles", "photosynthesis", "respiration", "atp", "osmosis", "protein-synthesis"],
     root, pickables, portals,
     fallbackPickables: [wallHandle],
