@@ -64,6 +64,7 @@ export class ImmuneModel {
   _begin(id, kind) {
     const s = this.slots[id];
     const secondary = s.Bm + s.Tm > 0.004;
+    for (const r of this.records) if (r.id === id) r.closed = true;      // an earlier exposure stops being tracked once a new one starts
     const rec = { id, kind, t0: this.day, secondary, detect: null, peakAb: this.total(id), peakDay: this.day, peakP: 0, peakI: 0, baseAb: this.total(id) };
     this.records.push(rec);
     this.events.push({ day: this.day, id, kind });
@@ -160,7 +161,9 @@ export class ImmuneModel {
         dZ += 0.6 * (60 * Ab * s.P + 0.3 * ph * s.P + 12 * s.Tc * s.I);
       }
       s.P = clamp(s.P + dP * h, 0, 1.5); s.I = clamp(s.I + dI * h, 0, 1);
-      if (s.P < 1e-5 && !virus) s.P = 0;
+      // joint extinction below a teaching threshold: a handful of particles cannot restart an infection once it has been cleared
+      if (!virus && s.P < 8e-4) s.P = 0;
+      if (virus && s.P + s.I < 1e-3) { s.P = 0; s.I = 0; }
       s.depot = Math.max(0, s.depot + ddep * h); s.Z = Math.max(0, s.Z + dZ * h);
       s.D = clamp(s.D + dD * h, 0, 1);
       s.Th = clamp(s.Th + dTh * h, 0, 1); s.Tc = clamp(s.Tc + dTc * h, 0, 1); s.Tr = clamp(s.Tr + dTr * h, 0, 1);
@@ -173,7 +176,7 @@ export class ImmuneModel {
     // ---- bookkeeping for the open exposures
     for (const r of this.records) {
       const s = this.slots[r.id], tot = s.IgM + s.IgG;
-      if (this.day - r.t0 > 60) continue;
+      if (r.closed || this.day - r.t0 > 60) continue;
       if (r.detect == null && tot - r.baseAb > Math.max(DETECT, 0.15 * r.baseAb)) r.detect = this.day - r.t0;
       if (tot > r.peakAb) { r.peakAb = tot; r.peakDay = this.day; }
       r.peakP = Math.max(r.peakP, s.P); r.peakI = Math.max(r.peakI, s.I);
@@ -206,7 +209,9 @@ export class ImmuneModel {
 // =====================================================================================================================
 export const herdThreshold = (r0) => (r0 <= 1 ? 0 : 1 - 1 / r0);
 /** Coverage needed with a vaccine that protects a fraction `eff` of those vaccinated (the "take" of the vaccine). */
-export const coverageNeeded = (r0, eff = 1) => Math.min(1, herdThreshold(r0) / Math.max(eff, 1e-6));
+export const coverageNeeded = (r0, eff = 1) => herdThreshold(r0) / Math.max(eff, 1e-6);   // can exceed 1: then herd immunity is not reachable by vaccination alone
+/** Herd immunity holds when the effective reproduction number is below 1: R0 x (1 - coverage x effectiveness) < 1. */
+export const herdReached = (r0, coverage, eff = 1) => r0 * (1 - coverage * eff) < 1;
 
 export const DISEASES = {
   measles: { name: "Measles", r0: 15, note: "R₀ about 12–18" },
@@ -219,11 +224,12 @@ function mulberry32(a) { return () => { a = (a + 0x6D2B79F5) | 0; let t = Math.i
 
 export class HerdSim {
   /**
-   * n people on a ~square layout. Each has K contacts (70% near, 30% random). Infectious for DAYS days.
-   * Transmission chance per contact per day is set so that a fully susceptible population gives R₀ ≈ r0.
+   * n people. Each has about 30 distinct contacts (a few near neighbours, the rest random), and is infectious for `days` days.
+   * When a person becomes infectious, each susceptible contact is infected with chance p = r0 / (average contacts), so the
+   * expected number of people one case infects in a fully susceptible population is r0. (Cases stay red for `days` days.)
    */
-  constructor({ n = 150, r0 = 15, coverage = 0, eff = 1, seed = 7, K = 12, days = 4 } = {}) {
-    Object.assign(this, { n, r0, coverage, eff, K, days });
+  constructor({ n = 150, r0 = 15, coverage = 0, eff = 1, seed = 7, nearK = 8, randK = 10, days = 4 } = {}) {
+    Object.assign(this, { n, r0, coverage, eff, nearK, randK, days });
     this.build(seed);
   }
 
@@ -232,19 +238,16 @@ export class HerdSim {
     this.rng = rng;
     const cols = Math.ceil(Math.sqrt(n * 1.5));
     this.pos = Array.from({ length: n }, (_, i) => ({ x: ((i % cols) + 0.5 + (rng() - 0.5) * 0.6) / cols, y: (Math.floor(i / cols) + 0.5 + (rng() - 0.5) * 0.6) / Math.ceil(n / cols) }));
-    // who is vaccinated (a random subset), and for how many the vaccine "takes"
     const order = Array.from({ length: n }, (_, i) => i);
     for (let i = n - 1; i > 0; i--) { const j = Math.floor(rng() * (i + 1)); [order[i], order[j]] = [order[j], order[i]]; }
     this.order = order;
-    this.take = Array.from({ length: n }, () => rng());       // vaccinated person is immune if take < eff
-    // contact lists
+    this.take = Array.from({ length: n }, () => rng());       // a vaccinated person is immune if take < eff
     const d2 = (a, b) => (this.pos[a].x - this.pos[b].x) ** 2 + (this.pos[a].y - this.pos[b].y) ** 2;
     this.nb = Array.from({ length: n }, () => new Set());
-    const nearK = Math.round(this.K * 0.35);
     for (let i = 0; i < n; i++) {
-      const near = [...order].filter((j) => j !== i).sort((a, b) => d2(i, a) - d2(i, b)).slice(0, nearK);
+      const near = [...order].filter((j) => j !== i).sort((a, b) => d2(i, a) - d2(i, b)).slice(0, this.nearK);
       for (const j of near) { this.nb[i].add(j); this.nb[j].add(i); }
-      for (let k = 0; k < Math.round(this.K * 0.15); k++) { const j = Math.floor(rng() * n); if (j !== i) { this.nb[i].add(j); this.nb[j].add(i); } }
+      for (let k = 0; k < this.randK; k++) { const j = Math.floor(rng() * n); if (j !== i) { this.nb[i].add(j); this.nb[j].add(i); } }
     }
     this.nb = this.nb.map((s) => [...s]);
     this.avgDeg = this.nb.reduce((a, l) => a + l.length, 0) / n;
@@ -262,14 +265,15 @@ export class HerdSim {
   reset() {
     const n = this.n, nv = Math.round(this.coverage * n);
     this.state = new Uint8Array(n);
-    this.vacc = new Uint8Array(n);                // vaccinated at all
+    this.vacc = new Uint8Array(n);
     for (let k = 0; k < nv; k++) { const i = this.order[k]; this.vacc[i] = 1; if (this.take[i] < this.eff) this.state[i] = 3; }
     this.timer = new Uint8Array(n);
+    this.infector = new Int16Array(n).fill(-1);
+    this.seeds = [];
     this.day = 0; this.everInfected = 0;
-    // two index cases among the people who are not immune (the first few in a fixed random order)
     let seeded = 0;
-    for (let k = n - 1; k >= 0 && seeded < 2; k--) { const i = this.order[k]; if (this.state[i] === 0) { this.state[i] = 1; this.timer[i] = this.days; this.everInfected++; seeded++; } }
-    this.p = Math.min(0.95, this.r0 / (this.avgDeg * this.days));       // per contact per day
+    for (let k = n - 1; k >= 0 && seeded < 2; k--) { const i = this.order[k]; if (this.state[i] === 0) { this.state[i] = 1; this.timer[i] = this.days; this.everInfected++; this.seeds.push(i); seeded++; } }
+    this.p = Math.min(0.98, this.r0 / this.avgDeg);                       // chance a case infects a given contact
     this.done = seeded === 0;
   }
 
@@ -278,7 +282,7 @@ export class HerdSim {
     let active = 0;
     for (let i = 0; i < n; i++) {
       if (this.state[i] !== 1) continue;
-      for (const j of this.nb[i]) if (this.state[j] === 0 && next[j] === 0 && this.rng() < this.p) { next[j] = 1; this.timer[j] = this.days; this.everInfected++; }
+      if (this.timer[i] === this.days) for (const j of this.nb[i]) if (this.state[j] === 0 && next[j] === 0 && this.rng() < this.p) { next[j] = 1; this.timer[j] = this.days; this.everInfected++; this.infector[j] = i; }
       if (--this.timer[i] <= 0) next[i] = 2;
     }
     this.state = next;
@@ -289,6 +293,8 @@ export class HerdSim {
   }
 
   run() { let g = 0; while (!this.done && g++ < 200) this.step(); return this.attackRate(); }
+  /** People directly infected by the index cases (the first generation). */
+  firstGeneration() { return this.seeds.reduce((a, s) => a + this.infector.reduce((c, v) => c + (v === s ? 1 : 0), 0), 0); }
   count(s) { let c = 0; for (const v of this.state) if (v === s) c++; return c; }
   attackRate() { return this.everInfected / this.n; }
 }

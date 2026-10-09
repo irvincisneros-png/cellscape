@@ -16,8 +16,8 @@ export const STAGES = [
 export const STAGE_BLURB = {
   wound: {
     "y7-8": "The cut has let germs in. Your body reacts in minutes: the blood vessel widens, white blood cells squeeze out and swallow the germs.",
-    "y9-10": "<b>Barrier breached.</b> Damaged cells and mast cells release signals. The vessel widens and becomes leaky (inflammation), and neutrophils squeeze out (diapedesis) and follow the chemical trail (chemotaxis).",
-    y11: "<b>Innate response.</b> Mast cells and damaged cells release histamine and cytokines; the venule dilates and becomes permeable; neutrophils roll, adhere, undergo diapedesis and migrate along a chemokine gradient. Resident macrophages phagocytose and release interleukins that amplify the response.",
+    "y9-10": "<b>Barrier breached.</b> Damaged cells send out danger signals and mast cells release <b>histamine</b>. The vessel widens (more blood flow: red and warm) and becomes leaky (swelling). Macrophages release chemical messengers that call in white blood cells: neutrophils squeeze out (diapedesis) and follow the chemical trail (chemotaxis).",
+    y11: "<b>Innate response.</b> Damaged cells release danger signals; mast cells release histamine, which dilates the venule (more blood flow: redness, heat) and increases its permeability (oedema). Macrophages sense microbial patterns and release cytokines and chemokines (interleukins, TNF-α) that make the endothelium display adhesion molecules, so neutrophils roll, adhere, undergo diapedesis and follow the chemokine gradient (recruitment).",
   },
   phago: {
     "y7-8": "A macrophage is a big white blood cell. Watch it wrap around a germ, trap it in a bubble, and digest it with chemicals from its recycling bags.",
@@ -27,7 +27,7 @@ export const STAGE_BLURB = {
   node: {
     "y7-8": "Special cells carry a piece of the germ to a lymph node, where other white blood cells learn to make antibodies. Some of them stay behind as memory cells.",
     "y9-10": "<b>Adaptive response.</b> A dendritic cell shows a piece of the pathogen (antigen) to a helper T cell. Helper T cells activate B cells, which become plasma cells that make antibodies. Memory cells remain.",
-    y11: "<b>Adaptive response.</b> An antigen-presenting cell shows antigen on MHC to a helper T cell, which releases interleukins that activate B cells (clonal expansion into plasma cells and memory B cells) and cytotoxic T cells. Regulatory T cells damp the response down afterwards.",
+    y11: "<b>Adaptive response.</b> A dendritic cell presents peptide on MHC class II to a helper T cell with a matching T-cell receptor. That T cell then gives <em>linked</em> help to a B cell that has taken up the same antigen (peptide on its own MHC II, plus interleukins), so the B cell expands into plasma and memory cells. Interleukins also support cytotoxic T cells. Regulatory T cells damp the response down afterwards.",
   },
 };
 
@@ -61,7 +61,7 @@ export const PARTS = {
     role: {
       "y7-8": "Your skin is the <strong>first barrier</strong> against germs. It is made of many layers of tightly packed cells, with a tough, waterproof outer layer of dead cells. Germs cannot easily get through unless the skin is cut.",
       "y9-10": "Skin is part of the <strong>first line of defence</strong>. The outer layer is dead, tough cells filled with keratin. Sweat and oils make the surface acidic and salty, and harmless microbes living on it compete with harmful ones. Other barriers include mucus and cilia in the airways, tears and saliva (which contain lysozyme), and acid in the stomach.",
-      y11: "The <strong>stratum corneum</strong> (dead, keratinised cells) and tight junctions between living keratinocytes form a physical barrier. Chemical barriers include the acidic surface (about pH 5), sebum, defensins and other antimicrobial peptides, and lysozyme in tears and saliva. The normal skin microbiota compete with pathogens. These barriers are all part of <strong>innate</strong> immunity: they act the same way against every pathogen. The layers here are stylised and much thinner than real skin.",
+      y11: "The <strong>stratum corneum</strong> (dead, keratinised cells) and tight junctions between living keratinocytes form a physical barrier. Chemical barriers include the acidic surface (about pH 5), sebum, defensins and other antimicrobial peptides, and lysozyme in tears and saliva. The normal skin microbiota compete with pathogens. These barriers are all part of <strong>innate</strong> immunity: they do not depend on recognising one particular antigen. The layers here are stylised and much thinner than real skin.",
     },
     note: "Layers are stylised: real epidermis is about 50–100 µm thick, and the stratum corneum has many more layers.",
   },
@@ -78,7 +78,7 @@ export const PARTS = {
     role: {
       "y7-8": "Bacteria are tiny living things made of a single cell. Some cause disease. Compare their size with the white blood cells: a bacterium is about <strong>2 µm</strong> long, and a neutrophil is about 12 µm across.",
       "y9-10": "A bacterium is a single-celled <strong>cellular</strong> pathogen with no nucleus (it is prokaryotic). It has a cell wall and some have flagella for swimming. It multiplies by binary fission, so numbers can double every 20–60 minutes in good conditions. Molecules on its surface are <strong>antigens</strong>: they are what the immune system recognises.",
-      y11: "A prokaryotic, <strong>cellular</strong> pathogen (bacteria, protozoa and fungi are cellular; viruses and prions are not). It carries a cell wall, ribosomes and a circular chromosome, and reproduces by binary fission. Surface molecules (antigens) are recognised by innate pattern-recognition receptors and, later, by specific antibodies and T-cell receptors. Pathogens cause disease by damaging tissue directly or by releasing toxins.",
+      y11: "A prokaryotic, <strong>cellular</strong> pathogen (bacteria, protozoa and fungi are cellular; viruses and prions are not). It carries a cell wall, ribosomes and a circular chromosome, and reproduces by binary fission. Innate <strong>pattern-recognition receptors</strong> bind shared microbial patterns (such as cell-wall components). Antibodies and B-cell receptors bind the intact, native antigen directly. T-cell receptors do not: they recognise only a processed <strong>peptide displayed on MHC</strong>. Pathogens cause disease by damaging tissue directly or by releasing toxins.",
     },
     note: "Drawn at true size relative to the cells. Not every bacillus has flagella.",
   },
@@ -87,7 +87,7 @@ export const PARTS = {
     role: {
       "y7-8": "Viruses are far smaller than bacteria (about <strong>0.1 µm</strong>) and cannot multiply on their own. They get inside your cells and make the cells build more viruses. They are drawn as dots, much bigger than life, so you can see them.",
       "y9-10": "A virus is a tiny package of genetic material in a protein coat (often with an outer envelope). It has no cell structure and no metabolism, and it can only reproduce inside a host cell. Whether viruses count as \"living\" is a <strong>debated boundary case</strong>: they carry genes and evolve, but they do not carry out life processes on their own. Here they are drawn about 3 times too big, because at true scale (0.1 µm) they would be almost invisible.",
-      y11: "A <strong>non-cellular</strong> infectious agent: nucleic acid (DNA or RNA) inside a protein capsid, sometimes with a lipid envelope. It has no ribosomes or metabolism and is an obligate intracellular parasite. Classifying viruses as living or non-living is a <strong>debated boundary case</strong>: they have genes, evolve and reproduce, but only by hijacking a host cell. Antibodies can neutralise <em>free</em> virus; once a virus is inside a cell, cytotoxic T cells are needed to destroy the infected cell.",
+      y11: "A <strong>non-cellular</strong> infectious agent: nucleic acid (DNA or RNA) inside a protein capsid, sometimes with a lipid envelope. It has no ribosomes or metabolism and is an obligate intracellular parasite. Classifying viruses as living or non-living is a <strong>debated boundary case</strong>: they have genes, evolve and reproduce, but only by hijacking a host cell. Antibodies can neutralise <em>free</em> virus. Once a virus is inside a cell, antibodies cannot reach it: interferons and natural killer cells slow the infection, and cytotoxic T cells can kill infected cells.",
     },
     note: "Dots are drawn about 3 times larger than true scale (0.1 µm).",
   },
@@ -139,7 +139,7 @@ export const PARTS = {
     role: {
       "y7-8": "Damaged cells and guard cells release chemicals that act like a trail of breadcrumbs. White blood cells follow the trail to the germs.",
       "y9-10": "Chemical signals released from the wound form a <strong>gradient</strong> (strongest at the wound). White blood cells move up the gradient towards the source: this is <strong>chemotaxis</strong>.",
-      y11: "Histamine, chemokines (e.g. interleukin-8) and cytokines released by damaged cells, mast cells and macrophages. Chemokines form a gradient that leukocytes follow (chemotaxis); other cytokines (interleukins) alert the adaptive immune system.",
+      y11: "Different signals do different jobs. <strong>Danger signals</strong> leak from damaged cells; <strong>histamine</strong> from mast cells dilates vessels (more blood flow) and makes them leaky; <strong>cytokines</strong> (interleukin-1, TNF-α) from macrophages activate the endothelium; <strong>chemokines</strong> (e.g. interleukin-8) form the gradient that leukocytes follow (recruitment by chemotaxis). Some cytokines also alert the adaptive immune system.",
     },
   },
   dc: {
@@ -178,8 +178,8 @@ export const PARTS = {
     name: "B cell", color: "#5eead4",
     role: {
       "y7-8": "A white blood cell that can make antibodies. When a helper cell gives the signal, it multiplies and turns into antibody factories.",
-      "y9-10": "A <strong>B cell</strong> has receptors that fit one particular antigen. When activated by a helper T cell it divides into many copies (<strong>clonal expansion</strong>), and many become <strong>plasma cells</strong> that make antibodies. Some become <strong>memory B cells</strong>.",
-      y11: "Each naive B cell carries a unique membrane-bound antibody (its B-cell receptor). On binding its antigen, and with interleukin help from a helper T cell, it undergoes <strong>clonal selection</strong> and expansion, then differentiates into <strong>plasma cells</strong> and <strong>memory B cells</strong>. Only about one cell in 10⁴–10⁵ fits a given antigen, which is why the first response is slow.",
+      "y9-10": "A <strong>B cell</strong> has receptors that fit one particular antigen. After a matching helper T cell touches it and gives the go-ahead, it divides into many copies (<strong>clonal expansion</strong>), and many become <strong>plasma cells</strong> that make antibodies. Some become <strong>memory B cells</strong>.",
+      y11: "Each naive B cell carries a unique membrane-bound antibody (its B-cell receptor). In the T-dependent response its receptor binds native antigen, the B cell takes it in and displays a peptide on <strong>MHC class II</strong>, and a helper T cell whose receptor matches that peptide gives contact-dependent help plus interleukins (linked recognition). The B cell then undergoes <strong>clonal selection</strong> and expansion, then differentiates into <strong>plasma cells</strong> and <strong>memory B cells</strong>. Only about one cell in 10⁴–10⁵ fits a given antigen, which is why the first response is slow.",
     },
   },
   plasma: {
@@ -195,7 +195,7 @@ export const PARTS = {
     role: {
       "y7-8": "A memory cell stays in your body for years. If the same germ comes back, it helps your body respond much faster.",
       "y9-10": "A <strong>memory B cell</strong> remains after the infection. If the same pathogen returns, memory cells respond faster and make more antibodies (the <strong>secondary response</strong>).",
-      y11: "Long-lived progeny of the activated clone. They are present in larger numbers than the naive clone was and are already class-switched, so a second exposure produces a <strong>faster, larger, longer-lasting</strong> response dominated by IgG. Memory does not always last for life: some immunity wanes and some pathogens (e.g. influenza) change their antigens.",
+      y11: "Long-lived progeny of the activated clone. They are present in larger numbers than the naive clone was and many are already class-switched (not all: some stay IgM), so a typical second exposure produces a <strong>faster, larger, longer-lasting</strong> response dominated by IgG. Memory does not always last for life: some immunity wanes and some pathogens (e.g. influenza) change their antigens.",
     },
   },
   memoryT: {
@@ -227,7 +227,7 @@ export const PARTS = {
     name: { "y7-8": "Body cell", "y9-10": "Body cell", y11: "Host cell" }, color: "#fbcfe8",
     role: {
       "y7-8": "An ordinary body cell. When a virus gets inside, the cell is forced to make more viruses.",
-      "y9-10": "An ordinary body cell. A virus enters it and uses its machinery to make new viruses, so the cell can no longer be saved by antibodies: it has to be killed by a cytotoxic T cell.",
+      "y9-10": "An ordinary body cell. A virus enters it and uses its machinery to make new viruses, and antibodies cannot reach virus inside the cell. Interferons and natural killer cells help, and cytotoxic T cells can find and destroy infected cells.",
       y11: "A host cell. Infected cells display viral peptides on MHC class I, which is how cytotoxic T cells recognise them.",
     },
   },
@@ -264,7 +264,7 @@ export const DEFENCES = {
 
 export const COMPARE = [
   { a: "Speed", i: "minutes to hours", d: "days for a first exposure; 1–3 days for a repeat" },
-  { a: "Specificity", i: "non-specific: same response to any pathogen", d: "specific to one antigen" },
+  { a: "Recognition", i: "receptors for shared microbial patterns (not antigen-specific clones); triggers an appropriate but non-specific response", d: "receptors specific to one antigen (clonal selection)" },
   { a: "Memory", i: "none", d: "yes (memory B and T cells)" },
   { a: "Main cells", i: "barriers, phagocytes (neutrophils, macrophages), mast cells, inflammation", d: "helper, cytotoxic, memory and regulatory T cells; B cells, plasma cells, antibodies" },
 ];
@@ -310,9 +310,9 @@ export const QUIZ = [
   { band: "y7-8", maxBand: "y9-10", q: "What is an antibody?", options: ["A Y-shaped protein that sticks to a particular germ", "A kind of germ", "A part of the skin", "A type of red blood cell"], answer: 0, why: "Antibodies are made by plasma cells. Each type fits one antigen." },
   { band: "y9-10", maxBand: "y11", q: "A disease has R₀ = 4. About what fraction of people must be immune for herd immunity?", options: ["75%", "25%", "40%", "100%"], answer: 0, why: "Threshold = 1 − 1/R₀ = 1 − 1/4 = 0.75, assuming the vaccine works for everyone vaccinated." },
   { band: "y9-10", maxBand: "y9-10", q: "Skin, mucus and stomach acid belong to which line of defence?", options: ["The first line (barriers)", "The second line (innate response)", "The third line (adaptive response)", "None of them"], answer: 0, why: "They are barriers that stop pathogens entering. If a pathogen gets in, the innate response (inflammation, phagocytes) is the second line, then the adaptive response." },
-  { band: "y9-10", maxBand: "y9-10", q: "Which of these is part of the <b>innate</b> (non-specific) response?", options: ["Neutrophils engulfing bacteria", "Plasma cells making a specific antibody", "Memory B cells", "Cytotoxic T cells that recognise one virus"], answer: 0, why: "Phagocytes respond within hours to any pathogen. Antibodies and memory cells belong to the adaptive response." },
+  { band: "y9-10", maxBand: "y9-10", q: "Which of these is part of the <b>innate</b> (non-specific) response?", options: ["Neutrophils engulfing bacteria", "Plasma cells making a specific antibody", "Memory B cells", "Cytotoxic T cells that recognise one virus"], answer: 0, why: "Phagocytes respond within hours to many kinds of pathogen, using shared microbial patterns rather than one specific antigen. Antibodies and memory cells belong to the adaptive response." },
   { band: "y11", q: "Which cells kill virus-infected body cells using perforin?", options: ["Cytotoxic T cells", "Plasma cells", "Neutrophils", "Mast cells"], answer: 0, why: "Cytotoxic (CD8⁺) T cells recognise viral peptide on MHC class I and release perforin and granzymes." },
-  { band: "y11", q: "In a first exposure to a pathogen, which antibody class is made first, and which dominates after a repeat exposure?", options: ["IgM first; IgG dominates the secondary response", "IgG first; IgM dominates the secondary response", "IgM both times", "IgG both times"], answer: 0, why: "Class switching from IgM to IgG needs T-cell help. Memory B cells have already switched, so the secondary response is mostly IgG." },
+  { band: "y11", q: "In a first exposure to a pathogen, which antibody class is made first, and which dominates after a repeat exposure?", options: ["IgM first; IgG dominates the secondary response", "IgG first; IgM dominates the secondary response", "IgM both times", "IgG both times"], answer: 0, why: "Class switching from IgM to IgG needs T-cell help. Many memory B cells have already switched, so a typical secondary response is dominated by IgG." },
   { band: "y11", q: "Why does the first antibody response take about a week or more?", options: ["Only a very few lymphocytes fit the antigen and their clone has to expand first", "Antibodies travel slowly", "The skin is a thick barrier", "Neutrophils block them"], answer: 0, why: "Clonal selection and expansion take days, which is why innate defences have to hold the line first." },
   { band: "y12", q: "Interleukins released by helper T cells do which of the following?", options: ["Activate B cells and cytotoxic T cells", "Digest bacteria in lysosomes", "Make pores in infected cells", "Carry oxygen"], answer: 0, why: "Helper T cells coordinate the adaptive response. Perforin is released by cytotoxic T cells. HIV depletes helper T cells." },
   { band: "y12", q: "How does opsonisation by antibodies help?", options: ["It coats the pathogen so phagocytes engulf it more easily", "It makes pores in the pathogen", "It switches the pathogen's genes off", "It turns the pathogen into a memory cell"], answer: 0, why: "Phagocytes have Fc receptors that bind the constant region of antibodies bound to a pathogen." },
@@ -322,64 +322,73 @@ export const QUIZ = [
 // ---------- narrative generated from model state ----------
 const level = (v, lo, hi) => (v < lo ? "low" : v < hi ? "moderate" : "high");
 
-/** ctx: { id: "bacterium" | "virus" } */
+/** ctx: { id: "bacterium" | "virus" }. Everything here is about the chosen pathogen's own exposure record and state;
+ *  shared inflammation is described with its real source(s). */
 export function narrative(M, band, ctx = {}) {
-  const id = ctx.id || "bacterium", s = M.slot(id), bug = id === "virus" ? "virus" : "bacteria";
+  const id = ctx.id || "bacterium", s = M.slot(id), bug = id === "virus" ? "virus" : "bacteria", other = id === "virus" ? "bacterium" : "virus";
   const y7 = band === "y7-8", sen = band === "y11" || band === "y12";
-  const anyExposure = M.records.length > 0;
-  const rec = [...M.records].reverse().find((r) => r.id === id) || M.records.at(-1);
-  const t = rec ? M.day - rec.t0 : 0;
   const day = `Day ${M.day.toFixed(1)}`;
   const p = [];
-  if (!anyExposure) {
+  if (!M.records.length) {
     p.push(`<b>${day}:</b> The skin has been cut, but no germs have entered yet. Choose a pathogen and press <b>Infect</b>, or press <b>Vaccinate</b> to see how a vaccine trains the body first.`);
     if (!y7) p.push("Nothing is happening yet in the defences: no signals, no extra white blood cells, and no antibodies.");
     return p;
   }
-  const loadNow = M.load;
-  const active = M.anyActive;
-  const Ab = M.total(id);
-  const dom = M.dominant(id);
-  const ph = M.phase(id);
-
-  // line 1: what is going on at the wound
-  const parts = [];
-  if (M.S > 0.05 && loadNow > 0.002) {
-    const nl = level(M.N, 0.2, 0.55), ml = level(M.M, 0.4, 0.7);
-    const dil = Math.round(M.phi * 100);
-    if (sen) parts.push(`Inflammation: histamine and cytokines have widened the venule (${dil}% of maximum) and made it leaky, so neutrophils (${nl}) cross by diapedesis and macrophages (${ml}) phagocytose ${bug}`);
-    else if (y7) parts.push(`the blood vessel has widened and white blood cells (${nl === "low" ? "a few" : nl === "moderate" ? "quite a few" : "lots"}) are eating the ${bug}`);
-    else parts.push(`inflammation has widened the vessel (${dil}% of the way) and neutrophils (${nl}) and macrophages (${ml}) are engulfing ${bug}`);
+  const rec = [...M.records].reverse().find((r) => r.id === id);        // this pathogen's own latest exposure (never another pathogen's)
+  // where the inflammation is coming from
+  const src = [];
+  if (M.active("bacterium")) src.push(y7 ? "the bacteria" : "the bacterial infection");
+  if (M.active("virus")) src.push(y7 ? "the virus" : "the viral infection");
+  if (M.adj > 0.05) src.push(y7 ? "the vaccine" : "the vaccine's adjuvant (a mild local reaction)");
+  if (M.w > 0.08) src.push(y7 ? "the cut" : "damage from the cut");
+  const from = src.join(" and ");
+  const nl = level(M.N, 0.2, 0.55), ml = level(M.M, 0.4, 0.7), dil = Math.round(M.phi * 100);
+  const inflam = M.S > 0.05 && src.length
+    ? (sen ? `Inflammation, caused by ${from}: histamine has increased blood flow and permeability (venule ${dil}% of maximum), and cytokines and chemokines recruit neutrophils (${nl}) and macrophages (${ml})`
+      : y7 ? `The blood vessel has widened because of ${from}, and white blood cells (${nl === "low" ? "a few" : nl === "moderate" ? "quite a few" : "lots"}) have come to help`
+        : `Inflammation caused by ${from}: the vessel is ${dil}% widened and neutrophils (${nl}) and macrophages (${ml}) have been called in`) : "";
+  if (!rec) {
+    p.push(`<b>${day}:</b> No ${bug} has entered, so there is no ${bug}-specific response${y7 ? "" : " and no memory of it"}.${inflam ? " " + inflam + "." : ""}`);
+    if (src.length) p.push(y7 ? `Switch to the ${other} to follow what is happening there.` : `The ${other} infection is being followed separately: switch the pathogen to see it.`);
+    return p;
   }
+  const t = M.day - rec.t0, idActive = M.active(id), vac = rec.kind === "vaccinate";
+  const Ab = M.total(id), noAb = Ab < DETECT, dom = M.dominant(id), ph = M.phase(id), sec = rec.secondary;
+  const hasMemory = s.Bm > 0.004 || s.Tm > 0.004;
+
+  // line 1: the pathogen / vaccine and the innate response
+  const parts = [];
+  if (vac && s.depot > 0.02) parts.push(y7 ? "the vaccine has been given: it cannot make you ill, but your body can see it" : "inactivated vaccine antigen is present: it cannot multiply, but it can be seen and presented");
+  if (inflam) parts.push(inflam.charAt(0).toLowerCase() + inflam.slice(1));
   if (id === "virus" && s.I > 0.03) parts.push(sen ? `${Math.round(s.I * 100)}% of the nearby host cells are infected and are making new virus particles` : `${Math.round(s.I * 100)}% of the nearby body cells have virus inside them`);
   else if (id === "bacterium" && s.P > 0.03) parts.push(sen ? `the bacterial load is ${Math.round(s.P * 100)}% of the site's capacity` : `the bacteria are multiplying (${Math.round(s.P * 100)}% of the room available)`);
-  if (parts.length) p.push(`<b>${day}:</b> ` + parts.join("; ") + ".");
-  else if (active) p.push(`<b>${day}:</b> The ${bug} have just entered the wound and the defences are starting to react.`);
-  else p.push(`<b>${day}:</b> No ${bug} can be found at the wound now.`);
+  if (parts.length) p.push(`<b>${day}:</b> ` + parts.map((x, i) => (i ? x : x.charAt(0).toUpperCase() + x.slice(1))).join("; ") + ".");
+  else if (idActive) p.push(`<b>${day}:</b> The ${bug} have just entered the wound and the defences are starting to react.`);
+  else if (!vac) p.push(`<b>${day}:</b> No ${bug} can be found at the wound now.`);
+  else p.push(`<b>${day}:</b> The vaccine antigen has been cleared from the injection site.`);
 
   // line 2: adaptive stage and antibodies
-  const noAb = Ab < DETECT;
-  const sec = rec?.secondary;
   const adaptive = [];
-  if (ph === "priming") adaptive.push(sen ? "Dendritic cells are carrying antigen to the lymph node; the matching T and B cell clones are still tiny" : y7 ? "special cells are taking a piece of the germ to a lymph node" : "dendritic cells are carrying antigen to a lymph node, where only a few lymphocytes fit it");
-  if (ph === "expanding") adaptive.push(sen ? `helper T cells are active and releasing interleukins; B cells are in clonal expansion${sec ? " (memory cells made this quick)" : ""}` : y7 ? "helper cells are waking up the antibody-making cells" : `helper T cells are active and B cells are multiplying${sec ? ", faster because memory cells remember this germ" : ""}`);
+  if (ph === "priming") adaptive.push(sen ? "dendritic cells are carrying antigen to the lymph node; the matching T and B cell clones are still tiny" : y7 ? "special cells are taking a piece of the germ to a lymph node" : "dendritic cells are carrying antigen to a lymph node, where only a few lymphocytes fit it");
+  if (ph === "expanding") adaptive.push(sen ? `helper T cells are active and releasing interleukins; matching B cells are in clonal expansion${sec ? " (memory cells made this quick)" : ""}` : y7 ? "helper cells are waking up the antibody-making cells" : `helper T cells are active and B cells are multiplying${sec ? ", faster because memory cells remember this germ" : ""}`);
   if (!noAb) {
-    const peakNote = s.IgG + s.IgM >= 0.9 * (rec?.peakAb ?? 0) ? " near its peak" : "";
-    adaptive.push(sen ? `antibodies are ${peakNote ? "near their peak" : "present"} (mainly ${dom})` : y7 ? "antibodies are now sticking to the germs" : `antibodies are being made${peakNote} and are marking ${bug} for destruction`);
+    const near = Ab >= 0.9 * (rec.peakAb ?? 0);
+    adaptive.push(sen ? `antibodies are ${near ? "near their peak" : "present"} (mainly ${dom})` : y7 ? "antibodies are now sticking to the germs" : `antibodies are being made${near ? " near the peak" : ""} and are marking ${bug} for destruction`);
   }
-  if (noAb && (ph === "priming" || ph === "expanding" || active) && t < 12 && !sec) adaptive.push(y7 ? "no antibodies yet" : "no antibodies yet: the first response is slow");
+  if (noAb && t < 12 && !sec && (ph === "priming" || ph === "expanding" || idActive || vac)) adaptive.push(y7 ? "no antibodies yet" : "no antibodies yet: the first response is slow");
   if (adaptive.length) p.push(adaptive[0].charAt(0).toUpperCase() + adaptive.join("; ").slice(1) + ".");
 
   if (id === "virus" && s.Tc > 0.05 && s.I > 0.004) p.push(sen ? "Cytotoxic T cells are killing infected host cells with perforin." : "Killer T cells are finding and destroying infected body cells.");
-  if (!y7 && s.Tr > 0.12 && !active) p.push(sen ? "Regulatory (suppressor) T cells are now damping the response down." : "Calming T cells are now turning the response down.");
+  if (!y7 && s.Tr > 0.12 && !idActive) p.push(sen ? "Regulatory (suppressor) T cells are now damping the response down." : "Calming T cells are now turning the response down.");
 
-  // line 3: outcome / memory
-  if (!active && rec) {
-    const ill = M.illness(rec);
-    if (rec.kind === "vaccinate") p.push(y7 ? "The vaccine has trained your body: you are now ready for the real germ, and you have not been ill." : `The vaccine (inactivated antigen) caused a primary response with no illness. ${sen ? "Memory B and T cells now remain." : "Memory cells now remain."}`);
-    else if (ill === "none" && sec) p.push(y7 ? "Memory cells stopped the germ before you got ill." : "Memory cells and antibodies controlled it at once: little or no illness.");
-    else if (!noAb || s.Bm > 0.004) p.push(y7 ? "The infection is over, and memory cells stay behind." : `The infection has been cleared and memory cells remain, so the next exposure should be faster${sen ? " (shorter lag, higher IgG peak)" : ""}. Memory is usually, but not always, lasting: some viruses change or hide in the body.`);
+  // line 3: outcome and memory (memory is only claimed when the model actually has memory cells)
+  if (!idActive) {
+    if (vac) {
+      if (hasMemory) p.push(y7 ? "The vaccine has trained your body: memory cells now remain, and you have not been ill." : `The vaccine (inactivated antigen) caused a primary response with no illness. ${sen ? "Memory B and T cells now remain." : "Memory cells now remain."}`);
+      else p.push(y7 ? "Your body is still learning from the vaccine: no antibodies or memory cells yet." : "Vaccine response pending: there are no antibodies and no memory cells yet. They take days to form.");
+    } else if (M.illness(rec) === "none" && sec) p.push(y7 ? "Memory cells stopped the germ before you got ill." : "Memory cells and antibodies controlled it at once: little or no illness.");
+    else if (hasMemory) p.push(y7 ? "The infection is over, and memory cells stay behind." : `The infection has been cleared and memory cells remain, so the next exposure should be faster${sen ? " (shorter lag, higher IgG peak)" : ""}. Memory is usually, but not always, lasting: some viruses change or hide in the body.`);
   }
-  if (M.compromised && (active || ph !== "naive")) p.push(sen ? "Helper T cells are reduced (as in untreated HIV infection), so B cells and cytotoxic T cells get little help." : "Fewer helper T cells: the response is weaker and slower.");
+  if (M.compromised && (idActive || ph !== "naive")) p.push(sen ? "Helper T cells are reduced (as in untreated HIV infection), so B cells and cytotoxic T cells get little help." : "Fewer helper T cells: the response is weaker and slower.");
   return p;
 }

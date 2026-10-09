@@ -6,7 +6,7 @@ import * as THREE from "three";
 import { mergeGeometries, mergeVertices } from "three/addons/utils/BufferGeometryUtils.js";
 import * as K from "../../kit.js";
 import { physical, glass, specks, hash, wobble, softDot, paint } from "../materials.js";
-import { ImmuneModel, PATHOGENS, DAY_SECONDS, DETECT, HerdSim, herdThreshold, coverageNeeded, DISEASES, HERD_R0_MAX } from "./immunityModel.js";
+import { ImmuneModel, PATHOGENS, DAY_SECONDS, DETECT, HerdSim, herdThreshold, coverageNeeded, herdReached, DISEASES, HERD_R0_MAX } from "./immunityModel.js";
 import { NOTE, STAGES, STAGE_BLURB, PHAGO_STEPS, PARTS, DEFENCES, COMPARE, CLASSIFY, HERD_NOTE, MISSIONS, QUIZ, narrative } from "./immunityContent.js";
 
 // ---------- layout constants (µm) ----------
@@ -447,7 +447,8 @@ export function create(engine) {
   const tHost = nodeType("host", "host", 2, 6.2, "#f6a9c9", "#ffe3ef", "#8a63b0", 0.36, [0.1, 0.1, 0]);
   [[-4.5, 6.5, 3.2], [-1.5, 11, -3], [2, 5, 6], [-8.5, 12.5, 0.5], [3.5, 9.5, -6]].forEach((p) => slot(tTh, ...p));
   [[10, -6, 4], [13.5, 1, -5], [8, 4, -8]].forEach((p) => slot(tBn, ...p));
-  [[9.5, -3.5, 3.5], [14.5, -9.5, -1.5], [16.5, 0.5, 6], [11, 5.5, -5.5], [18.5, -5, -6.5], [11.5, -14, 5.5], [7, 0, 10], [17.5, 6.5, -2]].forEach((p) => slot(tBa, ...p));
+  [[-4.5, 6.5, 3.2], [-1.5, 11, -3], [2, 5, 6], [-8.5, 12.5, 0.5], [3.5, 9.5, -6]].forEach((p) => slot(tBa, p[0] + 8.2, p[1] - 2.2, p[2] + 0.6));   // activated B cells sit in contact with their helper T cell partner
+  [[17.5, -1, 4], [20, -9, -3], [14, -13, 3]].forEach((p) => slot(tBa, ...p));
   [[27, -2, 3], [35, 6, -4], [27, 11, -7], [36, -8, -2], [29, -13, 6], [38, 0, 7]].forEach((p) => slot(tPc, ...p));
   [[-26, -12, -3], [-21, -17, 3], [-14, -17.5, -4], [3, -16, 2], [-8, -20, 5], [-29, -5, 6]].forEach((p) => slot(tMb, ...p));
   [[-24, 9, 4], [-28, 3, -6], [-19, 14, -2], [-22, -8, 7]].forEach((p) => slot(tMt, ...p));
@@ -931,7 +932,8 @@ export function create(engine) {
     const br = (1.95 + 0.25 * f) * bs;
     phagoBubble.visible = bs > 0.01; phagoBubble.position.copy(bpos); phagoBubble.scale.setScalar(Math.max(0.001, br));
     tC.copy(bubbleBase).lerp(bubbleFused, f); if (i === 3) tC.lerp(bubbleDeep, smooth(u, 0.2, 0.9));
-    phagoBubble.material.color.copy(tC); phagoBubble.material.userData.glass.rimColor.value.copy(tC).lerp(tC2.set("#ffffff"), 0.5);
+    const gm = phagoBubble.userData.realMat || phagoBubble.material;     // in clay the visible material is the style's own: update the real glass one
+    if (gm.userData.glass) { gm.color.copy(tC); gm.userData.glass.rimColor.value.copy(tC).lerp(tC2.set("#ffffff"), 0.5); }
     // the bacterium digests
     const sb = i === 3 ? 1 - smooth(u, 0.15, 0.92) : 1;
     phS.sb = sb;
@@ -1002,10 +1004,11 @@ export function create(engine) {
     cur.mt = off ? 0 : Math.round(4 * sat(s.Tm + s.Tcm, 0.02));
     cur.tc = virus ? Math.max(1, off ? 1 : Math.round(5 * sat(s.Tc, 0.1))) : 0;
     cur.tr = off ? 0 : s.Tr > 0.3 ? 2 : s.Tr > 0.08 ? 1 : 0;
-    cur.host = virus ? (s.I > 0.02 || !off ? 2 : 1) : 0;
+    cur.host = virus ? 2 : 0;
     cur.mhc = off ? 4 : Math.round(NMHC * (0.07 + 0.93 * s.D));
   };
-  const IL_SRC = [], IL_DST = [];
+  const pairSpr = Array.from({ length: 5 }, () => { const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: softDot(), color: "#fff2a8", transparent: true, opacity: 0, depthWrite: false, blending: THREE.AdditiveBlending })); sp.scale.setScalar(4.5); sp.userData.clayHide = true; gN.add(sp); return sp; });
+  const bMhcMesh = mkInst(mhcGeo, mhcMesh.material, 5, gN, "mhc"), BMHCM = [bMhcMesh];
   function updateNode(dt, t) {
     const s = M.slot(pathId), virus = pathId === "virus", still = engine.reducedMotion ? 0 : 1;
     nodeCount();
@@ -1044,16 +1047,26 @@ export function create(engine) {
     const th0 = tTh.slots[0].cur;
     synapse.position.copy(th0).lerp(mhcLoc[2].p, 0.45).lerp(th0, 0.3);
     synapse.material.opacity = 0.2 + 0.7 * sat(s.D, 0.2) * (0.7 + 0.3 * Math.sin(t * 3));
-    // interleukins from active helper T cells to B cells (and cytotoxic T cells for a virus)
-    IL_SRC.length = 0; IL_DST.length = 0;
-    for (let i = 0; i < cur.th; i++) IL_SRC.push(tTh.slots[i].cur);
-    for (let i = 0; i < Math.max(cur.ba, 1) && i < tBa.n; i++) IL_DST.push(i < cur.ba ? tBa.slots[i].cur : tBn.slots[i % tBn.n].cur);
-    for (let i = 0; i < cur.tc; i++) IL_DST.push(tTc.slots[i].cur);
+    // linked help: each activated helper T cell touches its own B-cell partner (peptide on the B cell's MHC II) and sends interleukins to it
+    const npair = Math.min(cur.th, cur.ba);
+    for (let i = 0; i < 5; i++) {
+      const on = i < npair;
+      if (on) { tV.copy(tTh.slots[i].cur); tV2.copy(tBa.slots[i].cur); pairSpr[i].position.copy(tV).lerp(tV2, 0.5); tV3.copy(tV).sub(tV2).normalize(); tQ2.setFromUnitVectors(YAX, tV3); put(BMHCM, i, tV4.copy(tV2).addScaledVector(tV3, tBa.r * 0.92), tQ2, 0.9); }
+      else put(BMHCM, i, tV.set(0, -999, 0), IDQ, 0.0001);
+      pairSpr[i].material.opacity = on ? 0.35 + 0.45 * sat(s.Th * M.hf, 0.1) * (0.7 + 0.3 * Math.sin(t * 3 + i)) : 0;
+    }
+    done(BMHCM, 5);
     const nIL = prion ? 0 : Math.round(NIL * sat(s.Th * M.hf, 0.12));
     for (let i = 0; i < NIL; i++) {
       const p = il[i];
       if (p.u >= 1) {
-        if (i < nIL && IL_SRC.length && IL_DST.length) { p.a.copy(IL_SRC[Math.floor(rng() * IL_SRC.length)]); p.b.copy(IL_DST[Math.floor(rng() * IL_DST.length)]); p.u = 0; p.sp = 0.35 + rng() * 0.35; randDir(rng, p.j).multiplyScalar(2.2); }
+        if (i < nIL && cur.th > 0) {
+          const ti = Math.floor(rng() * cur.th);
+          p.a.copy(tTh.slots[ti].cur);
+          if (pathId === "virus" && cur.tc > 0 && rng() < 0.3) p.b.copy(tTc.slots[ti % cur.tc].cur);               // interleukins also support cytotoxic T cells
+          else if (ti < cur.ba) p.b.copy(tBa.slots[ti].cur);                                                       // the matching B-cell partner
+          else p.b.copy(tBn.slots[ti % tBn.n].cur);
+          p.u = 0; p.sp = 0.35 + rng() * 0.35; randDir(rng, p.j).multiplyScalar(2.2); }
         else { ilPos[i * 3 + 1] = -999; continue; }
       }
       p.u += p.sp * dt;
@@ -1116,7 +1129,7 @@ export function create(engine) {
     const firstAgent = (type, pred = () => true) => LA.find((a) => a.type === type && a.on && a.st !== S.DIE && pred(a));
     add("wound", L("epidermis"), (o) => o.set(52, 22, 26));
     add("wound", L("cut"), (o) => o.set(WX, 37, 0));
-    add("wound", `${L("mast")}<small>releases histamine</small>`, (o) => o.copy(MAST[0]).add(tV.set(0, 8.5, 0)));
+    add("wound", `${L("mast")}<small>releases histamine</small>`, (o) => o.copy(MAST[2]).add(tV.set(0, 8.5, 0)));
     add("wound", `${L("vessel")}`, (o) => o.set(46, VY + R + 3.5, 0));
     add("wound", `${L("rbc")}<small>~7.5 µm</small>`, (o) => { const c = rbc.find((q) => q.x > 12 && q.x < 40 && q.r < 0.5); if (!c) return false; return !!o.set(c.x, VY + Math.cos(c.a) * c.r * (R - 4.3) + 5, Math.sin(c.a) * c.r * (R - 4.3)); });
     add("wound", `${L("neutrophil")}<small>~12 µm</small>`, (o) => { const a = firstAgent(0, (q) => q.st >= S.MIG && q.st <= S.DIG) || firstAgent(0, (q) => q.st !== S.LOOP && q.st !== S.CIRC) || firstAgent(0); return a ? !!o.copy(a.p).add(tV.set(0, 9, 0)) : false; });
@@ -1140,7 +1153,7 @@ export function create(engine) {
     add("node", L("memoryB"), (o) => (cur.mb > 0 ? !!o.copy(tMb.slots[0].cur).add(tV.set(0, 5, 0)) : false));
     add("node", L("tc"), (o) => (cur.tc > 0 ? !!o.copy(tTc.slots[0].cur).add(tV.set(0, 6.2, 0)) : false));
     add("node", L("treg"), (o) => (cur.tr > 0 ? !!o.copy(tTr.slots[0].cur).add(tV.set(0, 5.6, 0)) : false));
-    add("node", () => lens.pick({ "y7-8": "Infected cell", y11: "Infected host cell" }), (o) => (cur.host > 0 && pathId === "virus" ? !!o.copy(tHost.slots[0].cur).add(tV.set(0, 8.4, 0)) : false));
+    add("node", () => lens.pick({ "y7-8": "Infected cell", y11: "Infected host cell" }), (o) => (cur.host > 0 && pathId === "virus" && M.slot("virus").I > 0.02 ? !!o.copy(tHost.slots[0].cur).add(tV.set(0, 8.4, 0)) : false));
     add("node", "MHC", (o) => o.copy(mhcLoc[16].p).add(tV.set(0, 2.2, 1)));
   }
   const tLbl = new THREE.Vector3();
@@ -1333,7 +1346,7 @@ export function create(engine) {
     herdCheck();
   }
   const herdNeed = () => coverageNeeded(herd.r0, herd.eff);
-  function herdCheck() { if (herd.r0 >= 12 && herd.cov + 1e-9 >= herdNeed() && herdNeed() < 1.0001 && herd.cov > 0) ms.herd = true; }
+  function herdCheck() { if (herd.r0 >= 12 && herdReached(herd.r0, herd.cov, herd.eff) && herd.cov > 0) ms.herd = true; }
   function drawHerd() {
     for (const [cv, sim] of [[herdCanvA, simA], [herdCanvB, simB]]) {
       if (!cv) continue;
@@ -1356,9 +1369,9 @@ export function create(engine) {
       herdStat[1].innerHTML = `<b>${Math.round(herd.cov * 100)}% vaccinated.</b> ${Math.round(b * 100)}% caught it${simB.done ? "" : " so far"}.`;
     }
     if (herdInfo) {
-      const th = herdThreshold(herd.r0), need = herdNeed(), ok = herd.cov + 1e-9 >= need && need <= 1;
+      const th = herdThreshold(herd.r0), need = herdNeed(), ok = herdReached(herd.r0, herd.cov, herd.eff);
       const sen = lens.atLeast("y11");
-      herdInfo.innerHTML = `<p style="margin:0 0 6px">Threshold: 1 − 1/R₀ = 1 − 1/${+herd.r0.toFixed(1)} = <b>${(th * 100).toFixed(0)}%</b>${sen && herd.eff < 0.999 ? `. With a vaccine that protects ${Math.round(herd.eff * 100)}% of those vaccinated you need <b>${need > 1 ? "more than 100% (not reachable)" : (need * 100).toFixed(0) + "%"}</b> coverage.` : "."}</p><span class="imm-badge ${ok ? "ok" : "no"}">${ok ? "✓ Above the herd-immunity threshold" : "Below the threshold: outbreaks can spread"}</span>`;
+      herdInfo.innerHTML = `<p style="margin:0 0 6px">Threshold: 1 − 1/R₀ = 1 − 1/${+herd.r0.toFixed(1)} = <b>${(th * 100).toFixed(0)}%</b>${sen && herd.eff < 0.999 ? `. With a vaccine that protects ${Math.round(herd.eff * 100)}% of those vaccinated you need <b>${need > 1 ? `${(need * 100).toFixed(0)}%, which is more than everyone: not reachable by this vaccine alone` : (need * 100).toFixed(0) + "% coverage"}</b>.` : "."}</p><span class="imm-badge ${ok ? "ok" : "no"}">${ok ? "✓ Herd immunity reached (R_eff below 1)" : "Not reached: outbreaks can spread"}</span>`;
     }
   }
   function buildHerd(parent) {
