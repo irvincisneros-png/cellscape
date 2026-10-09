@@ -400,7 +400,8 @@ export function create(engine) {
   const mitoMesh = instanced(mitoGeo, mitoMat, N_MITO, "mitochondrion");
   const cristaeMat = physical("#c2410c", { emissive: new THREE.Color("#9a3412"), emissiveIntensity: 0.3, side: THREE.DoubleSide });
   const cristaeMesh = instanced(cristaeGeo, cristaeMat, N_MITO);
-  cristaeMesh.userData.clayColor = "#f1a57c";
+  cristaeMesh.userData.clayColor = "#fde6d4";
+  mitoMesh.userData.claySide = cristaeMesh.userData.claySide = "double";
   const mito = [];
   for (let i = 0; i < N_MITO; i++) {
     const L = 0.72 + rng() * 0.95, Rr = 0.78 + rng() * 0.4;
@@ -1521,7 +1522,7 @@ export function create(engine) {
   const clayKit = new THREE.Group();
   clayKit.visible = false;
   cellGroup.add(clayKit);
-  let kitBuilt = false, saved = null, kitAo = null;
+  let kitBuilt = false, saved = null, kitAo = null, halfMito = null, halfCrist = null;
   const cutR = (th, inset) => {                                  // radius of the cell outline at the cut, minus an inset
     let lo = 0, hi = 26;
     for (let i = 0; i < 24; i++) { const m = (lo + hi) / 2; if (insideCell(tmpV.set(Math.cos(th) * m, CUT, Math.sin(th) * m), inset)) lo = m; else hi = m; }
@@ -1540,6 +1541,8 @@ export function create(engine) {
       clayKit.add(mesh);
       return mesh;
     };
+    halfMito = clipGeometryBelow(mitoGeo, 0);      // mitochondria are shown cut open, cristae folds visible on the cut face
+    halfCrist = clipGeometryBelow(cristaeGeo, 0);
     const bowl = add(clipGeometryBelow(membrane.geometry, CUT), mat("#7499e2"));
     const o0 = outline(0, 128), o1 = outline(0.65, 128), o2 = outline(1.1, 128);
     add(slabGeometry(o0, o1, 2.6), mat("#bba8ea"), CUT - 2.05);       // plasma membrane: outer lipid heads (lilac)
@@ -1603,7 +1606,7 @@ export function create(engine) {
     mito.forEach((o, i) => {
       const r = 0.62 * 1.07 * o.L * 1.15 + 0.45;
       const p = spot(r, 40 + i);
-      o.base.set(p.x, CUT + 0.4, p.z);
+      o.base.set(p.x, CUT + 0.5, p.z);
       o.q.setFromAxisAngle(UP, hash(i * 7.7 + 3) * Math.PI * 2);
       o.pos.copy(o.base);
     });
@@ -1618,6 +1621,7 @@ export function create(engine) {
       blob(NUC.x, NUC.z, 22);
       kitAo.count = n; kitAo.instanceMatrix.needsUpdate = true;
     }
+    mitoMesh.geometry = halfMito; cristaeMesh.geometry = halfCrist;
     Object.assign(clayK, { mito: 1.15, small: 1.5 });
     clearFlows();
   }
@@ -1632,6 +1636,7 @@ export function create(engine) {
     for (const it of saved.perox) { it.o.base.copy(it.base); it.o.pos.copy(it.base); }
     for (const it of saved.glyc) it.o.p.copy(it.p);
     saved.gol.forEach((it, i) => { it.g.position.copy(it.p); it.g.quaternion.copy(it.q); golgiStacks[i].pos.copy(it.pos); golgiStacks[i].trans.copy(it.trans); });
+    mitoMesh.geometry = mitoGeo; cristaeMesh.geometry = cristaeGeo;
     Object.assign(clayK, { mito: 1, small: 1 });
     clearFlows();
   }
@@ -1660,7 +1665,7 @@ export function create(engine) {
     metersPerUnit: 1e-6,
     get view() {
       const a = engine.camera.aspect, d = Math.min(150, Math.max(52, 23 / (0.344 * a)));
-      return clay ? { target: new THREE.Vector3(0, CUT * 0.7, 0), distance: d * (a < 1 ? 0.95 : 0.86), dir: new THREE.Vector3(0.06, 0.74, 0.66) } : { target: new THREE.Vector3(a < 0.9 ? 1 : 3.5, 0, 0), distance: d, dir: new THREE.Vector3(0.12, 0.3, 1) };
+      return clay ? { target: new THREE.Vector3(0, CUT * 0.7, 1), distance: Math.min(150, Math.max(40, 60 / a)), dir: new THREE.Vector3(0.06, 0.58, 0.8) } : { target: new THREE.Vector3(a < 0.9 ? 1 : 3.5, 0, 0), distance: d, dir: new THREE.Vector3(0.12, 0.3, 1) };
     },
     clay: { groundY: -13.2, groundR: 26, shadow: 28, freq: 0.7 },
     clayEnv: { aperture: 0.0016 },

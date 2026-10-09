@@ -157,9 +157,12 @@ export class StyleManager {
     const s = document.createElement("style");
     s.id = "cs-clay-css";
     s.textContent = `
-      .style-clay .cs-hint, .style-clay .cs-scale, .style-clay .cs-scale span { color: #4a433c; text-shadow: none; }
-      .style-clay .cs-scale i { background: #4a433c; }
-      .style-clay .cs-hint { background: rgba(255,255,255,0.55); }`;
+      .style-clay .cs-scale, .style-clay .cs-scale span { color: #3f3832; text-shadow: none; }
+      .style-clay .cs-scale i { background: #3f3832; }
+      .style-clay .cs-hint, .style-clay .lbl3d.dive, .style-clay .lbl3d.org, .style-clay .lbl3d.cs-tip {
+        background: rgba(17, 26, 40, 0.94) !important; color: #eef5f6 !important; border-color: rgba(94, 234, 212, 0.55); text-shadow: none; }
+      .style-clay .cs-hint { padding: 4px 9px; border-radius: 8px; }
+      .style-clay .lbl3d.org small, .style-clay .lbl3d.cs-tip small { color: #b9c7d4 !important; }`;
     document.head.appendChild(s);
   }
 
@@ -204,12 +207,13 @@ export class StyleManager {
     const vc = !!orig.vertexColors, perInst = !!(o.isInstancedMesh && o.instanceColor), tinted = vc || perInst;
     // enclosing glass shells (low alpha) and other see-through parts stay see-through so the action inside remains visible
     const g = orig.userData?.glass, opacity = g ? (g.maxA.value <= 0.5 ? 0.2 : 1) : orig.transparent && orig.opacity < 0.9 ? Math.max(0.15, orig.opacity) : 1;
-    const key = `${vc ? "v" : "p"}${perInst ? "i" : ""}${opacity}${o.userData.clayColor || ""}`;
+    const op = o.userData.clayOpacity ?? opacity, dbl = o.userData.claySide === "double" || orig.side === THREE.DoubleSide;
+    const key = `${vc ? "v" : "p"}${perInst ? "i" : ""}${op}${dbl ? "d" : ""}${o.userData.clayColor || ""}`;
     let per = this.cache.get(orig);
     if (!per) this.cache.set(orig, (per = {}));
     if (per[key]) return per[key];
     const color = o.userData.clayColor ? new THREE.Color(o.userData.clayColor) : tinted ? (orig.color || new THREE.Color("#ffffff")).clone() : pastelOf(orig.color || new THREE.Color("#cccccc"));
-    const m = (per[key] = this.makeClay(color, { vc, pastelShader: tinted, opacity, side: orig.side === THREE.DoubleSide ? THREE.DoubleSide : THREE.FrontSide }));
+    const m = (per[key] = this.makeClay(color, { vc, pastelShader: tinted, opacity: op, side: dbl ? THREE.DoubleSide : THREE.FrontSide }));
     this.syncClip(orig, m);
     return m;
   }
@@ -373,7 +377,7 @@ export class StyleManager {
     }
     const f = inst?.clay?.freq ?? 0.14 * (60 / Math.max(20, inst?.view?.distance || 60)) * 0.6;
     this.U.freq.value = f;
-    this.U.amt.value = inst?.clay?.amount ?? 1.1 / Math.max(0.2, f * 6);
+    this.U.amt.value = inst?.clay?.amount ?? 1.15 / Math.max(0.2, f * 6);
     this.refreshQuality();
   }
 
