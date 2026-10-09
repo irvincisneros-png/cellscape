@@ -549,6 +549,12 @@ export function create(engine) {
     const tr = K.buttonRow(tours);
     K.button(tr, "Follow the energy", () => startTour("energy"));
     K.button(tr, "Follow a secreted protein", () => startTour("protein"));
+    const dv = K.card(el, lens.pick({ "y7-8": "Make new cells", "y9-10": "Cell division" }));
+    dv.insertAdjacentHTML("beforeend", `<p class="hint" style="margin:0 0 8px">${lens.pick({ "y7-8": "Watch this cell copy its DNA and split into two identical cells.", y11: "Follow this cell through the cell cycle: DNA replication, mitosis and cytokinesis (cell plate). Or see how meiosis makes gametes." })}</p>`);
+    const dr = K.buttonRow(dv);
+    const divePortal = (to, label) => ({ to, label, radius: NUC_R, center: () => NUC.clone(), object: nucShell });
+    K.button(dr, lens.pick({ "y7-8": "Watch it divide ▸", "y9-10": "Mitosis ▸" }), () => engine.dive(divePortal("mitosis", "Cell division")), { kind: "primary" });
+    K.button(dr, "Meiosis ▸", () => engine.dive(divePortal("meiosis", "Meiosis")));
 
     nightTime = 0; sec0 = M.secreted;
     wasFlaccid = false;

@@ -17,6 +17,8 @@ export const LEVELS = {
   dna: { title: "DNA double helix", load: () => import("./levels/dna.js") },
   expression: { title: "DNA to protein", load: () => import("../../../sims/protein-synthesis/level.js") },
   folding: { title: "Protein folding", load: () => import("./levels/folding.js") },
+  mitosis: { title: "Cell division (mitosis)", load: () => import("../../../sims/mitosis/level.js") },
+  meiosis: { title: "Meiosis & variation", load: () => import("../../../sims/meiosis/level.js") },
 };
 
 /**
