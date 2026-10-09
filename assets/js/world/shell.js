@@ -23,6 +23,7 @@ export const LEVELS = {
   karyotype: { title: "Human karyotype", load: () => import("./levels/karyotype.js") },
   inheritance: { title: "Inheritance lab", load: () => import("./levels/inheritance.js") },
   specialised: { title: "Specialised cells", load: () => import("./levels/specialised.js") },
+  immunity: { title: "Immune defence", load: () => import("./levels/immunity.js") },
 };
 
 /**
