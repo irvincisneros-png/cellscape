@@ -1,9 +1,10 @@
-// CellScape · Cell Division: Mitosis
+// CellScape · Cell Division: Mitosis (2D fallback when WebGL2 is unavailable; the 3D level is level.js)
 // A 2n = 4 animal cell (two homologous pairs) moves through interphase (G1 → S → G2), mitosis and
 // cytokinesis. Watch mode = auto-play + scrubbable timeline. Do-it-yourself mode = the learner
 // replicates DNA, aligns chromosomes, pulls the poles apart and closes the cleavage furrow.
 // All model geometry is in "cell units" (1 = parent cell radius R), converted to pixels at draw time.
 import * as K from "../../assets/js/kit.js";
+import { PH, TOTAL, I, phaseAt, GATE_PM, GATE_META, CHR, SLOT_Y, WATCH_SLOT, ND_CHR, HAPLOID, RN, RN2, RD, dnaAt } from "./model.js";
 
 const { C, clamp, lerp, easeInOut, easeOut, TAU } = K;
 const PI = Math.PI;
@@ -17,44 +18,8 @@ const { ctx } = stage;
 const toast = K.toaster(stageEl);
 const reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-// ---------------------------------------------------------------- phases
-const PH = [
-  { key: "G1", name: "Interphase · G1", short: "G1", dur: 4 },
-  { key: "S", name: "Interphase · S phase", short: "S", dur: 5 },
-  { key: "G2", name: "Interphase · G2", short: "G2", dur: 3 },
-  { key: "pro", name: "Prophase", short: "Pro", dur: 5 },
-  { key: "prometa", name: "Prometaphase", short: "PM", dur: 6 },
-  { key: "meta", name: "Metaphase", short: "Meta", dur: 4 },
-  { key: "ana", name: "Anaphase", short: "Ana", dur: 4 },
-  { key: "telo", name: "Telophase", short: "Telo", dur: 5 },
-  { key: "cyto", name: "Cytokinesis", short: "Cyto", dur: 5 },
-  { key: "done", name: "Daughter cells (G1)", short: "G1", dur: 3, label: "G1" },
-];
-let acc = 0;
-for (const p of PH) { p.start = acc; acc += p.dur; p.end = acc; }
-const TOTAL = acc;
-const I = Object.fromEntries(PH.map((p, i) => [p.key, i]));
-const phaseAt = (T) => { for (let i = PH.length - 1; i >= 0; i--) if (T >= PH[i].start) return i; return 0; };
-const GATE_PM = PH[I.prometa].start + 0.5 * PH[I.prometa].dur; // DIY: chromosomes become draggable
-const GATE_META = PH[I.meta].start + 0.5 * PH[I.meta].dur;     // DIY: wait for the learner to pull
-
-// ---------------------------------------------------------------- karyotype (2n = 4)
-// Pair 1 = long, metacentric. Pair 2 = short, submetacentric. Pink = maternal, blue = paternal.
-const CHR = [
-  { pair: 1, mat: true, len: 0.26, cpos: 0.5, col: C.pink, home: [-0.17, -0.1], hAng: 0.6, scat: [-0.44, -0.34], sAng: 2.2, tilt: 0.08, seed: 1.3 },
-  { pair: 1, mat: false, len: 0.26, cpos: 0.5, col: C.blue, home: [0.14, 0.12], hAng: 2.4, scat: [0.38, 0.3], sAng: 0.9, tilt: -0.06, seed: 4.1 },
-  { pair: 2, mat: true, len: 0.16, cpos: 0.33, col: C.pink, home: [0.13, -0.17], hAng: -0.5, scat: [0.42, -0.36], sAng: -1.0, tilt: 0.1, seed: 7.7 },
-  { pair: 2, mat: false, len: 0.16, cpos: 0.33, col: C.blue, home: [-0.13, 0.17], hAng: 1.9, scat: [-0.36, 0.4], sAng: 0.3, tilt: -0.1, seed: 2.9 },
-];
+// ---------------------------------------------------------------- phases + karyotype (shared with the 3D level: model.js)
 for (const c of CHR) { c.dark = K.shade(c.col, -0.45); c.light = K.shade(c.col, 0.55); }
-const SLOT_Y = [-0.42, -0.14, 0.14, 0.42];
-const WATCH_SLOT = [0, 2, 1, 3];
-const ND_CHR = 0; // chromosome whose sister chromatids fail to separate when nondisjunction is on
-const HAPLOID = CHR[0].len + CHR[2].len; // DNA of one set = 1C
-const RN = 0.46; // parent nucleus radius
-const RN2 = 0.34; // daughter nucleus radius
-const RD = 0.75; // daughter cell radius after rounding up
-
 // ---------------------------------------------------------------- state
 const S = {
   mode: "watch", T: 0, mutation: false, ndL: false, labels: true, graph: true,
@@ -948,14 +913,6 @@ function drawLabels(o) {
   }
 }
 
-// DNA content per cell (units of C) at timeline position T
-function dnaAt(T) {
-  const k = phaseAt(T), p = clamp((T - PH[k].start) / PH[k].dur, 0, 1);
-  if (k < I.S) return 2;
-  if (k === I.S) return 2 + 2 * p;
-  if (k < I.done) return 4;
-  return 2;
-}
 function drawGraph(o) {
   if (!S.graph) return;
   const small = stage.w < 600;
