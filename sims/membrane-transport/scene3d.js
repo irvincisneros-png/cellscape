@@ -1,14 +1,7 @@
-// Membrane Transport — WebGL renderer (Three.js). Reads the 2D model (model.js) every frame and
+// Membrane Transport — 3D level renderer (Three.js, inside the CellScape engine). Reads the 2D model (model.js) every frame and
 // maps it onto a curved 3D bilayer: model x → along the membrane, model y → across it, and each
 // particle gets its own depth. The model stays the single source of truth for the science.
 import * as THREE from "three";
-import { OrbitControls } from "three/addons/controls/OrbitControls.js";
-import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";
-import { EffectComposer } from "three/addons/postprocessing/EffectComposer.js";
-import { RenderPass } from "three/addons/postprocessing/RenderPass.js";
-import { UnrealBloomPass } from "three/addons/postprocessing/UnrealBloomPass.js";
-import { BokehPass } from "three/addons/postprocessing/BokehPass.js";
-import { OutputPass } from "three/addons/postprocessing/OutputPass.js";
 import { mergeGeometries } from "three/addons/utils/BufferGeometryUtils.js";
 import { SP, ORDER } from "./model.js";
 
@@ -208,55 +201,37 @@ function buildPump(P) {
 }
 
 export class Scene3D {
-  constructor(canvas, M, labelLayer) {
+  /** Renders the membrane model inside a CellScape engine (engine owns renderer, camera, controls, post). */
+  constructor(M, engine, labelLayer) {
     this.M = M;
-    this.canvas = canvas;
+    this.engine = engine;
+    this.camera = engine.camera;
     this.labelLayer = labelLayer;
-    this.quality = "high";
-    this.renderer = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: "high-performance" });
-    this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    this.renderer.toneMappingExposure = 1.0;
-    this.renderer.outputColorSpace = THREE.SRGBColorSpace;
-
-    const scene = (this.scene = new THREE.Scene());
-    scene.fog = new THREE.FogExp2("#082230", 0.022);
-    const pm = new THREE.PMREMGenerator(this.renderer);
-    scene.environment = pm.fromScene(new RoomEnvironment(), 0.04).texture;
-    scene.environmentIntensity = 0.55;
-
-    this.camera = new THREE.PerspectiveCamera(36, 1, 0.1, 200);
-    this.camera.position.set(0, 3.6, 15);
-    this.controls = new OrbitControls(this.camera, canvas);
-    Object.assign(this.controls, {
-      enableDamping: true, dampingFactor: 0.08, enablePan: false, rotateSpeed: 0.6, zoomSpeed: 0.7,
-      minDistance: 6, maxDistance: 30, minPolarAngle: 0.35, maxPolarAngle: 2.4,
-      minAzimuthAngle: -1.1, maxAzimuthAngle: 1.1,
-    });
-    this.controls.target.set(-0.6, -0.2, 0);
-    this.userZoomed = false;
-    this.controls.addEventListener("start", () => (this.userZoomed = true));
-
+    this.root = new THREE.Group();          // the level's root (engine adds it to its scene)
     this.world = new THREE.Group();
     this.world.rotation.z = -0.1;
-    scene.add(this.world);
+    this.root.add(this.world);
 
     this.addBackground();
-    this.addLights();
     this.buildMembrane();
     this.buildProteins();
     this.buildParticles();
     this.buildVesicle();
     this.buildFx();
     this.buildLabels();
-    this.setupPost();
 
-    this.ray = new THREE.Raycaster();
     this.tmpM = new THREE.Matrix4();
     this.tmpQ = new THREE.Quaternion();
     this.tmpV = new THREE.Vector3();
     this.tmpS = new THREE.Vector3();
     this.tmpE = new THREE.Euler();
-    this.frameTimes = [];
+  }
+
+  /** Default framing: ~16 world units across whatever the aspect. */
+  view() {
+    const cam = this.camera, halfW = cam.aspect < 1 ? 6.5 : 8.2, t = Math.tan(THREE.MathUtils.degToRad(cam.fov / 2));
+    const d = clamp(halfW / (t * cam.aspect), 9, 30);
+    return { target: new THREE.Vector3(-0.6, -0.2, 0), distance: d, dir: new THREE.Vector3(0, 0.55, 1) };
   }
 
   // ---------- coordinates ----------
@@ -282,32 +257,6 @@ export class Scene3D {
 
   // ---------- environment ----------
   addBackground() {
-    const g = new THREE.SphereGeometry(90, 48, 32);
-    const m = new THREE.ShaderMaterial({
-      side: THREE.BackSide, depthWrite: false, fog: false,
-      uniforms: { t: { value: 0 } },
-      vertexShader: `varying vec3 vP; void main(){ vP = normalize(position); gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.0); }`,
-      fragmentShader: `
-        varying vec3 vP; uniform float t;
-        float h(vec3 p){ return fract(sin(dot(p, vec3(12.9898,78.233,37.719)))*43758.5453); }
-        float n(vec3 p){ vec3 i=floor(p), f=fract(p); f=f*f*(3.0-2.0*f);
-          return mix(mix(mix(h(i),h(i+vec3(1,0,0)),f.x),mix(h(i+vec3(0,1,0)),h(i+vec3(1,1,0)),f.x),f.y),
-                     mix(mix(h(i+vec3(0,0,1)),h(i+vec3(1,0,1)),f.x),mix(h(i+vec3(0,1,1)),h(i+vec3(1,1,1)),f.x),f.y),f.z); }
-        float fbm(vec3 p){ float s=0.0, a=0.5; for(int i=0;i<5;i++){ s+=a*n(p); p*=2.03; a*=0.5; } return s; }
-        void main(){
-          float y = vP.y;
-          vec3 deep = vec3(0.01,0.03,0.06), teal = vec3(0.02,0.19,0.22), violet = vec3(0.20,0.08,0.34), blue = vec3(0.03,0.08,0.20);
-          vec3 c = mix(teal, blue, smoothstep(-0.3, 0.5, y));
-          float f = fbm(vP * 3.0 + vec3(t*0.01, 0.0, t*0.007));
-          c = mix(c, violet, smoothstep(0.45, 0.85, f) * smoothstep(-0.1, 0.6, y) * 0.9);
-          c += vec3(0.05,0.25,0.25) * smoothstep(0.55, 0.9, fbm(vP*5.0 - t*0.005)) * 0.6;
-          c = mix(c, deep, smoothstep(0.2, -0.9, y) * 0.6);
-          gl_FragColor = vec4(c, 1.0);
-        }`,
-    });
-    this.bg = new THREE.Mesh(g, m);
-    this.scene.add(this.bg);
-
     // drifting specks for depth
     const n = 900, pos = new Float32Array(n * 3), col = new Float32Array(n * 3);
     const pal = ["#5eead4", "#a78bfa", "#fbbf24", "#93c5fd", "#f9a8d4"].map((c) => new THREE.Color(c));
@@ -321,7 +270,7 @@ export class Scene3D {
     this.specks = new THREE.Points(pg, new THREE.PointsMaterial({
       size: 0.18, map: softDot(), vertexColors: true, transparent: true, opacity: 0.55, depthWrite: false, blending: THREE.AdditiveBlending,
     }));
-    this.scene.add(this.specks);
+    this.root.add(this.specks);
 
     // out-of-focus organelles deep in the cytoplasm
     const mito = physical("#f472b6", { transparent: true, opacity: 0.35, roughness: 0.5 });
@@ -330,14 +279,6 @@ export class Scene3D {
       m.position.set(x, y, z); m.rotation.set(0.3, 0.2, Math.PI / 2 + rz);
       this.world.add(m);
     }
-  }
-
-  addLights() {
-    const s = this.scene;
-    s.add(new THREE.HemisphereLight("#a5c8ff", "#1e5a55", 0.7));
-    const key = new THREE.DirectionalLight("#fff3e0", 2.4); key.position.set(-6, 10, 9); s.add(key);
-    const rim = new THREE.DirectionalLight("#c4a1ff", 1.8); rim.position.set(5, 4, -10); s.add(rim);
-    const under = new THREE.DirectionalLight("#38d6c4", 0.8); under.position.set(0, -10, 4); s.add(under);
   }
 
   // ---------- membrane ----------
@@ -506,68 +447,19 @@ export class Scene3D {
   }
 
   place(el, v, dx = 0, dy = 0) {
-    const p = this.tmpV.copy(v);
-    this.world.localToWorld(p);
-    p.project(this.camera);
-    if (p.z > 1 || p.z < -1) { el.style.display = "none"; return; }
-    el.style.display = "";
-    const x = (p.x * 0.5 + 0.5) * this.w + dx, y = (-p.y * 0.5 + 0.5) * this.h + dy;
-    el.style.transform = `translate(${x.toFixed(1)}px, ${y.toFixed(1)}px) translate(-50%, -50%)`;
+    this.engine.place(el, this.world.localToWorld(this.tmpV.copy(v)), dx, dy);
   }
 
-  // ---------- post-processing ----------
-  setupPost() {
-    this.composer = new EffectComposer(this.renderer);
-    this.composer.addPass(new RenderPass(this.scene, this.camera));
-    this.bokeh = new BokehPass(this.scene, this.camera, { focus: 15, aperture: 0.0016, maxblur: 0.006 });
-    this.composer.addPass(this.bokeh);
-    this.bloom = new UnrealBloomPass(new THREE.Vector2(256, 256), 0.55, 0.55, 0.82);
-    this.composer.addPass(this.bloom);
-    this.composer.addPass(new OutputPass());
-  }
-
-  setQuality(q) {
-    this.quality = q;
-    this.bokeh.enabled = q === "high";
-    this.bloom.enabled = q !== "low";
-    this.resize(this.w, this.h);
-  }
-
-  resize(w, h) {
-    this.w = w; this.h = h;
-    const dpr = Math.min(window.devicePixelRatio || 1, this.quality === "low" ? 1 : this.quality === "medium" ? 1.5 : 2);
-    this.renderer.setPixelRatio(dpr);
-    this.renderer.setSize(w, h, false);
-    this.composer.setPixelRatio(dpr);
-    this.composer.setSize(w, h);
-    this.bloom.resolution.set(w / 2, h / 2);
-    this.camera.aspect = w / h;
-    this.camera.updateProjectionMatrix();
-    if (!this.userZoomed) {
-      // frame ~19 world units across, whatever the aspect
-      const halfW = this.camera.aspect < 1 ? 6.5 : 8.2, t = Math.tan(THREE.MathUtils.degToRad(this.camera.fov / 2));
-      const d = clamp(halfW / (t * this.camera.aspect), 9, 30);
-      const dir = this.tmpV.set(0, 0.55, 1).normalize();
-      this.camera.position.copy(this.controls.target).addScaledVector(dir, d);
-      this.controls.update();
-    }
-  }
 
   // ---------- picking ----------
-  setRay(cx, cy) {
-    const r = this.canvas.getBoundingClientRect();
-    const nx = ((cx - r.left) / r.width) * 2 - 1, ny = -((cy - r.top) / r.height) * 2 + 1;
-    this.ray.setFromCamera({ x: nx, y: ny }, this.camera);
-  }
-
   pickProtein(cx, cy) {
-    this.setRay(cx, cy);
+    this.ray = this.engine.setRay(cx, cy);
     const hit = this.ray.intersectObjects(this.pickables, false)[0];
     return hit ? hit.object.userData.protId : null;
   }
 
   pickParticle(cx, cy) {
-    this.setRay(cx, cy);
+    this.ray = this.engine.setRay(cx, cy);
     const meshes = Object.values(this.pmesh);
     const hit = this.ray.intersectObjects(meshes, false)[0];
     if (!hit) return null;
@@ -576,7 +468,7 @@ export class Scene3D {
 
   /** Screen point → model coords on the vertical plane through the membrane's centre line. */
   toModel(cx, cy, planeZ = 0) {
-    this.setRay(cx, cy);
+    this.ray = this.engine.setRay(cx, cy);
     const inv = this.tmpM.copy(this.world.matrixWorld).invert();
     const o = this.ray.ray.origin.clone().applyMatrix4(inv);
     const d = this.ray.ray.direction.clone().transformDirection(inv);
@@ -589,38 +481,18 @@ export class Scene3D {
   }
 
   // ---------- per-frame ----------
-  render(dt, t, ui = {}) {
-    const M = this.M, L = M.L;
-    this.bg.material.uniforms.t.value = t;
+  update(dt, t, ui = {}) {
     this.specks.rotation.y = Math.sin(t * 0.03) * 0.05;
     this.specks.position.y = Math.sin(t * 0.05) * 0.4;
     this.world.rotation.y = Math.sin(t * 0.07) * 0.035;
-    this.controls.update();
-    this.bokeh.uniforms.focus.value = this.camera.position.distanceTo(this.controls.target);
-
     this.updateProteins(t, ui);
     this.updateParticles(dt, t);
     this.updateVesicle();
     this.updateFx(t);
     this.updateLabels(ui);
-
-    const t0 = performance.now();
-    if (this.quality === "low") this.renderer.render(this.scene, this.camera);
-    else this.composer.render();
-    this.autoQuality(performance.now() - t0, dt);
   }
 
-  autoQuality(ms, dt) {
-    if (!dt) return;
-    const f = this.frameTimes;
-    f.push(dt);
-    if (f.length < 90) return;
-    const avg = f.reduce((a, b) => a + b, 0) / f.length;
-    f.length = 0;
-    if (this.lockQuality) return;
-    if (avg > 1 / 32 && this.quality === "high") { this.setQuality("medium"); this.onQuality?.("medium"); }
-    else if (avg > 1 / 26 && this.quality === "medium") { this.setQuality("low"); this.onQuality?.("low"); }
-  }
+  dispose() { this.labelLayer.remove(); }
 
   updateProteins(t, ui) {
     const M = this.M;

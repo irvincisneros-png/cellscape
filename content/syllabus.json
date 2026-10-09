@@ -1,0 +1,3121 @@
+{
+  "source_notes": [
+    {
+      "syllabus": "Science 7–10 (2023)",
+      "url": "https://curriculum.nsw.edu.au/learning-areas/science/science-7-10-2023/overview",
+      "retrieved": "2026-10-09",
+      "status": "current (implemented from 2026; replaces Science 7–10 Syllabus 2018)",
+      "method": "Text extracted from the NSW Curriculum website's embedded page data for each Stage 4/5 focus area page (URLs per dot point in source_url)."
+    },
+    {
+      "syllabus": "Biology Stage 6 (2017)",
+      "url": "https://www.nsw.gov.au/sites/default/files/noindex/2025-03/biology-stage-6-syllabus-2017.docx",
+      "retrieved": "2026-10-09",
+      "status": "current for Year 11 in 2026 and for Year 12 until end of Term 3 2027; replaced by Biology 11–12 (2025)",
+      "method": "Official NESA syllabus DOCX linked from https://www.nsw.gov.au/education-and-training/nesa/curriculum/science/biology-stage-6-2017. ACARA (ACSBL) codes removed from text and stored in acara_codes."
+    },
+    {
+      "syllabus": "Biology 11–12 (2025)",
+      "url": "https://curriculum.nsw.edu.au/learning-areas/science/biology-11-12-2025/overview",
+      "retrieved": "2026-10-09",
+      "status": "new syllabus: Year 11 from Term 1 2027, Year 12 from Term 4 2027, first HSC 2028",
+      "method": "Text extracted from the NSW Curriculum website's embedded page data for each Year 11/12 focus area page. Two respiration/photosynthesis equations and one cell-size equation were MathML; rendered here as plain text."
+    }
+  ],
+  "bands": [
+    {
+      "id": "y7-8",
+      "label": "Years 7–8 (Stage 4)"
+    },
+    {
+      "id": "y9-10",
+      "label": "Years 9–10 (Stage 5)"
+    },
+    {
+      "id": "y11",
+      "label": "Year 11 (Stage 6)"
+    },
+    {
+      "id": "y12",
+      "label": "Year 12 (Stage 6)"
+    }
+  ],
+  "extra_topic_tags": [
+    "biotechnology",
+    "evolution",
+    "immunity",
+    "plant-transport"
+  ],
+  "dotpoints": [
+    {
+      "id": "s4-cells-01",
+      "band": "y7-8",
+      "syllabus": "Science 7–10 (2023)",
+      "outcome": "SC4-CLS-01",
+      "focus_area": "Cells and classification",
+      "content_group": "Cells",
+      "text": "Outline cell theory",
+      "topics": [
+        "cell-structure"
+      ],
+      "paraphrased": false,
+      "source_url": "https://curriculum.nsw.edu.au/learning-areas/science/science-7-10-2023/content/stage-4/fa3acda8f7"
+    },
+    {
+      "id": "s4-cells-02",
+      "band": "y7-8",
+      "syllabus": "Science 7–10 (2023)",
+      "outcome": "SC4-CLS-01",
+      "focus_area": "Cells and classification",
+      "content_group": "Cells",
+      "text": "Identify which cell structures and organelles are common in plant and animal cells",
+      "topics": [
+        "cell-structure",
+        "organelles"
+      ],
+      "paraphrased": false,
+      "source_url": "https://curriculum.nsw.edu.au/learning-areas/science/science-7-10-2023/content/stage-4/fa3acda8f7"
+    },
+    {
+      "id": "s4-cells-03",
+      "band": "y7-8",
+      "syllabus": "Science 7–10 (2023)",
+      "outcome": "SC4-CLS-01",
+      "focus_area": "Cells and classification",
+      "content_group": "Cells",
+      "text": "Describe the functions of the cell membrane, cytoplasm, nucleus containing DNA, mitochondria and chloroplasts",
+      "topics": [
+        "organelles",
+        "membrane",
+        "cell-structure"
+      ],
+      "paraphrased": false,
+      "source_url": "https://curriculum.nsw.edu.au/learning-areas/science/science-7-10-2023/content/stage-4/fa3acda8f7"
+    },
+    {
+      "id": "s4-cells-04",
+      "band": "y7-8",
+      "syllabus": "Science 7–10 (2023)",
+      "outcome": "SC4-CLS-01",
+      "focus_area": "Cells and classification",
+      "content_group": "Cells",
+      "text": "Compare the structure of plant and animal cells to identify similarities and differences",
+      "topics": [
+        "cell-structure",
+        "organelles"
+      ],
+      "paraphrased": false,
+      "source_url": "https://curriculum.nsw.edu.au/learning-areas/science/science-7-10-2023/content/stage-4/fa3acda8f7"
+    },
+    {
+      "id": "s4-cells-05",
+      "band": "y7-8",
+      "syllabus": "Science 7–10 (2023)",
+      "outcome": "SC4-CLS-01",
+      "focus_area": "Cells and classification",
+      "content_group": "Cells",
+      "text": "Conduct an investigation to observe and record the similarities and differences between different cells, including fungi, bacteria, plant and animal cells, using microscopes and/or images obtained from microscopes",
+      "topics": [
+        "microscopy",
+        "cell-structure",
+        "prokaryote-eukaryote"
+      ],
+      "paraphrased": false,
+      "source_url": "https://curriculum.nsw.edu.au/learning-areas/science/science-7-10-2023/content/stage-4/fa3acda8f7"
+    },
+    {
+      "id": "s4-cells-06",
+      "band": "y7-8",
+      "syllabus": "Science 7–10 (2023)",
+      "outcome": "SC4-CLS-01",
+      "focus_area": "Cells and classification",
+      "content_group": "Cells",
+      "text": "Identify cellular respiration via mitochondria, and photosynthesis via chloroplasts, as examples of important processes that take place in specialised organelles",
+      "topics": [
+        "respiration",
+        "photosynthesis",
+        "organelles"
+      ],
+      "paraphrased": false,
+      "source_url": "https://curriculum.nsw.edu.au/learning-areas/science/science-7-10-2023/content/stage-4/fa3acda8f7"
+    },
+    {
+      "id": "s4-cells-07",
+      "band": "y7-8",
+      "syllabus": "Science 7–10 (2023)",
+      "outcome": "SC4-CLS-01",
+      "focus_area": "Cells and classification",
+      "content_group": "Cells",
+      "text": "Draw single-celled organisms observed under a microscope",
+      "topics": [
+        "microscopy",
+        "cell-structure"
+      ],
+      "paraphrased": false,
+      "source_url": "https://curriculum.nsw.edu.au/learning-areas/science/science-7-10-2023/content/stage-4/fa3acda8f7"
+    },
+    {
+      "id": "s4-cells-08",
+      "band": "y7-8",
+      "syllabus": "Science 7–10 (2023)",
+      "outcome": "SC4-CLS-01",
+      "focus_area": "Cells and classification",
+      "content_group": "Cells",
+      "text": "Describe the role of specialised cells in multicellular organisms and explain why they are needed",
+      "topics": [
+        "specialised-cells"
+      ],
+      "paraphrased": false,
+      "source_url": "https://curriculum.nsw.edu.au/learning-areas/science/science-7-10-2023/content/stage-4/fa3acda8f7"
+    },
+    {
+      "id": "s4-cells-09",
+      "band": "y7-8",
+      "syllabus": "Science 7–10 (2023)",
+      "outcome": "SC4-CLS-01",
+      "focus_area": "Cells and classification",
+      "content_group": "Cells",
+      "text": "Represent the arrangement of specialised cells in tissues and in organs",
+      "topics": [
+        "specialised-cells"
+      ],
+      "paraphrased": false,
+      "source_url": "https://curriculum.nsw.edu.au/learning-areas/science/science-7-10-2023/content/stage-4/fa3acda8f7"
+    },
+    {
+      "id": "s4-cells-10",
+      "band": "y7-8",
+      "syllabus": "Science 7–10 (2023)",
+      "outcome": "SC4-CLS-01",
+      "focus_area": "Cells and classification",
+      "content_group": "Cells",
+      "text": "Examine the relationship between structure and function for a range of specialised cells",
+      "topics": [
+        "specialised-cells"
+      ],
+      "paraphrased": false,
+      "source_url": "https://curriculum.nsw.edu.au/learning-areas/science/science-7-10-2023/content/stage-4/fa3acda8f7"
+    },
+    {
+      "id": "s4-cells-11",
+      "band": "y7-8",
+      "syllabus": "Science 7–10 (2023)",
+      "outcome": "SC4-CLS-01",
+      "focus_area": "Cells and classification",
+      "content_group": "Cells",
+      "text": "Conduct a practical investigation to observe and compare prepared slides of specialised cells",
+      "topics": [
+        "specialised-cells",
+        "microscopy"
+      ],
+      "paraphrased": false,
+      "source_url": "https://curriculum.nsw.edu.au/learning-areas/science/science-7-10-2023/content/stage-4/fa3acda8f7"
+    },
+    {
+      "id": "s4-living-01",
+      "band": "y7-8",
+      "syllabus": "Science 7–10 (2023)",
+      "outcome": "SC4-LIV-01",
+      "focus_area": "Living systems",
+      "content_group": "Body systems",
+      "text": "Explain the interrelationship among cells, tissues and organs",
+      "topics": [
+        "specialised-cells"
+      ],
+      "paraphrased": false,
+      "source_url": "https://curriculum.nsw.edu.au/learning-areas/science/science-7-10-2023/content/stage-4/fae99583e2"
+    },
+    {
+      "id": "s4-living-02",
+      "band": "y7-8",
+      "syllabus": "Science 7–10 (2023)",
+      "outcome": "SC4-LIV-01",
+      "focus_area": "Living systems",
+      "content_group": "Body systems",
+      "text": "Identify the role of the digestive, circulatory, respiratory and excretory systems of humans, and name the major organs",
+      "topics": [
+        "gas-exchange",
+        "blood-transport"
+      ],
+      "paraphrased": false,
+      "source_url": "https://curriculum.nsw.edu.au/learning-areas/science/science-7-10-2023/content/stage-4/fae99583e2"
+    },
+    {
+      "id": "s4-living-03",
+      "band": "y7-8",
+      "syllabus": "Science 7–10 (2023)",
+      "outcome": "SC4-LIV-01",
+      "focus_area": "Living systems",
+      "content_group": "Body systems",
+      "text": "Describe how the structures of organ systems, and the specialised cells within these systems, enable them to carry out their functions",
+      "topics": [
+        "specialised-cells",
+        "gas-exchange",
+        "blood-transport"
+      ],
+      "paraphrased": false,
+      "source_url": "https://curriculum.nsw.edu.au/learning-areas/science/science-7-10-2023/content/stage-4/fae99583e2"
+    },
+    {
+      "id": "s4-living-04",
+      "band": "y7-8",
+      "syllabus": "Science 7–10 (2023)",
+      "outcome": "SC4-LIV-01",
+      "focus_area": "Living systems",
+      "content_group": "Plant systems",
+      "text": "Determine the role, structure and function of the components of a plant, including the xylem and phloem, in maintaining plants as multicellular organisms",
+      "topics": [
+        "plant-transport",
+        "specialised-cells"
+      ],
+      "paraphrased": false,
+      "source_url": "https://curriculum.nsw.edu.au/learning-areas/science/science-7-10-2023/content/stage-4/fae99583e2"
+    },
+    {
+      "id": "s4-living-05",
+      "band": "y7-8",
+      "syllabus": "Science 7–10 (2023)",
+      "outcome": "SC4-LIV-01",
+      "focus_area": "Living systems",
+      "content_group": "Plant systems",
+      "text": "Use scientific tools and instruments to observe the specialised cells and tissues involved in the structure and function of plants",
+      "topics": [
+        "specialised-cells",
+        "microscopy"
+      ],
+      "paraphrased": false,
+      "source_url": "https://curriculum.nsw.edu.au/learning-areas/science/science-7-10-2023/content/stage-4/fae99583e2"
+    },
+    {
+      "id": "s4-change-01",
+      "band": "y7-8",
+      "syllabus": "Science 7–10 (2023)",
+      "outcome": "SC4-CHG-01",
+      "focus_area": "Change",
+      "content_group": "Chemical change",
+      "text": "Conduct a practical investigation to model cellular processes, including respiration and photosynthesis, and document findings in a written report",
+      "topics": [
+        "respiration",
+        "photosynthesis"
+      ],
+      "paraphrased": false,
+      "source_url": "https://curriculum.nsw.edu.au/learning-areas/science/science-7-10-2023/content/stage-4/fafa172269"
+    },
+    {
+      "id": "s5-gev-01",
+      "band": "y9-10",
+      "syllabus": "Science 7–10 (2023)",
+      "outcome": "SC5-GEV-02",
+      "focus_area": "Genetics and evolutionary change",
+      "content_group": "DNA structure and function",
+      "text": "Identify that all organisms have information coded in genetic material",
+      "topics": [
+        "dna-structure",
+        "genes"
+      ],
+      "paraphrased": false,
+      "source_url": "https://curriculum.nsw.edu.au/learning-areas/science/science-7-10-2023/content/stage-5/fa16e6f2bd"
+    },
+    {
+      "id": "s5-gev-02",
+      "band": "y9-10",
+      "syllabus": "Science 7–10 (2023)",
+      "outcome": "SC5-GEV-02",
+      "focus_area": "Genetics and evolutionary change",
+      "content_group": "DNA structure and function",
+      "text": "Observe and model the arrangement of genetic information in an organism to define and compare the terms DNA, gene, chromosome and genome",
+      "topics": [
+        "dna-structure",
+        "genes"
+      ],
+      "paraphrased": false,
+      "source_url": "https://curriculum.nsw.edu.au/learning-areas/science/science-7-10-2023/content/stage-5/fa16e6f2bd"
+    },
+    {
+      "id": "s5-gev-03",
+      "band": "y9-10",
+      "syllabus": "Science 7–10 (2023)",
+      "outcome": "SC5-GEV-02",
+      "focus_area": "Genetics and evolutionary change",
+      "content_group": "DNA structure and function",
+      "text": "Relate the structure of the DNA double helix to its functions",
+      "topics": [
+        "dna-structure"
+      ],
+      "paraphrased": false,
+      "source_url": "https://curriculum.nsw.edu.au/learning-areas/science/science-7-10-2023/content/stage-5/fa16e6f2bd"
+    },
+    {
+      "id": "s5-gev-04",
+      "band": "y9-10",
+      "syllabus": "Science 7–10 (2023)",
+      "outcome": "SC5-GEV-02",
+      "focus_area": "Genetics and evolutionary change",
+      "content_group": "DNA structure and function",
+      "text": "Discuss the nature of scientific discovery by comparing the contributions of scientists involved in the discovery of the double helix structure of DNA",
+      "topics": [
+        "dna-structure"
+      ],
+      "paraphrased": false,
+      "source_url": "https://curriculum.nsw.edu.au/learning-areas/science/science-7-10-2023/content/stage-5/fa16e6f2bd"
+    },
+    {
+      "id": "s5-gev-05",
+      "band": "y9-10",
+      "syllabus": "Science 7–10 (2023)",
+      "outcome": "SC5-GEV-02",
+      "focus_area": "Genetics and evolutionary change",
+      "content_group": "Variation and inheritance",
+      "text": "Outline how genetic information is passed on to offspring by sexual and asexual reproduction",
+      "topics": [
+        "inheritance",
+        "meiosis",
+        "mitosis"
+      ],
+      "paraphrased": false,
+      "source_url": "https://curriculum.nsw.edu.au/learning-areas/science/science-7-10-2023/content/stage-5/fa16e6f2bd"
+    },
+    {
+      "id": "s5-gev-06",
+      "band": "y9-10",
+      "syllabus": "Science 7–10 (2023)",
+      "outcome": "SC5-GEV-02",
+      "focus_area": "Genetics and evolutionary change",
+      "content_group": "Variation and inheritance",
+      "text": "Identify that multiple genes and multiple environmental factors interact in the development of most traits",
+      "topics": [
+        "genes",
+        "inheritance"
+      ],
+      "paraphrased": false,
+      "source_url": "https://curriculum.nsw.edu.au/learning-areas/science/science-7-10-2023/content/stage-5/fa16e6f2bd"
+    },
+    {
+      "id": "s5-gev-07",
+      "band": "y9-10",
+      "syllabus": "Science 7–10 (2023)",
+      "outcome": "SC5-GEV-02",
+      "focus_area": "Genetics and evolutionary change",
+      "content_group": "Variation and inheritance",
+      "text": "Explain how DNA mutation can result in genetic variation with beneficial, harmful or minimal effects on the functioning of an organism",
+      "topics": [
+        "mutation",
+        "genes"
+      ],
+      "paraphrased": false,
+      "source_url": "https://curriculum.nsw.edu.au/learning-areas/science/science-7-10-2023/content/stage-5/fa16e6f2bd"
+    },
+    {
+      "id": "s5-gev-08",
+      "band": "y9-10",
+      "syllabus": "Science 7–10 (2023)",
+      "outcome": "SC5-GEV-02",
+      "focus_area": "Genetics and evolutionary change",
+      "content_group": "Variation and inheritance",
+      "text": "Outline the connection between genotypes and phenotypes, using Mendelian inheritance for both plants and animals",
+      "topics": [
+        "inheritance",
+        "genes"
+      ],
+      "paraphrased": false,
+      "source_url": "https://curriculum.nsw.edu.au/learning-areas/science/science-7-10-2023/content/stage-5/fa16e6f2bd"
+    },
+    {
+      "id": "s5-gev-09",
+      "band": "y9-10",
+      "syllabus": "Science 7–10 (2023)",
+      "outcome": "SC5-GEV-02",
+      "focus_area": "Genetics and evolutionary change",
+      "content_group": "Variation and inheritance",
+      "text": "Use pedigrees and Punnett squares to model monogenic gene-trait relationships and make predictions about patterns of inheritance",
+      "topics": [
+        "inheritance"
+      ],
+      "paraphrased": false,
+      "source_url": "https://curriculum.nsw.edu.au/learning-areas/science/science-7-10-2023/content/stage-5/fa16e6f2bd"
+    },
+    {
+      "id": "s5-gev-10",
+      "band": "y9-10",
+      "syllabus": "Science 7–10 (2023)",
+      "outcome": "SC5-GEV-02",
+      "focus_area": "Genetics and evolutionary change",
+      "content_group": "Genetic technologies",
+      "text": "Identify examples of current and emerging genetic technologies",
+      "topics": [
+        "biotechnology"
+      ],
+      "paraphrased": false,
+      "source_url": "https://curriculum.nsw.edu.au/learning-areas/science/science-7-10-2023/content/stage-5/fa16e6f2bd"
+    },
+    {
+      "id": "s5-gev-11",
+      "band": "y9-10",
+      "syllabus": "Science 7–10 (2023)",
+      "outcome": "SC5-GEV-02",
+      "focus_area": "Genetics and evolutionary change",
+      "content_group": "Genetic technologies",
+      "text": "Discuss applications of genetic technologies in conservation, agriculture, industry and medicine",
+      "topics": [
+        "biotechnology"
+      ],
+      "paraphrased": false,
+      "source_url": "https://curriculum.nsw.edu.au/learning-areas/science/science-7-10-2023/content/stage-5/fa16e6f2bd"
+    },
+    {
+      "id": "s5-gev-12",
+      "band": "y9-10",
+      "syllabus": "Science 7–10 (2023)",
+      "outcome": "SC5-GEV-02",
+      "focus_area": "Genetics and evolutionary change",
+      "content_group": "Genetic technologies",
+      "text": "Discuss the applications of genetic testing and its associated social, economic and ethical implications",
+      "topics": [
+        "biotechnology",
+        "genes"
+      ],
+      "paraphrased": false,
+      "source_url": "https://curriculum.nsw.edu.au/learning-areas/science/science-7-10-2023/content/stage-5/fa16e6f2bd"
+    },
+    {
+      "id": "s5-gev-13",
+      "band": "y9-10",
+      "syllabus": "Science 7–10 (2023)",
+      "outcome": "SC5-GEV-01",
+      "focus_area": "Genetics and evolutionary change",
+      "content_group": "The theory of evolution and evidence of natural selection",
+      "text": "Explain how the processes of natural selection and isolation can lead to changes within and between species",
+      "topics": [
+        "evolution"
+      ],
+      "paraphrased": false,
+      "source_url": "https://curriculum.nsw.edu.au/learning-areas/science/science-7-10-2023/content/stage-5/fa16e6f2bd"
+    },
+    {
+      "id": "s5-gev-14",
+      "band": "y9-10",
+      "syllabus": "Science 7–10 (2023)",
+      "outcome": "SC5-GEV-02",
+      "focus_area": "Genetics and evolutionary change",
+      "content_group": "Genetics and evolutionary change in context",
+      "text": "Use an ethical framework to construct evidence-based written arguments about the implications of a genetic technology, including the ethical implications of the continued use of the immortal HeLa cell line",
+      "topics": [
+        "biotechnology",
+        "cell-cycle"
+      ],
+      "paraphrased": false,
+      "source_url": "https://curriculum.nsw.edu.au/learning-areas/science/science-7-10-2023/content/stage-5/fa16e6f2bd"
+    },
+    {
+      "id": "s5-dis-01",
+      "band": "y9-10",
+      "syllabus": "Science 7–10 (2023)",
+      "outcome": "SC5-DIS-01",
+      "focus_area": "Disease",
+      "content_group": "Infectious and non-infectious diseases",
+      "text": "Identify how the body prevents the entry of pathogens and describe how it responds to pathogens that enter the body",
+      "topics": [
+        "immunity"
+      ],
+      "paraphrased": false,
+      "source_url": "https://curriculum.nsw.edu.au/learning-areas/science/science-7-10-2023/content/stage-5/fa8c24a583"
+    },
+    {
+      "id": "s5-dis-02",
+      "band": "y9-10",
+      "syllabus": "Science 7–10 (2023)",
+      "outcome": "SC5-DIS-01",
+      "focus_area": "Disease",
+      "content_group": "Infectious and non-infectious diseases",
+      "text": "Outline how a vaccination stimulates the body to produce antibodies to fight infection",
+      "topics": [
+        "immunity"
+      ],
+      "paraphrased": false,
+      "source_url": "https://curriculum.nsw.edu.au/learning-areas/science/science-7-10-2023/content/stage-5/fa8c24a583"
+    },
+    {
+      "id": "b17-m1-01",
+      "band": "y11",
+      "syllabus": "Biology Stage 6 (2017)",
+      "outcome": "BIO11-8",
+      "focus_area": "Module 1: Cells as the Basis of Life",
+      "content_group": "Cell Structure",
+      "inquiry_question": "What distinguishes one cell from another?",
+      "text": "investigate different cellular structures, including but not limited to:",
+      "subpoints": [
+        "examining a variety of prokaryotic and eukaryotic cells"
+      ],
+      "acara_codes": [
+        "ACSBL032",
+        "ACSBL048"
+      ],
+      "topics": [
+        "cell-structure",
+        "prokaryote-eukaryote",
+        "microscopy"
+      ],
+      "paraphrased": false,
+      "source_url": "https://www.nsw.gov.au/sites/default/files/noindex/2025-03/biology-stage-6-syllabus-2017.docx"
+    },
+    {
+      "id": "b17-m1-02",
+      "band": "y11",
+      "syllabus": "Biology Stage 6 (2017)",
+      "outcome": "BIO11-8",
+      "focus_area": "Module 1: Cells as the Basis of Life",
+      "content_group": "Cell Structure",
+      "inquiry_question": "What distinguishes one cell from another?",
+      "text": "describe a range of technologies that are used to determine a cell’s structure and function",
+      "topics": [
+        "microscopy"
+      ],
+      "paraphrased": false,
+      "source_url": "https://www.nsw.gov.au/sites/default/files/noindex/2025-03/biology-stage-6-syllabus-2017.docx"
+    },
+    {
+      "id": "b17-m1-03",
+      "band": "y11",
+      "syllabus": "Biology Stage 6 (2017)",
+      "outcome": "BIO11-8",
+      "focus_area": "Module 1: Cells as the Basis of Life",
+      "content_group": "Cell Structure",
+      "inquiry_question": "What distinguishes one cell from another?",
+      "text": "investigate a variety of prokaryotic and eukaryotic cell structures, including but not limited to:",
+      "subpoints": [
+        "drawing scaled diagrams of a variety of cells",
+        "comparing and contrasting different cell organelles and arrangements",
+        "modelling the structure and function of the fluid mosaic model of the cell membrane"
+      ],
+      "acara_codes": [
+        "ACSBL035",
+        "ACSBL045"
+      ],
+      "topics": [
+        "cell-structure",
+        "organelles",
+        "membrane",
+        "prokaryote-eukaryote",
+        "microscopy"
+      ],
+      "paraphrased": false,
+      "source_url": "https://www.nsw.gov.au/sites/default/files/noindex/2025-03/biology-stage-6-syllabus-2017.docx"
+    },
+    {
+      "id": "b17-m1-04",
+      "band": "y11",
+      "syllabus": "Biology Stage 6 (2017)",
+      "outcome": "BIO11-8",
+      "focus_area": "Module 1: Cells as the Basis of Life",
+      "content_group": "Cell Function",
+      "inquiry_question": "How do cells coordinate activities within their internal environment and the external environment?",
+      "text": "investigate the way in which materials can move into and out of cells, including but not limited to:",
+      "subpoints": [
+        "conducting a practical investigation modelling diffusion and osmosis",
+        "examining the roles of active transport, endocytosis and exocytosis",
+        "relating the exchange of materials across membranes to the surface-area-to-volume ratio, concentration gradients and characteristics of the materials being exchanged"
+      ],
+      "acara_codes": [
+        "ACSBL046",
+        "ACSBL047"
+      ],
+      "topics": [
+        "membrane",
+        "diffusion",
+        "osmosis",
+        "active-transport"
+      ],
+      "paraphrased": false,
+      "source_url": "https://www.nsw.gov.au/sites/default/files/noindex/2025-03/biology-stage-6-syllabus-2017.docx"
+    },
+    {
+      "id": "b17-m1-05",
+      "band": "y11",
+      "syllabus": "Biology Stage 6 (2017)",
+      "outcome": "BIO11-8",
+      "focus_area": "Module 1: Cells as the Basis of Life",
+      "content_group": "Cell Function",
+      "inquiry_question": "How do cells coordinate activities within their internal environment and the external environment?",
+      "text": "investigate cell requirements, including but not limited to:",
+      "subpoints": [
+        "suitable forms of energy, including light energy and chemical energy in complex molecules",
+        "matter, including gases, simple nutrients and ions",
+        "removal of wastes"
+      ],
+      "acara_codes": [
+        "ACSBL044"
+      ],
+      "topics": [
+        "photosynthesis",
+        "respiration",
+        "diffusion"
+      ],
+      "paraphrased": false,
+      "source_url": "https://www.nsw.gov.au/sites/default/files/noindex/2025-03/biology-stage-6-syllabus-2017.docx"
+    },
+    {
+      "id": "b17-m1-06",
+      "band": "y11",
+      "syllabus": "Biology Stage 6 (2017)",
+      "outcome": "BIO11-8",
+      "focus_area": "Module 1: Cells as the Basis of Life",
+      "content_group": "Cell Function",
+      "inquiry_question": "How do cells coordinate activities within their internal environment and the external environment?",
+      "text": "investigate the biochemical processes of photosynthesis, cell respiration and the removal of cellular products and wastes in eukaryotic cells",
+      "acara_codes": [
+        "ACSBL049",
+        "ACSBL050",
+        "ACSBL052",
+        "ACSBL053"
+      ],
+      "topics": [
+        "photosynthesis",
+        "respiration",
+        "atp"
+      ],
+      "paraphrased": false,
+      "source_url": "https://www.nsw.gov.au/sites/default/files/noindex/2025-03/biology-stage-6-syllabus-2017.docx"
+    },
+    {
+      "id": "b17-m1-07",
+      "band": "y11",
+      "syllabus": "Biology Stage 6 (2017)",
+      "outcome": "BIO11-8",
+      "focus_area": "Module 1: Cells as the Basis of Life",
+      "content_group": "Cell Function",
+      "inquiry_question": "How do cells coordinate activities within their internal environment and the external environment?",
+      "text": "conduct a practical investigation to model the action of enzymes in cells",
+      "acara_codes": [
+        "ACSBL050"
+      ],
+      "topics": [
+        "enzymes"
+      ],
+      "paraphrased": false,
+      "source_url": "https://www.nsw.gov.au/sites/default/files/noindex/2025-03/biology-stage-6-syllabus-2017.docx"
+    },
+    {
+      "id": "b17-m1-08",
+      "band": "y11",
+      "syllabus": "Biology Stage 6 (2017)",
+      "outcome": "BIO11-8",
+      "focus_area": "Module 1: Cells as the Basis of Life",
+      "content_group": "Cell Function",
+      "inquiry_question": "How do cells coordinate activities within their internal environment and the external environment?",
+      "text": "investigate the effects of the environment on enzyme activity through the collection of primary or secondary data",
+      "acara_codes": [
+        "ACSBL050",
+        "ACSBL051"
+      ],
+      "topics": [
+        "enzymes"
+      ],
+      "paraphrased": false,
+      "source_url": "https://www.nsw.gov.au/sites/default/files/noindex/2025-03/biology-stage-6-syllabus-2017.docx"
+    },
+    {
+      "id": "b17-m2-01",
+      "band": "y11",
+      "syllabus": "Biology Stage 6 (2017)",
+      "outcome": "BIO11-9",
+      "focus_area": "Module 2: Organisation of Living Things",
+      "content_group": "Organisation of Cells",
+      "inquiry_question": "How are cells arranged in a multicellular organism?",
+      "text": "compare the differences between unicellular, colonial and multicellular organisms by:",
+      "subpoints": [
+        "investigating structures at the level of the cell and organelle",
+        "relating structure of cells and cell specialisation to function"
+      ],
+      "topics": [
+        "specialised-cells",
+        "cell-structure",
+        "organelles"
+      ],
+      "paraphrased": false,
+      "source_url": "https://www.nsw.gov.au/sites/default/files/noindex/2025-03/biology-stage-6-syllabus-2017.docx"
+    },
+    {
+      "id": "b17-m2-02",
+      "band": "y11",
+      "syllabus": "Biology Stage 6 (2017)",
+      "outcome": "BIO11-9",
+      "focus_area": "Module 2: Organisation of Living Things",
+      "content_group": "Organisation of Cells",
+      "inquiry_question": "How are cells arranged in a multicellular organism?",
+      "text": "investigate the structure and function of tissues, organs and systems and relate those functions to cell differentiation and specialisation",
+      "acara_codes": [
+        "ACSBL055"
+      ],
+      "topics": [
+        "specialised-cells"
+      ],
+      "paraphrased": false,
+      "source_url": "https://www.nsw.gov.au/sites/default/files/noindex/2025-03/biology-stage-6-syllabus-2017.docx"
+    },
+    {
+      "id": "b17-m2-03",
+      "band": "y11",
+      "syllabus": "Biology Stage 6 (2017)",
+      "outcome": "BIO11-9",
+      "focus_area": "Module 2: Organisation of Living Things",
+      "content_group": "Organisation of Cells",
+      "inquiry_question": "How are cells arranged in a multicellular organism?",
+      "text": "justify the hierarchical structural organisation of organelles, cells, tissues, organs, systems and organisms",
+      "acara_codes": [
+        "ACSBL054"
+      ],
+      "topics": [
+        "specialised-cells",
+        "organelles"
+      ],
+      "paraphrased": false,
+      "source_url": "https://www.nsw.gov.au/sites/default/files/noindex/2025-03/biology-stage-6-syllabus-2017.docx"
+    },
+    {
+      "id": "b17-m2-04",
+      "band": "y11",
+      "syllabus": "Biology Stage 6 (2017)",
+      "outcome": "BIO11-9",
+      "focus_area": "Module 2: Organisation of Living Things",
+      "content_group": "Nutrient and Gas Requirements",
+      "inquiry_question": "What is the difference in nutrient and gas requirements between autotrophs and heterotrophs?",
+      "text": "investigate the structure of autotrophs through the examination of a variety of materials, for example:",
+      "subpoints": [
+        "dissected plant materials",
+        "microscopic structures",
+        "using a range of imaging technologies to determine plant structure"
+      ],
+      "acara_codes": [
+        "ACSBL032",
+        "ACSBL035"
+      ],
+      "topics": [
+        "microscopy",
+        "specialised-cells"
+      ],
+      "paraphrased": false,
+      "source_url": "https://www.nsw.gov.au/sites/default/files/noindex/2025-03/biology-stage-6-syllabus-2017.docx"
+    },
+    {
+      "id": "b17-m2-05",
+      "band": "y11",
+      "syllabus": "Biology Stage 6 (2017)",
+      "outcome": "BIO11-9",
+      "focus_area": "Module 2: Organisation of Living Things",
+      "content_group": "Nutrient and Gas Requirements",
+      "inquiry_question": "What is the difference in nutrient and gas requirements between autotrophs and heterotrophs?",
+      "text": "investigate the function of structures in a plant, including but not limited to:",
+      "subpoints": [
+        "tracing the development and movement of the products of photosynthesis"
+      ],
+      "acara_codes": [
+        "ACSBL059",
+        "ACSBL060"
+      ],
+      "topics": [
+        "photosynthesis",
+        "plant-transport"
+      ],
+      "paraphrased": false,
+      "source_url": "https://www.nsw.gov.au/sites/default/files/noindex/2025-03/biology-stage-6-syllabus-2017.docx"
+    },
+    {
+      "id": "b17-m2-06",
+      "band": "y11",
+      "syllabus": "Biology Stage 6 (2017)",
+      "outcome": "BIO11-9",
+      "focus_area": "Module 2: Organisation of Living Things",
+      "content_group": "Nutrient and Gas Requirements",
+      "inquiry_question": "What is the difference in nutrient and gas requirements between autotrophs and heterotrophs?",
+      "text": "investigate the gas exchange structures in animals and plants through the collection of primary and secondary data and information, for example:",
+      "subpoints": [
+        "microscopic structures: alveoli in mammals and leaf structure in plants",
+        "macroscopic structures: respiratory systems in a range of animals"
+      ],
+      "acara_codes": [
+        "ACSBL032",
+        "ACSBL056"
+      ],
+      "topics": [
+        "gas-exchange",
+        "diffusion",
+        "microscopy"
+      ],
+      "paraphrased": false,
+      "source_url": "https://www.nsw.gov.au/sites/default/files/noindex/2025-03/biology-stage-6-syllabus-2017.docx"
+    },
+    {
+      "id": "b17-m2-07",
+      "band": "y11",
+      "syllabus": "Biology Stage 6 (2017)",
+      "outcome": "BIO11-9",
+      "focus_area": "Module 2: Organisation of Living Things",
+      "content_group": "Nutrient and Gas Requirements",
+      "inquiry_question": "What is the difference in nutrient and gas requirements between autotrophs and heterotrophs?",
+      "text": "interpret a range of secondary-sourced information to evaluate processes, claims and conclusions that have led scientists to develop hypotheses, theories and models about the structure and function of plants, including but not limited to:",
+      "subpoints": [
+        "photosynthesis",
+        "transpiration-cohesion-tension theory"
+      ],
+      "acara_codes": [
+        "ACSBL034"
+      ],
+      "topics": [
+        "photosynthesis",
+        "plant-transport",
+        "osmosis"
+      ],
+      "paraphrased": false,
+      "source_url": "https://www.nsw.gov.au/sites/default/files/noindex/2025-03/biology-stage-6-syllabus-2017.docx"
+    },
+    {
+      "id": "b17-m2-08",
+      "band": "y11",
+      "syllabus": "Biology Stage 6 (2017)",
+      "outcome": "BIO11-9",
+      "focus_area": "Module 2: Organisation of Living Things",
+      "content_group": "Nutrient and Gas Requirements",
+      "inquiry_question": "What is the difference in nutrient and gas requirements between autotrophs and heterotrophs?",
+      "text": "trace the digestion of foods in a mammalian digestive system, including:",
+      "subpoints": [
+        "physical digestion",
+        "chemical digestion",
+        "absorption of nutrients, minerals and water",
+        "elimination of solid waste"
+      ],
+      "topics": [
+        "enzymes",
+        "diffusion",
+        "active-transport"
+      ],
+      "paraphrased": false,
+      "source_url": "https://www.nsw.gov.au/sites/default/files/noindex/2025-03/biology-stage-6-syllabus-2017.docx"
+    },
+    {
+      "id": "b17-m2-09",
+      "band": "y11",
+      "syllabus": "Biology Stage 6 (2017)",
+      "outcome": "BIO11-9",
+      "focus_area": "Module 2: Organisation of Living Things",
+      "content_group": "Nutrient and Gas Requirements",
+      "inquiry_question": "What is the difference in nutrient and gas requirements between autotrophs and heterotrophs?",
+      "text": "compare the nutrient and gas requirements of autotrophs and heterotrophs",
+      "topics": [
+        "photosynthesis",
+        "respiration",
+        "gas-exchange"
+      ],
+      "paraphrased": false,
+      "source_url": "https://www.nsw.gov.au/sites/default/files/noindex/2025-03/biology-stage-6-syllabus-2017.docx"
+    },
+    {
+      "id": "b17-m2-10",
+      "band": "y11",
+      "syllabus": "Biology Stage 6 (2017)",
+      "outcome": "BIO11-9",
+      "focus_area": "Module 2: Organisation of Living Things",
+      "content_group": "Transport",
+      "inquiry_question": "How does the composition of the transport medium change as it moves around an organism?",
+      "text": "investigate transport systems in animals and plants by comparing structures and components using physical and digital models, including but not limited to:",
+      "subpoints": [
+        "macroscopic structures in plants and animals",
+        "microscopic samples of blood, the cardiovascular system and plant vascular systems"
+      ],
+      "acara_codes": [
+        "ACSBL032",
+        "ACSBL058",
+        "ACSBL059",
+        "ACSBL060"
+      ],
+      "topics": [
+        "blood-transport",
+        "plant-transport",
+        "microscopy"
+      ],
+      "paraphrased": false,
+      "source_url": "https://www.nsw.gov.au/sites/default/files/noindex/2025-03/biology-stage-6-syllabus-2017.docx"
+    },
+    {
+      "id": "b17-m2-11",
+      "band": "y11",
+      "syllabus": "Biology Stage 6 (2017)",
+      "outcome": "BIO11-9",
+      "focus_area": "Module 2: Organisation of Living Things",
+      "content_group": "Transport",
+      "inquiry_question": "How does the composition of the transport medium change as it moves around an organism?",
+      "text": "investigate the exchange of gases between the internal and external environments of plants and animals",
+      "topics": [
+        "gas-exchange",
+        "diffusion"
+      ],
+      "paraphrased": false,
+      "source_url": "https://www.nsw.gov.au/sites/default/files/noindex/2025-03/biology-stage-6-syllabus-2017.docx"
+    },
+    {
+      "id": "b17-m2-12",
+      "band": "y11",
+      "syllabus": "Biology Stage 6 (2017)",
+      "outcome": "BIO11-9",
+      "focus_area": "Module 2: Organisation of Living Things",
+      "content_group": "Transport",
+      "inquiry_question": "How does the composition of the transport medium change as it moves around an organism?",
+      "text": "compare the structures and function of transport systems in animals and plants, including but not limited to:",
+      "subpoints": [
+        "vascular systems in plants and animals",
+        "open and closed transport systems in animals"
+      ],
+      "acara_codes": [
+        "ACSBL033"
+      ],
+      "topics": [
+        "blood-transport",
+        "plant-transport"
+      ],
+      "paraphrased": false,
+      "source_url": "https://www.nsw.gov.au/sites/default/files/noindex/2025-03/biology-stage-6-syllabus-2017.docx"
+    },
+    {
+      "id": "b17-m2-13",
+      "band": "y11",
+      "syllabus": "Biology Stage 6 (2017)",
+      "outcome": "BIO11-9",
+      "focus_area": "Module 2: Organisation of Living Things",
+      "content_group": "Transport",
+      "inquiry_question": "How does the composition of the transport medium change as it moves around an organism?",
+      "text": "compare the changes in the composition of the transport medium as it moves around an organism",
+      "topics": [
+        "blood-transport",
+        "gas-exchange"
+      ],
+      "paraphrased": false,
+      "source_url": "https://www.nsw.gov.au/sites/default/files/noindex/2025-03/biology-stage-6-syllabus-2017.docx"
+    },
+    {
+      "id": "b17-m3-01",
+      "band": "y11",
+      "syllabus": "Biology Stage 6 (2017)",
+      "outcome": "BIO11-10",
+      "focus_area": "Module 3: Biological Diversity",
+      "content_group": "Evolution – the Evidence",
+      "inquiry_question": "What is the evidence that supports the Theory of Evolution by Natural Selection?",
+      "text": "investigate, using secondary sources, evidence in support of Darwin and Wallace’s Theory of Evolution by Natural Selection, including but not limited to:",
+      "subpoints": [
+        "biochemical evidence, comparative anatomy, comparative embryology and biogeography",
+        "techniques used to date fossils and the evidence produced"
+      ],
+      "acara_codes": [
+        "ACSBL089"
+      ],
+      "topics": [
+        "evolution",
+        "dna-structure"
+      ],
+      "paraphrased": false,
+      "source_url": "https://www.nsw.gov.au/sites/default/files/noindex/2025-03/biology-stage-6-syllabus-2017.docx"
+    },
+    {
+      "id": "b17-m3-02",
+      "band": "y11",
+      "syllabus": "Biology Stage 6 (2017)",
+      "outcome": "BIO11-10",
+      "focus_area": "Module 3: Biological Diversity",
+      "content_group": "Evolution – the Evidence",
+      "inquiry_question": "What is the evidence that supports the Theory of Evolution by Natural Selection?",
+      "text": "explain modern-day examples that demonstrate evolutionary change, for example:",
+      "subpoints": [
+        "the cane toad",
+        "antibiotic-resistant strains of bacteria"
+      ],
+      "topics": [
+        "evolution",
+        "mutation"
+      ],
+      "paraphrased": false,
+      "source_url": "https://www.nsw.gov.au/sites/default/files/noindex/2025-03/biology-stage-6-syllabus-2017.docx"
+    },
+    {
+      "id": "b17-m5-01",
+      "band": "y12",
+      "syllabus": "Biology Stage 6 (2017)",
+      "outcome": "BIO12-12",
+      "focus_area": "Module 5: Heredity",
+      "content_group": "Reproduction",
+      "inquiry_question": "How does reproduction ensure the continuity of a species?",
+      "text": "explain the mechanisms of reproduction that ensure the continuity of a species, by analysing sexual and asexual methods of reproduction in a variety of organisms, including but not limited to:",
+      "subpoints": [
+        "animals: advantages of external and internal fertilisation",
+        "plants: asexual and sexual reproduction",
+        "fungi: budding, spores",
+        "bacteria: binary fission",
+        "protists: binary fission, budding"
+      ],
+      "acara_codes": [
+        "ACSBL075"
+      ],
+      "topics": [
+        "cell-cycle",
+        "meiosis",
+        "inheritance"
+      ],
+      "paraphrased": false,
+      "source_url": "https://www.nsw.gov.au/sites/default/files/noindex/2025-03/biology-stage-6-syllabus-2017.docx"
+    },
+    {
+      "id": "b17-m5-02",
+      "band": "y12",
+      "syllabus": "Biology Stage 6 (2017)",
+      "outcome": "BIO12-12",
+      "focus_area": "Module 5: Heredity",
+      "content_group": "Cell Replication",
+      "inquiry_question": "How important is it for genetic material to be replicated exactly?",
+      "text": "model the processes involved in cell replication, including but not limited to:",
+      "subpoints": [
+        "mitosis and meiosis",
+        "DNA replication using the Watson and Crick DNA model, including nucleotide composition, pairing and bonding"
+      ],
+      "acara_codes": [
+        "ACSBL075",
+        "ACSBL076",
+        "ACSBL077"
+      ],
+      "topics": [
+        "cell-cycle",
+        "mitosis",
+        "meiosis",
+        "dna-structure"
+      ],
+      "paraphrased": false,
+      "source_url": "https://www.nsw.gov.au/sites/default/files/noindex/2025-03/biology-stage-6-syllabus-2017.docx"
+    },
+    {
+      "id": "b17-m5-03",
+      "band": "y12",
+      "syllabus": "Biology Stage 6 (2017)",
+      "outcome": "BIO12-12",
+      "focus_area": "Module 5: Heredity",
+      "content_group": "Cell Replication",
+      "inquiry_question": "How important is it for genetic material to be replicated exactly?",
+      "text": "assess the effect of the cell replication processes on the continuity of species",
+      "acara_codes": [
+        "ACSBL084"
+      ],
+      "topics": [
+        "cell-cycle",
+        "mitosis",
+        "meiosis"
+      ],
+      "paraphrased": false,
+      "source_url": "https://www.nsw.gov.au/sites/default/files/noindex/2025-03/biology-stage-6-syllabus-2017.docx"
+    },
+    {
+      "id": "b17-m5-04",
+      "band": "y12",
+      "syllabus": "Biology Stage 6 (2017)",
+      "outcome": "BIO12-12",
+      "focus_area": "Module 5: Heredity",
+      "content_group": "DNA and Polypeptide Synthesis",
+      "inquiry_question": "Why is polypeptide synthesis important?",
+      "text": "construct appropriate representations to model and compare the forms in which DNA exists in eukaryotes and prokaryotes",
+      "acara_codes": [
+        "ACSBL076"
+      ],
+      "topics": [
+        "dna-structure",
+        "prokaryote-eukaryote"
+      ],
+      "paraphrased": false,
+      "source_url": "https://www.nsw.gov.au/sites/default/files/noindex/2025-03/biology-stage-6-syllabus-2017.docx"
+    },
+    {
+      "id": "b17-m5-05",
+      "band": "y12",
+      "syllabus": "Biology Stage 6 (2017)",
+      "outcome": "BIO12-12",
+      "focus_area": "Module 5: Heredity",
+      "content_group": "DNA and Polypeptide Synthesis",
+      "inquiry_question": "Why is polypeptide synthesis important?",
+      "text": "model the process of polypeptide synthesis, including:",
+      "subpoints": [
+        "transcription and translation",
+        "assessing the importance of mRNA and tRNA in transcription and translation",
+        "analysing the function and importance of polypeptide synthesis",
+        "assessing how genes and environment affect phenotypic expression"
+      ],
+      "acara_codes": [
+        "ACSBL079",
+        "ACSBL080",
+        "ACSBL081"
+      ],
+      "topics": [
+        "protein-synthesis",
+        "genes"
+      ],
+      "paraphrased": false,
+      "source_url": "https://www.nsw.gov.au/sites/default/files/noindex/2025-03/biology-stage-6-syllabus-2017.docx"
+    },
+    {
+      "id": "b17-m5-06",
+      "band": "y12",
+      "syllabus": "Biology Stage 6 (2017)",
+      "outcome": "BIO12-12",
+      "focus_area": "Module 5: Heredity",
+      "content_group": "DNA and Polypeptide Synthesis",
+      "inquiry_question": "Why is polypeptide synthesis important?",
+      "text": "investigate the structure and function of proteins in living things",
+      "topics": [
+        "protein-folding"
+      ],
+      "paraphrased": false,
+      "source_url": "https://www.nsw.gov.au/sites/default/files/noindex/2025-03/biology-stage-6-syllabus-2017.docx"
+    },
+    {
+      "id": "b17-m5-07",
+      "band": "y12",
+      "syllabus": "Biology Stage 6 (2017)",
+      "outcome": "BIO12-12",
+      "focus_area": "Module 5: Heredity",
+      "content_group": "Genetic Variation",
+      "inquiry_question": "How can the genetic similarities and differences within and between species be compared?",
+      "text": "conduct practical investigations to predict variations in the genotype of offspring by modelling meiosis, including the crossing over of homologous chromosomes, fertilisation and mutations",
+      "acara_codes": [
+        "ACSBL084"
+      ],
+      "topics": [
+        "meiosis",
+        "inheritance",
+        "mutation"
+      ],
+      "paraphrased": false,
+      "source_url": "https://www.nsw.gov.au/sites/default/files/noindex/2025-03/biology-stage-6-syllabus-2017.docx"
+    },
+    {
+      "id": "b17-m5-08",
+      "band": "y12",
+      "syllabus": "Biology Stage 6 (2017)",
+      "outcome": "BIO12-12",
+      "focus_area": "Module 5: Heredity",
+      "content_group": "Genetic Variation",
+      "inquiry_question": "How can the genetic similarities and differences within and between species be compared?",
+      "text": "model the formation of new combinations of genotypes produced during meiosis, including but not limited to:",
+      "subpoints": [
+        "interpreting examples of autosomal, sex-linkage, co-dominance, incomplete dominance and multiple alleles",
+        "constructing and interpreting information and data from pedigrees and Punnett squares"
+      ],
+      "acara_codes": [
+        "ACSBL085"
+      ],
+      "topics": [
+        "meiosis",
+        "inheritance",
+        "genes"
+      ],
+      "paraphrased": false,
+      "source_url": "https://www.nsw.gov.au/sites/default/files/noindex/2025-03/biology-stage-6-syllabus-2017.docx"
+    },
+    {
+      "id": "b17-m5-09",
+      "band": "y12",
+      "syllabus": "Biology Stage 6 (2017)",
+      "outcome": "BIO12-12",
+      "focus_area": "Module 5: Heredity",
+      "content_group": "Genetic Variation",
+      "inquiry_question": "How can the genetic similarities and differences within and between species be compared?",
+      "text": "collect, record and present data to represent frequencies of characteristics in a population, in order to identify trends, patterns, relationships and limitations in data, for example:",
+      "subpoints": [
+        "examining frequency data",
+        "analysing single nucleotide polymorphism (SNP)"
+      ],
+      "topics": [
+        "inheritance",
+        "mutation",
+        "genes"
+      ],
+      "paraphrased": false,
+      "source_url": "https://www.nsw.gov.au/sites/default/files/noindex/2025-03/biology-stage-6-syllabus-2017.docx"
+    },
+    {
+      "id": "b17-m5-10",
+      "band": "y12",
+      "syllabus": "Biology Stage 6 (2017)",
+      "outcome": "BIO12-12",
+      "focus_area": "Module 5: Heredity",
+      "content_group": "Inheritance Patterns in a Population",
+      "inquiry_question": "Can population genetic patterns be predicted with any accuracy?",
+      "text": "investigate the use of technologies to determine inheritance patterns in a population using, for example:",
+      "subpoints": [
+        "DNA sequencing and profiling"
+      ],
+      "acara_codes": [
+        "ACSBL064",
+        "ACSBL085",
+        "ACSBL086"
+      ],
+      "topics": [
+        "biotechnology",
+        "dna-structure",
+        "inheritance"
+      ],
+      "paraphrased": false,
+      "source_url": "https://www.nsw.gov.au/sites/default/files/noindex/2025-03/biology-stage-6-syllabus-2017.docx"
+    },
+    {
+      "id": "b17-m5-11",
+      "band": "y12",
+      "syllabus": "Biology Stage 6 (2017)",
+      "outcome": "BIO12-12",
+      "focus_area": "Module 5: Heredity",
+      "content_group": "Inheritance Patterns in a Population",
+      "inquiry_question": "Can population genetic patterns be predicted with any accuracy?",
+      "text": "investigate the use of data analysis from a large-scale collaborative project to identify trends, patterns and relationships, for example:",
+      "subpoints": [
+        "the use of population genetics data in conservation management",
+        "population genetics studies used to determine the inheritance of a disease or disorder",
+        "population genetics relating to human evolution"
+      ],
+      "acara_codes": [
+        "ACSBL064",
+        "ACSBL073"
+      ],
+      "topics": [
+        "inheritance",
+        "genes"
+      ],
+      "paraphrased": false,
+      "source_url": "https://www.nsw.gov.au/sites/default/files/noindex/2025-03/biology-stage-6-syllabus-2017.docx"
+    },
+    {
+      "id": "b17-m6-01",
+      "band": "y12",
+      "syllabus": "Biology Stage 6 (2017)",
+      "outcome": "BIO12-13",
+      "focus_area": "Module 6: Genetic Change",
+      "content_group": "Mutation",
+      "inquiry_question": "How does mutation introduce new alleles into a population?",
+      "text": "explain how a range of mutagens operate, including but not limited to:",
+      "subpoints": [
+        "electromagnetic radiation sources",
+        "chemicals",
+        "naturally occurring mutagens"
+      ],
+      "topics": [
+        "mutation"
+      ],
+      "paraphrased": false,
+      "source_url": "https://www.nsw.gov.au/sites/default/files/noindex/2025-03/biology-stage-6-syllabus-2017.docx"
+    },
+    {
+      "id": "b17-m6-02",
+      "band": "y12",
+      "syllabus": "Biology Stage 6 (2017)",
+      "outcome": "BIO12-13",
+      "focus_area": "Module 6: Genetic Change",
+      "content_group": "Mutation",
+      "inquiry_question": "How does mutation introduce new alleles into a population?",
+      "text": "compare the causes, processes and effects of different types of mutation, including but not limited to:",
+      "subpoints": [
+        "point mutation",
+        "chromosomal mutation"
+      ],
+      "topics": [
+        "mutation"
+      ],
+      "paraphrased": false,
+      "source_url": "https://www.nsw.gov.au/sites/default/files/noindex/2025-03/biology-stage-6-syllabus-2017.docx"
+    },
+    {
+      "id": "b17-m6-03",
+      "band": "y12",
+      "syllabus": "Biology Stage 6 (2017)",
+      "outcome": "BIO12-13",
+      "focus_area": "Module 6: Genetic Change",
+      "content_group": "Mutation",
+      "inquiry_question": "How does mutation introduce new alleles into a population?",
+      "text": "distinguish between somatic mutations and germ-line mutations and their effect on an organism",
+      "acara_codes": [
+        "ACSBL082",
+        "ACSBL083"
+      ],
+      "topics": [
+        "mutation"
+      ],
+      "paraphrased": false,
+      "source_url": "https://www.nsw.gov.au/sites/default/files/noindex/2025-03/biology-stage-6-syllabus-2017.docx"
+    },
+    {
+      "id": "b17-m6-04",
+      "band": "y12",
+      "syllabus": "Biology Stage 6 (2017)",
+      "outcome": "BIO12-13",
+      "focus_area": "Module 6: Genetic Change",
+      "content_group": "Mutation",
+      "inquiry_question": "How does mutation introduce new alleles into a population?",
+      "text": "assess the significance of ‘coding’ and ‘non-coding’ DNA segments in the process of mutation",
+      "acara_codes": [
+        "ACSBL078"
+      ],
+      "topics": [
+        "mutation",
+        "genes",
+        "protein-synthesis"
+      ],
+      "paraphrased": false,
+      "source_url": "https://www.nsw.gov.au/sites/default/files/noindex/2025-03/biology-stage-6-syllabus-2017.docx"
+    },
+    {
+      "id": "b17-m6-05",
+      "band": "y12",
+      "syllabus": "Biology Stage 6 (2017)",
+      "outcome": "BIO12-13",
+      "focus_area": "Module 6: Genetic Change",
+      "content_group": "Mutation",
+      "inquiry_question": "How does mutation introduce new alleles into a population?",
+      "text": "investigate the causes of genetic variation relating to the processes of fertilisation, meiosis and mutation",
+      "acara_codes": [
+        "ACSBL078"
+      ],
+      "topics": [
+        "meiosis",
+        "mutation",
+        "inheritance"
+      ],
+      "paraphrased": false,
+      "source_url": "https://www.nsw.gov.au/sites/default/files/noindex/2025-03/biology-stage-6-syllabus-2017.docx"
+    },
+    {
+      "id": "b17-m6-06",
+      "band": "y12",
+      "syllabus": "Biology Stage 6 (2017)",
+      "outcome": "BIO12-13",
+      "focus_area": "Module 6: Genetic Change",
+      "content_group": "Mutation",
+      "inquiry_question": "How does mutation introduce new alleles into a population?",
+      "text": "evaluate the effect of mutation, gene flow and genetic drift on the gene pool of populations",
+      "acara_codes": [
+        "ACSBL091",
+        "ACSBL092"
+      ],
+      "topics": [
+        "mutation",
+        "evolution"
+      ],
+      "paraphrased": false,
+      "source_url": "https://www.nsw.gov.au/sites/default/files/noindex/2025-03/biology-stage-6-syllabus-2017.docx"
+    },
+    {
+      "id": "b17-m6-07",
+      "band": "y12",
+      "syllabus": "Biology Stage 6 (2017)",
+      "outcome": "BIO12-13",
+      "focus_area": "Module 6: Genetic Change",
+      "content_group": "Biotechnology",
+      "inquiry_question": "How do genetic techniques affect Earth’s biodiversity?",
+      "text": "investigate the uses and applications of biotechnology (past, present and future), including:",
+      "subpoints": [
+        "analysing the social implications and ethical uses of biotechnology, including plant and animal examples",
+        "researching future directions of the use of biotechnology",
+        "evaluating the potential benefits for society of research using genetic technologies",
+        "evaluating the changes to the Earth’s biodiversity due to genetic techniques"
+      ],
+      "acara_codes": [
+        "ACSBL087"
+      ],
+      "topics": [
+        "biotechnology"
+      ],
+      "paraphrased": false,
+      "source_url": "https://www.nsw.gov.au/sites/default/files/noindex/2025-03/biology-stage-6-syllabus-2017.docx"
+    },
+    {
+      "id": "b17-m6-08",
+      "band": "y12",
+      "syllabus": "Biology Stage 6 (2017)",
+      "outcome": "BIO12-13",
+      "focus_area": "Module 6: Genetic Change",
+      "content_group": "Genetic Technologies",
+      "inquiry_question": "Does artificial manipulation of DNA have the potential to change populations forever?",
+      "text": "investigate the uses and advantages of current genetic technologies that induce genetic change",
+      "topics": [
+        "biotechnology"
+      ],
+      "paraphrased": false,
+      "source_url": "https://www.nsw.gov.au/sites/default/files/noindex/2025-03/biology-stage-6-syllabus-2017.docx"
+    },
+    {
+      "id": "b17-m6-09",
+      "band": "y12",
+      "syllabus": "Biology Stage 6 (2017)",
+      "outcome": "BIO12-13",
+      "focus_area": "Module 6: Genetic Change",
+      "content_group": "Genetic Technologies",
+      "inquiry_question": "Does artificial manipulation of DNA have the potential to change populations forever?",
+      "text": "investigate and assess the effectiveness of cloning, including but not limited to:",
+      "subpoints": [
+        "whole organism cloning",
+        "gene cloning"
+      ],
+      "topics": [
+        "biotechnology",
+        "dna-structure"
+      ],
+      "paraphrased": false,
+      "source_url": "https://www.nsw.gov.au/sites/default/files/noindex/2025-03/biology-stage-6-syllabus-2017.docx"
+    },
+    {
+      "id": "b17-m6-10",
+      "band": "y12",
+      "syllabus": "Biology Stage 6 (2017)",
+      "outcome": "BIO12-13",
+      "focus_area": "Module 6: Genetic Change",
+      "content_group": "Genetic Technologies",
+      "inquiry_question": "Does artificial manipulation of DNA have the potential to change populations forever?",
+      "text": "describe techniques and applications used in recombinant DNA technology, for example:",
+      "subpoints": [
+        "the development of transgenic organisms in agricultural and medical applications"
+      ],
+      "acara_codes": [
+        "ACSBL087"
+      ],
+      "topics": [
+        "biotechnology",
+        "genes"
+      ],
+      "paraphrased": false,
+      "source_url": "https://www.nsw.gov.au/sites/default/files/noindex/2025-03/biology-stage-6-syllabus-2017.docx"
+    },
+    {
+      "id": "b17-m6-11",
+      "band": "y12",
+      "syllabus": "Biology Stage 6 (2017)",
+      "outcome": "BIO12-13",
+      "focus_area": "Module 6: Genetic Change",
+      "content_group": "Genetic Technologies",
+      "inquiry_question": "Does artificial manipulation of DNA have the potential to change populations forever?",
+      "text": "evaluate the benefits of using genetic technologies in agricultural, medical and industrial applications",
+      "acara_codes": [
+        "ACSBL086"
+      ],
+      "topics": [
+        "biotechnology"
+      ],
+      "paraphrased": false,
+      "source_url": "https://www.nsw.gov.au/sites/default/files/noindex/2025-03/biology-stage-6-syllabus-2017.docx"
+    },
+    {
+      "id": "b17-m7-01",
+      "band": "y12",
+      "syllabus": "Biology Stage 6 (2017)",
+      "outcome": "BIO12-14",
+      "focus_area": "Module 7: Infectious Disease",
+      "content_group": "Responses to Pathogens",
+      "inquiry_question": "How does a plant or animal respond to infection?",
+      "text": "analyse responses to the presence of pathogens by assessing the physical and chemical changes that occur in the host animals cells and tissues",
+      "acara_codes": [
+        "ACSBL119",
+        "ACSBL120",
+        "ACSBL121",
+        "ACSBL122"
+      ],
+      "topics": [
+        "immunity"
+      ],
+      "paraphrased": false,
+      "source_url": "https://www.nsw.gov.au/sites/default/files/noindex/2025-03/biology-stage-6-syllabus-2017.docx"
+    },
+    {
+      "id": "b17-m7-02",
+      "band": "y12",
+      "syllabus": "Biology Stage 6 (2017)",
+      "outcome": "BIO12-14",
+      "focus_area": "Module 7: Infectious Disease",
+      "content_group": "Immunity",
+      "inquiry_question": "How does the human immune system respond to exposure to a pathogen?",
+      "text": "investigate and model the innate and adaptive immune systems in the human body",
+      "acara_codes": [
+        "ACSBL119"
+      ],
+      "topics": [
+        "immunity"
+      ],
+      "paraphrased": false,
+      "source_url": "https://www.nsw.gov.au/sites/default/files/noindex/2025-03/biology-stage-6-syllabus-2017.docx"
+    },
+    {
+      "id": "b17-m7-03",
+      "band": "y12",
+      "syllabus": "Biology Stage 6 (2017)",
+      "outcome": "BIO12-14",
+      "focus_area": "Module 7: Infectious Disease",
+      "content_group": "Immunity",
+      "inquiry_question": "How does the human immune system respond to exposure to a pathogen?",
+      "text": "explain how the immune system responds after primary exposure to a pathogen, including innate and acquired immunity",
+      "topics": [
+        "immunity"
+      ],
+      "paraphrased": false,
+      "source_url": "https://www.nsw.gov.au/sites/default/files/noindex/2025-03/biology-stage-6-syllabus-2017.docx"
+    },
+    {
+      "id": "b17-m8-01",
+      "band": "y12",
+      "syllabus": "Biology Stage 6 (2017)",
+      "outcome": "BIO12-15",
+      "focus_area": "Module 8: Non-infectious Disease and Disorders",
+      "content_group": "Causes and Effects",
+      "inquiry_question": "Do non-infectious diseases cause more deaths than infectious diseases?",
+      "text": "investigate the causes and effects of non-infectious diseases in humans, including but not limited to:",
+      "subpoints": [
+        "genetic diseases",
+        "diseases caused by environmental exposure",
+        "nutritional diseases",
+        "cancer"
+      ],
+      "topics": [
+        "mutation",
+        "cell-cycle"
+      ],
+      "paraphrased": false,
+      "source_url": "https://www.nsw.gov.au/sites/default/files/noindex/2025-03/biology-stage-6-syllabus-2017.docx"
+    },
+    {
+      "id": "b25-y11-cells-01",
+      "band": "y11",
+      "syllabus": "Biology 11–12 (2025)",
+      "outcome": "BI-11-01",
+      "focus_area": "Cells as the basis of life",
+      "content_group": "Cell structures and functions",
+      "text": "Use a variety of sources to compare the cellular structures of eukaryotic and prokaryotic cells",
+      "topics": [
+        "prokaryote-eukaryote",
+        "cell-structure"
+      ],
+      "paraphrased": false,
+      "source_url": "https://curriculum.nsw.edu.au/learning-areas/science/biology-11-12-2025/content/year-11/fa0edb304c"
+    },
+    {
+      "id": "b25-y11-cells-02",
+      "band": "y11",
+      "syllabus": "Biology 11–12 (2025)",
+      "outcome": "BI-11-01",
+      "focus_area": "Cells as the basis of life",
+      "content_group": "Cell structures and functions",
+      "text": "Conduct a practical investigation to prepare a wet mount slide and identify the cytoplasm, cell wall and nucleus under a light microscope",
+      "topics": [
+        "microscopy",
+        "cell-structure"
+      ],
+      "paraphrased": false,
+      "source_url": "https://curriculum.nsw.edu.au/learning-areas/science/biology-11-12-2025/content/year-11/fa0edb304c"
+    },
+    {
+      "id": "b25-y11-cells-03",
+      "band": "y11",
+      "syllabus": "Biology 11–12 (2025)",
+      "outcome": "BI-11-01",
+      "focus_area": "Cells as the basis of life",
+      "content_group": "Cell structures and functions",
+      "text": "Describe the structure and function of the capsule, cell wall, cell membrane, cytoplasm, nucleoid, plasmid, ribosomes, flagella and pili in prokaryotic cells",
+      "topics": [
+        "prokaryote-eukaryote",
+        "cell-structure",
+        "organelles"
+      ],
+      "paraphrased": false,
+      "source_url": "https://curriculum.nsw.edu.au/learning-areas/science/biology-11-12-2025/content/year-11/fa0edb304c"
+    },
+    {
+      "id": "b25-y11-cells-04",
+      "band": "y11",
+      "syllabus": "Biology 11–12 (2025)",
+      "outcome": "BI-11-01",
+      "focus_area": "Cells as the basis of life",
+      "content_group": "Cell structures and functions",
+      "text": "Contrast the cell structure and organelles of plant and animal cells based on the function of the cell",
+      "topics": [
+        "cell-structure",
+        "organelles"
+      ],
+      "paraphrased": false,
+      "source_url": "https://curriculum.nsw.edu.au/learning-areas/science/biology-11-12-2025/content/year-11/fa0edb304c"
+    },
+    {
+      "id": "b25-y11-cells-05",
+      "band": "y11",
+      "syllabus": "Biology 11–12 (2025)",
+      "outcome": "BI-11-01",
+      "focus_area": "Cells as the basis of life",
+      "content_group": "Cell structures and functions",
+      "text": "Describe the structure and function of the cell wall, cell membrane, cytoplasm, nucleus, mitochondria, chloroplast, endoplasmic reticulum, Golgi body, ribosomes, lysosomes and vacuoles in eukaryotic cells",
+      "topics": [
+        "organelles",
+        "cell-structure",
+        "membrane"
+      ],
+      "paraphrased": false,
+      "source_url": "https://curriculum.nsw.edu.au/learning-areas/science/biology-11-12-2025/content/year-11/fa0edb304c"
+    },
+    {
+      "id": "b25-y11-cells-06",
+      "band": "y11",
+      "syllabus": "Biology 11–12 (2025)",
+      "outcome": "BI-11-01",
+      "focus_area": "Cells as the basis of life",
+      "content_group": "Cell structures and functions",
+      "text": "Conduct a practical investigation to calculate the size of a variety of specialised cells under the microscope using a mini-grid and the equation Cell size = diameter of field of view / number of cells across the field of view",
+      "topics": [
+        "microscopy",
+        "specialised-cells"
+      ],
+      "paraphrased": false,
+      "source_url": "https://curriculum.nsw.edu.au/learning-areas/science/biology-11-12-2025/content/year-11/fa0edb304c",
+      "note": "Wording exact; equation was MathML on the source page and is rendered here as plain text."
+    },
+    {
+      "id": "b25-y11-cells-07",
+      "band": "y11",
+      "syllabus": "Biology 11–12 (2025)",
+      "outcome": "BI-11-01",
+      "focus_area": "Cells as the basis of life",
+      "content_group": "Cell structures and functions",
+      "text": "Assess the impact of technological developments in microscopy on scientific understanding of cell structure and function",
+      "topics": [
+        "microscopy"
+      ],
+      "paraphrased": false,
+      "source_url": "https://curriculum.nsw.edu.au/learning-areas/science/biology-11-12-2025/content/year-11/fa0edb304c"
+    },
+    {
+      "id": "b25-y11-cells-08",
+      "band": "y11",
+      "syllabus": "Biology 11–12 (2025)",
+      "outcome": "BI-11-01",
+      "focus_area": "Cells as the basis of life",
+      "content_group": "Cells and their environments",
+      "text": "Use the fluid mosaic model of the cell membrane to explain the structure and function of protein channels, phospholipids, peripheral proteins, integral proteins, cholesterol and glycoproteins",
+      "topics": [
+        "membrane"
+      ],
+      "paraphrased": false,
+      "source_url": "https://curriculum.nsw.edu.au/learning-areas/science/biology-11-12-2025/content/year-11/fa0edb304c"
+    },
+    {
+      "id": "b25-y11-cells-09",
+      "band": "y11",
+      "syllabus": "Biology 11–12 (2025)",
+      "outcome": "BI-11-01",
+      "focus_area": "Cells as the basis of life",
+      "content_group": "Cells and their environments",
+      "text": "Explain the processes of simple diffusion, osmosis and facilitated diffusion",
+      "topics": [
+        "diffusion",
+        "osmosis",
+        "membrane"
+      ],
+      "paraphrased": false,
+      "source_url": "https://curriculum.nsw.edu.au/learning-areas/science/biology-11-12-2025/content/year-11/fa0edb304c"
+    },
+    {
+      "id": "b25-y11-cells-10",
+      "band": "y11",
+      "syllabus": "Biology 11–12 (2025)",
+      "outcome": "BI-11-01",
+      "focus_area": "Cells as the basis of life",
+      "content_group": "Cells and their environments",
+      "text": "Conduct practical investigations to demonstrate the processes of diffusion and osmosis",
+      "topics": [
+        "diffusion",
+        "osmosis"
+      ],
+      "paraphrased": false,
+      "source_url": "https://curriculum.nsw.edu.au/learning-areas/science/biology-11-12-2025/content/year-11/fa0edb304c"
+    },
+    {
+      "id": "b25-y11-cells-11",
+      "band": "y11",
+      "syllabus": "Biology 11–12 (2025)",
+      "outcome": "BI-11-01",
+      "focus_area": "Cells as the basis of life",
+      "content_group": "Cells and their environments",
+      "text": "Predict the effects of hypertonic, hypotonic and isotonic solutions on animal and plant cells",
+      "topics": [
+        "osmosis"
+      ],
+      "paraphrased": false,
+      "source_url": "https://curriculum.nsw.edu.au/learning-areas/science/biology-11-12-2025/content/year-11/fa0edb304c"
+    },
+    {
+      "id": "b25-y11-cells-12",
+      "band": "y11",
+      "syllabus": "Biology 11–12 (2025)",
+      "outcome": "BI-11-01",
+      "focus_area": "Cells as the basis of life",
+      "content_group": "Cells and their environments",
+      "text": "Explain the processes of active transport, exocytosis and endocytosis",
+      "topics": [
+        "active-transport",
+        "membrane",
+        "atp"
+      ],
+      "paraphrased": false,
+      "source_url": "https://curriculum.nsw.edu.au/learning-areas/science/biology-11-12-2025/content/year-11/fa0edb304c"
+    },
+    {
+      "id": "b25-y11-cells-13",
+      "band": "y11",
+      "syllabus": "Biology 11–12 (2025)",
+      "outcome": "BI-11-01",
+      "focus_area": "Cells as the basis of life",
+      "content_group": "Cells and their environments",
+      "text": "Relate the movement of glucose, oxygen, carbon dioxide, salts and wastes across membranes to concentration gradients and the characteristics of the materials being exchanged",
+      "topics": [
+        "diffusion",
+        "active-transport",
+        "membrane"
+      ],
+      "paraphrased": false,
+      "source_url": "https://curriculum.nsw.edu.au/learning-areas/science/biology-11-12-2025/content/year-11/fa0edb304c"
+    },
+    {
+      "id": "b25-y11-cells-14",
+      "band": "y11",
+      "syllabus": "Biology 11–12 (2025)",
+      "outcome": "BI-11-01",
+      "focus_area": "Cells as the basis of life",
+      "content_group": "Biochemical processes",
+      "text": "Relate carbon dioxide, oxygen, water, ions, amino acids and glucose to cell requirements",
+      "topics": [
+        "respiration",
+        "photosynthesis",
+        "diffusion"
+      ],
+      "paraphrased": false,
+      "source_url": "https://curriculum.nsw.edu.au/learning-areas/science/biology-11-12-2025/content/year-11/fa0edb304c"
+    },
+    {
+      "id": "b25-y11-cells-15",
+      "band": "y11",
+      "syllabus": "Biology 11–12 (2025)",
+      "outcome": "BI-11-01",
+      "focus_area": "Cells as the basis of life",
+      "content_group": "Biochemical processes",
+      "text": "Use the summary equation C6H12O6 + 6O2 → 6CO2 + 6H2O + energy to describe the process of cellular respiration",
+      "topics": [
+        "respiration",
+        "atp"
+      ],
+      "paraphrased": false,
+      "source_url": "https://curriculum.nsw.edu.au/learning-areas/science/biology-11-12-2025/content/year-11/fa0edb304c",
+      "note": "Wording exact; equation was MathML on the source page and is rendered here as plain text."
+    },
+    {
+      "id": "b25-y11-cells-16",
+      "band": "y11",
+      "syllabus": "Biology 11–12 (2025)",
+      "outcome": "BI-11-01",
+      "focus_area": "Cells as the basis of life",
+      "content_group": "Biochemical processes",
+      "text": "Use the summary equation 6CO2 + 6H2O → (light, chlorophyll) C6H12O6 + 6O2 to describe the process of photosynthesis",
+      "topics": [
+        "photosynthesis"
+      ],
+      "paraphrased": false,
+      "source_url": "https://curriculum.nsw.edu.au/learning-areas/science/biology-11-12-2025/content/year-11/fa0edb304c",
+      "note": "Wording exact; equation was MathML on the source page and is rendered here as plain text."
+    },
+    {
+      "id": "b25-y11-cells-17",
+      "band": "y11",
+      "syllabus": "Biology 11–12 (2025)",
+      "outcome": "BI-11-01",
+      "focus_area": "Cells as the basis of life",
+      "content_group": "Biochemical processes",
+      "text": "Explain the role of enzymes in cells",
+      "topics": [
+        "enzymes"
+      ],
+      "paraphrased": false,
+      "source_url": "https://curriculum.nsw.edu.au/learning-areas/science/biology-11-12-2025/content/year-11/fa0edb304c"
+    },
+    {
+      "id": "b25-y11-cells-18",
+      "band": "y11",
+      "syllabus": "Biology 11–12 (2025)",
+      "outcome": "BI-11-01",
+      "focus_area": "Cells as the basis of life",
+      "content_group": "Biochemical processes",
+      "text": "Use diagrams of the induced fit model and the lock and key model to explain the interaction between enzymes and specific substrates",
+      "topics": [
+        "enzymes",
+        "protein-folding"
+      ],
+      "paraphrased": false,
+      "source_url": "https://curriculum.nsw.edu.au/learning-areas/science/biology-11-12-2025/content/year-11/fa0edb304c"
+    },
+    {
+      "id": "b25-y11-cells-19",
+      "band": "y11",
+      "syllabus": "Biology 11–12 (2025)",
+      "outcome": "BI-11-01",
+      "focus_area": "Cells as the basis of life",
+      "content_group": "Biochemical processes",
+      "text": "Plan and conduct laboratory experiments to demonstrate the effect of temperature, pH and substrate concentration on the efficiency of a selected enzyme",
+      "topics": [
+        "enzymes"
+      ],
+      "paraphrased": false,
+      "source_url": "https://curriculum.nsw.edu.au/learning-areas/science/biology-11-12-2025/content/year-11/fa0edb304c"
+    },
+    {
+      "id": "b25-y11-cells-20",
+      "band": "y11",
+      "syllabus": "Biology 11–12 (2025)",
+      "outcome": "BI-11-01",
+      "focus_area": "Cells as the basis of life",
+      "content_group": "Biochemical processes",
+      "text": "Analyse graphs to explain the effect of temperature, pH and substrate concentration on enzyme activity",
+      "topics": [
+        "enzymes"
+      ],
+      "paraphrased": false,
+      "source_url": "https://curriculum.nsw.edu.au/learning-areas/science/biology-11-12-2025/content/year-11/fa0edb304c"
+    },
+    {
+      "id": "b25-y11-cells-21",
+      "band": "y11",
+      "syllabus": "Biology 11–12 (2025)",
+      "outcome": "BI-11-01",
+      "focus_area": "Cells as the basis of life",
+      "content_group": "Cell division",
+      "text": "Use the deoxyribonucleic acid (DNA) double helix model to demonstrate the structure of DNA, including nucleotide composition, complementary base pairing and hydrogen bonding",
+      "topics": [
+        "dna-structure"
+      ],
+      "paraphrased": false,
+      "source_url": "https://curriculum.nsw.edu.au/learning-areas/science/biology-11-12-2025/content/year-11/fa0edb304c"
+    },
+    {
+      "id": "b25-y11-cells-22",
+      "band": "y11",
+      "syllabus": "Biology 11–12 (2025)",
+      "outcome": "BI-11-01",
+      "focus_area": "Cells as the basis of life",
+      "content_group": "Cell division",
+      "text": "Conduct a practical investigation to model the process of DNA replication, demonstrating the role of complementary bases, the replication fork with leading and lagging strands, and the enzymes of helicase, primase, DNA polymerases and ligase",
+      "topics": [
+        "dna-structure",
+        "cell-cycle",
+        "enzymes"
+      ],
+      "paraphrased": false,
+      "source_url": "https://curriculum.nsw.edu.au/learning-areas/science/biology-11-12-2025/content/year-11/fa0edb304c"
+    },
+    {
+      "id": "b25-y11-cells-23",
+      "band": "y11",
+      "syllabus": "Biology 11–12 (2025)",
+      "outcome": "BI-11-01",
+      "focus_area": "Cells as the basis of life",
+      "content_group": "Cell division",
+      "text": "Assess the use of models to demonstrate DNA replication",
+      "topics": [
+        "dna-structure",
+        "cell-cycle"
+      ],
+      "paraphrased": false,
+      "source_url": "https://curriculum.nsw.edu.au/learning-areas/science/biology-11-12-2025/content/year-11/fa0edb304c"
+    },
+    {
+      "id": "b25-y11-cells-24",
+      "band": "y11",
+      "syllabus": "Biology 11–12 (2025)",
+      "outcome": "BI-11-01",
+      "focus_area": "Cells as the basis of life",
+      "content_group": "Cell division",
+      "text": "Construct diagrams to compare the forms in which DNA exists in prokaryotic and eukaryotic cells",
+      "topics": [
+        "dna-structure",
+        "prokaryote-eukaryote"
+      ],
+      "paraphrased": false,
+      "source_url": "https://curriculum.nsw.edu.au/learning-areas/science/biology-11-12-2025/content/year-11/fa0edb304c"
+    },
+    {
+      "id": "b25-y11-cells-25",
+      "band": "y11",
+      "syllabus": "Biology 11–12 (2025)",
+      "outcome": "BI-11-01",
+      "focus_area": "Cells as the basis of life",
+      "content_group": "Cell division",
+      "text": "Compare the structures and roles of somatic and gametic cells",
+      "topics": [
+        "meiosis",
+        "mitosis",
+        "specialised-cells"
+      ],
+      "paraphrased": false,
+      "source_url": "https://curriculum.nsw.edu.au/learning-areas/science/biology-11-12-2025/content/year-11/fa0edb304c"
+    },
+    {
+      "id": "b25-y11-cells-26",
+      "band": "y11",
+      "syllabus": "Biology 11–12 (2025)",
+      "outcome": "BI-11-01",
+      "focus_area": "Cells as the basis of life",
+      "content_group": "Cell division",
+      "text": "Account for the phases of gap 1 (G1), synthesis, gap 2 (G2) and mitosis in the cell cycle",
+      "topics": [
+        "cell-cycle",
+        "mitosis"
+      ],
+      "paraphrased": false,
+      "source_url": "https://curriculum.nsw.edu.au/learning-areas/science/biology-11-12-2025/content/year-11/fa0edb304c"
+    },
+    {
+      "id": "b25-y11-cells-27",
+      "band": "y11",
+      "syllabus": "Biology 11–12 (2025)",
+      "outcome": "BI-11-01",
+      "focus_area": "Cells as the basis of life",
+      "content_group": "Cell division",
+      "text": "Conduct a practical investigation to model the named phases of mitosis and cytokinesis",
+      "topics": [
+        "mitosis",
+        "cell-cycle"
+      ],
+      "paraphrased": false,
+      "source_url": "https://curriculum.nsw.edu.au/learning-areas/science/biology-11-12-2025/content/year-11/fa0edb304c"
+    },
+    {
+      "id": "b25-y11-cells-28",
+      "band": "y11",
+      "syllabus": "Biology 11–12 (2025)",
+      "outcome": "BI-11-01",
+      "focus_area": "Cells as the basis of life",
+      "content_group": "Cell division",
+      "text": "Describe the processes of crossing over, independent assortment and random segregation during meiosis",
+      "topics": [
+        "meiosis",
+        "inheritance"
+      ],
+      "paraphrased": false,
+      "source_url": "https://curriculum.nsw.edu.au/learning-areas/science/biology-11-12-2025/content/year-11/fa0edb304c"
+    },
+    {
+      "id": "b25-y11-cells-29",
+      "band": "y11",
+      "syllabus": "Biology 11–12 (2025)",
+      "outcome": "BI-11-01",
+      "focus_area": "Cells as the basis of life",
+      "content_group": "Cell division",
+      "text": "Conduct a practical investigation to model the named phases of meiosis and cytokinesis",
+      "topics": [
+        "meiosis"
+      ],
+      "paraphrased": false,
+      "source_url": "https://curriculum.nsw.edu.au/learning-areas/science/biology-11-12-2025/content/year-11/fa0edb304c"
+    },
+    {
+      "id": "b25-y11-cells-30",
+      "band": "y11",
+      "syllabus": "Biology 11–12 (2025)",
+      "outcome": "BI-11-01",
+      "focus_area": "Cells as the basis of life",
+      "content_group": "Cell division",
+      "text": "Evaluate the importance of DNA replication, mitosis, meiosis and cytokinesis in cell division",
+      "topics": [
+        "cell-cycle",
+        "mitosis",
+        "meiosis",
+        "dna-structure"
+      ],
+      "paraphrased": false,
+      "source_url": "https://curriculum.nsw.edu.au/learning-areas/science/biology-11-12-2025/content/year-11/fa0edb304c"
+    },
+    {
+      "id": "b25-y11-systems-01",
+      "band": "y11",
+      "syllabus": "Biology 11–12 (2025)",
+      "outcome": "BI-11-02",
+      "focus_area": "Cells to systems",
+      "content_group": "Cell organisation",
+      "text": "Compare the characteristics and structures of cells in unicellular, colonial and multicellular organisms",
+      "topics": [
+        "specialised-cells",
+        "cell-structure"
+      ],
+      "paraphrased": false,
+      "source_url": "https://curriculum.nsw.edu.au/learning-areas/science/biology-11-12-2025/content/year-11/fa79a477bc"
+    },
+    {
+      "id": "b25-y11-systems-02",
+      "band": "y11",
+      "syllabus": "Biology 11–12 (2025)",
+      "outcome": "BI-11-02",
+      "focus_area": "Cells to systems",
+      "content_group": "Cell organisation",
+      "text": "Explain the effect of the surface-area-to-volume ratio on the rate of movement of materials into and out of a cell",
+      "topics": [
+        "diffusion",
+        "membrane"
+      ],
+      "paraphrased": false,
+      "source_url": "https://curriculum.nsw.edu.au/learning-areas/science/biology-11-12-2025/content/year-11/fa79a477bc"
+    },
+    {
+      "id": "b25-y11-systems-03",
+      "band": "y11",
+      "syllabus": "Biology 11–12 (2025)",
+      "outcome": "BI-11-02",
+      "focus_area": "Cells to systems",
+      "content_group": "Cell organisation",
+      "text": "Conduct a laboratory experiment to predict the effect of the surface-area-to-volume ratio on the rate of movement of materials into and out of a cell",
+      "topics": [
+        "diffusion"
+      ],
+      "paraphrased": false,
+      "source_url": "https://curriculum.nsw.edu.au/learning-areas/science/biology-11-12-2025/content/year-11/fa79a477bc"
+    },
+    {
+      "id": "b25-y11-systems-04",
+      "band": "y11",
+      "syllabus": "Biology 11–12 (2025)",
+      "outcome": "BI-11-02",
+      "focus_area": "Cells to systems",
+      "content_group": "Cell organisation",
+      "text": "Explain the hierarchical organisation of organelles, cells, tissues, organs and systems in organisms",
+      "topics": [
+        "specialised-cells",
+        "organelles"
+      ],
+      "paraphrased": false,
+      "source_url": "https://curriculum.nsw.edu.au/learning-areas/science/biology-11-12-2025/content/year-11/fa79a477bc"
+    },
+    {
+      "id": "b25-y11-systems-05",
+      "band": "y11",
+      "syllabus": "Biology 11–12 (2025)",
+      "outcome": "BI-11-02",
+      "focus_area": "Cells to systems",
+      "content_group": "Plants as autotrophic organisms",
+      "text": "Describe the nutrient, water and gas requirements of plants for photosynthesis and respiration",
+      "topics": [
+        "photosynthesis",
+        "respiration",
+        "gas-exchange"
+      ],
+      "paraphrased": false,
+      "source_url": "https://curriculum.nsw.edu.au/learning-areas/science/biology-11-12-2025/content/year-11/fa79a477bc"
+    },
+    {
+      "id": "b25-y11-systems-06",
+      "band": "y11",
+      "syllabus": "Biology 11–12 (2025)",
+      "outcome": "BI-11-02",
+      "focus_area": "Cells to systems",
+      "content_group": "Plants as autotrophic organisms",
+      "text": "Discuss the conditions required for photosynthesis",
+      "topics": [
+        "photosynthesis"
+      ],
+      "paraphrased": false,
+      "source_url": "https://curriculum.nsw.edu.au/learning-areas/science/biology-11-12-2025/content/year-11/fa79a477bc"
+    },
+    {
+      "id": "b25-y11-systems-07",
+      "band": "y11",
+      "syllabus": "Biology 11–12 (2025)",
+      "outcome": "BI-11-02",
+      "focus_area": "Cells to systems",
+      "content_group": "Plants as autotrophic organisms",
+      "text": "Conduct a practical investigation to predict how changes in conditions affect photosynthesis",
+      "topics": [
+        "photosynthesis"
+      ],
+      "paraphrased": false,
+      "source_url": "https://curriculum.nsw.edu.au/learning-areas/science/biology-11-12-2025/content/year-11/fa79a477bc"
+    },
+    {
+      "id": "b25-y11-systems-08",
+      "band": "y11",
+      "syllabus": "Biology 11–12 (2025)",
+      "outcome": "BI-11-02",
+      "focus_area": "Cells to systems",
+      "content_group": "Plants as autotrophic organisms",
+      "text": "Use a variety of sources to compare the structures and functions of xylem and phloem in the plant transport system",
+      "topics": [
+        "plant-transport",
+        "specialised-cells"
+      ],
+      "paraphrased": false,
+      "source_url": "https://curriculum.nsw.edu.au/learning-areas/science/biology-11-12-2025/content/year-11/fa79a477bc"
+    },
+    {
+      "id": "b25-y11-systems-09",
+      "band": "y11",
+      "syllabus": "Biology 11–12 (2025)",
+      "outcome": "BI-11-02",
+      "focus_area": "Cells to systems",
+      "content_group": "Plants as autotrophic organisms",
+      "text": "Use the translocation theory to explain the movement of nutrients through phloem tissue",
+      "topics": [
+        "plant-transport",
+        "active-transport"
+      ],
+      "paraphrased": false,
+      "source_url": "https://curriculum.nsw.edu.au/learning-areas/science/biology-11-12-2025/content/year-11/fa79a477bc"
+    },
+    {
+      "id": "b25-y11-systems-10",
+      "band": "y11",
+      "syllabus": "Biology 11–12 (2025)",
+      "outcome": "BI-11-02",
+      "focus_area": "Cells to systems",
+      "content_group": "Plants as autotrophic organisms",
+      "text": "Use the cohesion-tension theory to explain how osmotic pressure, transpiration stream and the cohesion of water molecules control the movement of water and dissolved minerals through the xylem",
+      "topics": [
+        "plant-transport",
+        "osmosis"
+      ],
+      "paraphrased": false,
+      "source_url": "https://curriculum.nsw.edu.au/learning-areas/science/biology-11-12-2025/content/year-11/fa79a477bc"
+    },
+    {
+      "id": "b25-y11-systems-11",
+      "band": "y11",
+      "syllabus": "Biology 11–12 (2025)",
+      "outcome": "BI-11-02",
+      "focus_area": "Cells to systems",
+      "content_group": "Plants as autotrophic organisms",
+      "text": "Explain how light, temperature, wind and humidity affect the rate of transpiration in plants",
+      "topics": [
+        "plant-transport",
+        "diffusion"
+      ],
+      "paraphrased": false,
+      "source_url": "https://curriculum.nsw.edu.au/learning-areas/science/biology-11-12-2025/content/year-11/fa79a477bc"
+    },
+    {
+      "id": "b25-y11-systems-12",
+      "band": "y11",
+      "syllabus": "Biology 11–12 (2025)",
+      "outcome": "BI-11-02",
+      "focus_area": "Cells to systems",
+      "content_group": "Plants as autotrophic organisms",
+      "text": "Conduct a practical investigation to explain the functions of gas exchange, water and nutrient transport in microscopic leaf, stem and root structures",
+      "topics": [
+        "gas-exchange",
+        "plant-transport",
+        "microscopy",
+        "specialised-cells"
+      ],
+      "paraphrased": false,
+      "source_url": "https://curriculum.nsw.edu.au/learning-areas/science/biology-11-12-2025/content/year-11/fa79a477bc"
+    },
+    {
+      "id": "b25-y11-systems-13",
+      "band": "y11",
+      "syllabus": "Biology 11–12 (2025)",
+      "outcome": "BI-11-02",
+      "focus_area": "Cells to systems",
+      "content_group": "Animals as heterotrophic organisms",
+      "text": "Describe the organ systems required for nutrient, water, gas and waste management in animals",
+      "topics": [
+        "gas-exchange",
+        "blood-transport"
+      ],
+      "paraphrased": false,
+      "source_url": "https://curriculum.nsw.edu.au/learning-areas/science/biology-11-12-2025/content/year-11/fa79a477bc"
+    },
+    {
+      "id": "b25-y11-systems-14",
+      "band": "y11",
+      "syllabus": "Biology 11–12 (2025)",
+      "outcome": "BI-11-02",
+      "focus_area": "Cells to systems",
+      "content_group": "Animals as heterotrophic organisms",
+      "text": "Use a variety of sources to describe how the processes of mechanical, physical and chemical digestion, absorption and elimination in the human digestive system enable cellular functions",
+      "topics": [
+        "enzymes",
+        "diffusion",
+        "active-transport"
+      ],
+      "paraphrased": false,
+      "source_url": "https://curriculum.nsw.edu.au/learning-areas/science/biology-11-12-2025/content/year-11/fa79a477bc"
+    },
+    {
+      "id": "b25-y11-systems-15",
+      "band": "y11",
+      "syllabus": "Biology 11–12 (2025)",
+      "outcome": "BI-11-02",
+      "focus_area": "Cells to systems",
+      "content_group": "Animals as heterotrophic organisms",
+      "text": "Account for changes in the concentration of gases, nutrients and wastes in blood as it travels through the lungs, liver, small intestine, large intestine, kidneys and muscles organs in mammals",
+      "topics": [
+        "blood-transport",
+        "gas-exchange",
+        "diffusion"
+      ],
+      "paraphrased": false,
+      "source_url": "https://curriculum.nsw.edu.au/learning-areas/science/biology-11-12-2025/content/year-11/fa79a477bc"
+    },
+    {
+      "id": "b25-y11-systems-16",
+      "band": "y11",
+      "syllabus": "Biology 11–12 (2025)",
+      "outcome": "BI-11-02",
+      "focus_area": "Cells to systems",
+      "content_group": "Animals as heterotrophic organisms",
+      "text": "Use models to demonstrate the relationship between the structure and function of arteries, capillaries and veins",
+      "topics": [
+        "blood-transport"
+      ],
+      "paraphrased": false,
+      "source_url": "https://curriculum.nsw.edu.au/learning-areas/science/biology-11-12-2025/content/year-11/fa79a477bc"
+    },
+    {
+      "id": "b25-y11-systems-17",
+      "band": "y11",
+      "syllabus": "Biology 11–12 (2025)",
+      "outcome": "BI-11-02",
+      "focus_area": "Cells to systems",
+      "content_group": "Animals as heterotrophic organisms",
+      "text": "Explain the relationship between the structure of plasma, red blood cells, white blood cells and platelets and their function within blood",
+      "topics": [
+        "blood-transport",
+        "specialised-cells"
+      ],
+      "paraphrased": false,
+      "source_url": "https://curriculum.nsw.edu.au/learning-areas/science/biology-11-12-2025/content/year-11/fa79a477bc"
+    },
+    {
+      "id": "b25-y11-systems-18",
+      "band": "y11",
+      "syllabus": "Biology 11–12 (2025)",
+      "outcome": "BI-11-02",
+      "focus_area": "Cells to systems",
+      "content_group": "Animals as heterotrophic organisms",
+      "text": "Use models to demonstrate how the organisation of alveoli and capillaries in the lungs allows for efficient gas exchange",
+      "topics": [
+        "gas-exchange",
+        "diffusion",
+        "blood-transport"
+      ],
+      "paraphrased": false,
+      "source_url": "https://curriculum.nsw.edu.au/learning-areas/science/biology-11-12-2025/content/year-11/fa79a477bc"
+    },
+    {
+      "id": "b25-y11-systems-19",
+      "band": "y11",
+      "syllabus": "Biology 11–12 (2025)",
+      "outcome": "BI-11-02",
+      "focus_area": "Cells to systems",
+      "content_group": "Animals as heterotrophic organisms",
+      "text": "Explain how glomerular filtration, selective reabsorption and secretion contribute to the removal of waste in nephrons",
+      "topics": [
+        "active-transport",
+        "diffusion",
+        "osmosis"
+      ],
+      "paraphrased": false,
+      "source_url": "https://curriculum.nsw.edu.au/learning-areas/science/biology-11-12-2025/content/year-11/fa79a477bc"
+    },
+    {
+      "id": "b25-y11-systems-20",
+      "band": "y11",
+      "syllabus": "Biology 11–12 (2025)",
+      "outcome": "BI-11-02",
+      "focus_area": "Cells to systems",
+      "content_group": "Animals as heterotrophic organisms",
+      "text": "Use models to explain how the glomerulus, Bowman’s capsule and nephron tubules contribute to filtration and reabsorption for waste removal in the kidney",
+      "topics": [
+        "active-transport",
+        "diffusion",
+        "osmosis"
+      ],
+      "paraphrased": false,
+      "source_url": "https://curriculum.nsw.edu.au/learning-areas/science/biology-11-12-2025/content/year-11/fa79a477bc"
+    },
+    {
+      "id": "b25-y11-systems-21",
+      "band": "y11",
+      "syllabus": "Biology 11–12 (2025)",
+      "outcome": "BI-11-02",
+      "focus_area": "Cells to systems",
+      "content_group": "Animals as heterotrophic organisms",
+      "text": "Conduct a secondary-source investigation to compare the process of renal dialysis to the function of the kidney",
+      "topics": [
+        "diffusion",
+        "osmosis"
+      ],
+      "paraphrased": false,
+      "source_url": "https://curriculum.nsw.edu.au/learning-areas/science/biology-11-12-2025/content/year-11/fa79a477bc"
+    },
+    {
+      "id": "b25-y11-evo-01",
+      "band": "y11",
+      "syllabus": "Biology 11–12 (2025)",
+      "outcome": "BI-11-03",
+      "focus_area": "Evolution and ecosystems",
+      "content_group": "Natural selection",
+      "text": "Discuss the role of genetic variation, inheritance and selective pressures in contributing to the process of evolution by natural selection",
+      "topics": [
+        "evolution",
+        "inheritance",
+        "mutation"
+      ],
+      "paraphrased": false,
+      "source_url": "https://curriculum.nsw.edu.au/learning-areas/science/biology-11-12-2025/content/year-11/fad715a0de"
+    },
+    {
+      "id": "b25-y11-evo-02",
+      "band": "y11",
+      "syllabus": "Biology 11–12 (2025)",
+      "outcome": "BI-11-03",
+      "focus_area": "Evolution and ecosystems",
+      "content_group": "Evolution and adaptations",
+      "text": "Conduct a secondary-source investigation to analyse how human-induced pressures can drive the emergence of antibiotic-resistant strains of bacteria and Dichloro-Diphenyl-Trichloroethane (DDT)-resistant mosquitoes",
+      "topics": [
+        "evolution",
+        "mutation"
+      ],
+      "paraphrased": false,
+      "source_url": "https://curriculum.nsw.edu.au/learning-areas/science/biology-11-12-2025/content/year-11/fad715a0de"
+    },
+    {
+      "id": "b25-y11-evo-03",
+      "band": "y11",
+      "syllabus": "Biology 11–12 (2025)",
+      "outcome": "BI-11-03",
+      "focus_area": "Evolution and ecosystems",
+      "content_group": "Evolution and adaptations",
+      "text": "Conduct a scientific investigation to infer evolutionary relationships between species using DNA and amino acid sequences",
+      "topics": [
+        "evolution",
+        "dna-structure",
+        "protein-synthesis"
+      ],
+      "paraphrased": false,
+      "source_url": "https://curriculum.nsw.edu.au/learning-areas/science/biology-11-12-2025/content/year-11/fad715a0de"
+    },
+    {
+      "id": "b25-y12-hered-01",
+      "band": "y12",
+      "syllabus": "Biology 11–12 (2025)",
+      "outcome": "BI-12-01",
+      "focus_area": "Heredity",
+      "content_group": "Polypeptide synthesis",
+      "text": "Interpret models of the structure and composition of eukaryotic DNA, messenger ribonucleic acid (mRNA) and transfer ribonucleic acid (tRNA)",
+      "topics": [
+        "dna-structure",
+        "protein-synthesis"
+      ],
+      "paraphrased": false,
+      "source_url": "https://curriculum.nsw.edu.au/learning-areas/science/biology-11-12-2025/content/year-12/fab2288036"
+    },
+    {
+      "id": "b25-y12-hered-02",
+      "band": "y12",
+      "syllabus": "Biology 11–12 (2025)",
+      "outcome": "BI-12-01",
+      "focus_area": "Heredity",
+      "content_group": "Polypeptide synthesis",
+      "text": "Conduct a practical investigation to model the process of polypeptide synthesis, demonstrating the role of the template strand, coding strand, uracil, ribonucleic acid (RNA) polymerase, free-floating RNA nucleotides, mRNA, ribosomal ribonucleic acid (rRNA), start codon, stop codon, tRNA, peptide bonds and amino acids",
+      "topics": [
+        "protein-synthesis"
+      ],
+      "paraphrased": false,
+      "source_url": "https://curriculum.nsw.edu.au/learning-areas/science/biology-11-12-2025/content/year-12/fab2288036"
+    },
+    {
+      "id": "b25-y12-hered-03",
+      "band": "y12",
+      "syllabus": "Biology 11–12 (2025)",
+      "outcome": "BI-12-01",
+      "focus_area": "Heredity",
+      "content_group": "Polypeptide synthesis",
+      "text": "Explain the roles of mRNA and tRNA in transcription and translation",
+      "topics": [
+        "protein-synthesis"
+      ],
+      "paraphrased": false,
+      "source_url": "https://curriculum.nsw.edu.au/learning-areas/science/biology-11-12-2025/content/year-12/fab2288036"
+    },
+    {
+      "id": "b25-y12-hered-04",
+      "band": "y12",
+      "syllabus": "Biology 11–12 (2025)",
+      "outcome": "BI-12-01",
+      "focus_area": "Heredity",
+      "content_group": "Polypeptide synthesis",
+      "text": "Explain the role of introns and exons in alternative splicing of mRNA sequences",
+      "topics": [
+        "protein-synthesis",
+        "genes"
+      ],
+      "paraphrased": false,
+      "source_url": "https://curriculum.nsw.edu.au/learning-areas/science/biology-11-12-2025/content/year-12/fab2288036"
+    },
+    {
+      "id": "b25-y12-hered-05",
+      "band": "y12",
+      "syllabus": "Biology 11–12 (2025)",
+      "outcome": "BI-12-01",
+      "focus_area": "Heredity",
+      "content_group": "Polypeptide synthesis",
+      "text": "Solve problems using nitrogenous base pairing rules and codon tables to model the expression of a given exonic DNA coding strand, determining the sequence of the template strand, the mRNA and the amino acid sequence",
+      "topics": [
+        "protein-synthesis",
+        "dna-structure"
+      ],
+      "paraphrased": false,
+      "source_url": "https://curriculum.nsw.edu.au/learning-areas/science/biology-11-12-2025/content/year-12/fab2288036"
+    },
+    {
+      "id": "b25-y12-hered-06",
+      "band": "y12",
+      "syllabus": "Biology 11–12 (2025)",
+      "outcome": "BI-12-01",
+      "focus_area": "Heredity",
+      "content_group": "Polypeptide synthesis",
+      "text": "Use an example to explain the relationship between a protein’s primary, secondary, tertiary and quaternary structure and function",
+      "topics": [
+        "protein-folding"
+      ],
+      "paraphrased": false,
+      "source_url": "https://curriculum.nsw.edu.au/learning-areas/science/biology-11-12-2025/content/year-12/fab2288036"
+    },
+    {
+      "id": "b25-y12-hered-07",
+      "band": "y12",
+      "syllabus": "Biology 11–12 (2025)",
+      "outcome": "BI-12-01",
+      "focus_area": "Heredity",
+      "content_group": "Polypeptide synthesis",
+      "text": "Explain the function of proteins in living things",
+      "topics": [
+        "protein-folding",
+        "enzymes"
+      ],
+      "paraphrased": false,
+      "source_url": "https://curriculum.nsw.edu.au/learning-areas/science/biology-11-12-2025/content/year-12/fab2288036"
+    },
+    {
+      "id": "b25-y12-hered-08",
+      "band": "y12",
+      "syllabus": "Biology 11–12 (2025)",
+      "outcome": "BI-12-01",
+      "focus_area": "Heredity",
+      "content_group": "Polypeptide synthesis",
+      "text": "Explain the role of protein synthesis in the relationship between DNA sequence and phenotype",
+      "topics": [
+        "protein-synthesis",
+        "genes"
+      ],
+      "paraphrased": false,
+      "source_url": "https://curriculum.nsw.edu.au/learning-areas/science/biology-11-12-2025/content/year-12/fab2288036"
+    },
+    {
+      "id": "b25-y12-hered-09",
+      "band": "y12",
+      "syllabus": "Biology 11–12 (2025)",
+      "outcome": "BI-12-01",
+      "focus_area": "Heredity",
+      "content_group": "Polypeptide synthesis",
+      "text": "Assess how environmental factors influence phenotype",
+      "topics": [
+        "genes",
+        "epigenetics"
+      ],
+      "paraphrased": false,
+      "source_url": "https://curriculum.nsw.edu.au/learning-areas/science/biology-11-12-2025/content/year-12/fab2288036"
+    },
+    {
+      "id": "b25-y12-hered-10",
+      "band": "y12",
+      "syllabus": "Biology 11–12 (2025)",
+      "outcome": "BI-12-01",
+      "focus_area": "Heredity",
+      "content_group": "Polypeptide synthesis",
+      "text": "Conduct a scientific investigation to demonstrate the effect of environment on gene expression",
+      "topics": [
+        "genes",
+        "epigenetics"
+      ],
+      "paraphrased": false,
+      "source_url": "https://curriculum.nsw.edu.au/learning-areas/science/biology-11-12-2025/content/year-12/fab2288036"
+    },
+    {
+      "id": "b25-y12-hered-11",
+      "band": "y12",
+      "syllabus": "Biology 11–12 (2025)",
+      "outcome": "BI-12-01",
+      "focus_area": "Heredity",
+      "content_group": "Polypeptide synthesis",
+      "text": "Discuss the role of regulatory RNA in gene expression and its potential biotechnological application",
+      "topics": [
+        "genes",
+        "protein-synthesis",
+        "biotechnology"
+      ],
+      "paraphrased": false,
+      "source_url": "https://curriculum.nsw.edu.au/learning-areas/science/biology-11-12-2025/content/year-12/fab2288036"
+    },
+    {
+      "id": "b25-y12-hered-12",
+      "band": "y12",
+      "syllabus": "Biology 11–12 (2025)",
+      "outcome": "BI-12-01",
+      "focus_area": "Heredity",
+      "content_group": "Polypeptide synthesis",
+      "text": "Assess how epigenetic changes influence phenotype",
+      "topics": [
+        "epigenetics"
+      ],
+      "paraphrased": false,
+      "source_url": "https://curriculum.nsw.edu.au/learning-areas/science/biology-11-12-2025/content/year-12/fab2288036"
+    },
+    {
+      "id": "b25-y12-hered-13",
+      "band": "y12",
+      "syllabus": "Biology 11–12 (2025)",
+      "outcome": "BI-12-01",
+      "focus_area": "Heredity",
+      "content_group": "Polypeptide synthesis",
+      "text": "Evaluate the importance of polypeptide synthesis in living things",
+      "topics": [
+        "protein-synthesis"
+      ],
+      "paraphrased": false,
+      "source_url": "https://curriculum.nsw.edu.au/learning-areas/science/biology-11-12-2025/content/year-12/fab2288036"
+    },
+    {
+      "id": "b25-y12-hered-14",
+      "band": "y12",
+      "syllabus": "Biology 11–12 (2025)",
+      "outcome": "BI-12-01",
+      "focus_area": "Heredity",
+      "content_group": "Inheritance patterns",
+      "text": "Distinguish between alleles, genes and genotypes",
+      "topics": [
+        "genes",
+        "inheritance"
+      ],
+      "paraphrased": false,
+      "source_url": "https://curriculum.nsw.edu.au/learning-areas/science/biology-11-12-2025/content/year-12/fab2288036"
+    },
+    {
+      "id": "b25-y12-hered-15",
+      "band": "y12",
+      "syllabus": "Biology 11–12 (2025)",
+      "outcome": "BI-12-01",
+      "focus_area": "Heredity",
+      "content_group": "Inheritance patterns",
+      "text": "Analyse the processes and the implications of meiosis, crossing over, independent assortment, random segregation and fertilisation in creating genetic variation in offspring",
+      "topics": [
+        "meiosis",
+        "inheritance"
+      ],
+      "paraphrased": false,
+      "source_url": "https://curriculum.nsw.edu.au/learning-areas/science/biology-11-12-2025/content/year-12/fab2288036"
+    },
+    {
+      "id": "b25-y12-hered-16",
+      "band": "y12",
+      "syllabus": "Biology 11–12 (2025)",
+      "outcome": "BI-12-01",
+      "focus_area": "Heredity",
+      "content_group": "Inheritance patterns",
+      "text": "Use examples to distinguish between autosomal dominant/recessive, codominant and incomplete dominant inheritance",
+      "topics": [
+        "inheritance"
+      ],
+      "paraphrased": false,
+      "source_url": "https://curriculum.nsw.edu.au/learning-areas/science/biology-11-12-2025/content/year-12/fab2288036"
+    },
+    {
+      "id": "b25-y12-hered-17",
+      "band": "y12",
+      "syllabus": "Biology 11–12 (2025)",
+      "outcome": "BI-12-01",
+      "focus_area": "Heredity",
+      "content_group": "Inheritance patterns",
+      "text": "Compare autosomal, sex-linked and multiple allele inheritance",
+      "topics": [
+        "inheritance"
+      ],
+      "paraphrased": false,
+      "source_url": "https://curriculum.nsw.edu.au/learning-areas/science/biology-11-12-2025/content/year-12/fab2288036"
+    },
+    {
+      "id": "b25-y12-hered-18",
+      "band": "y12",
+      "syllabus": "Biology 11–12 (2025)",
+      "outcome": "BI-12-01",
+      "focus_area": "Heredity",
+      "content_group": "Inheritance patterns",
+      "text": "Use Punnett squares to solve inheritance problems, including autosomal dominant/recessive, codominance, incomplete dominance, multiple alleles and sex-linked",
+      "topics": [
+        "inheritance"
+      ],
+      "paraphrased": false,
+      "source_url": "https://curriculum.nsw.edu.au/learning-areas/science/biology-11-12-2025/content/year-12/fab2288036"
+    },
+    {
+      "id": "b25-y12-hered-19",
+      "band": "y12",
+      "syllabus": "Biology 11–12 (2025)",
+      "outcome": "BI-12-01",
+      "focus_area": "Heredity",
+      "content_group": "Inheritance patterns",
+      "text": "Explain the difference in genotype and phenotype ratios observed in Punnett squares for sex-linked and autosomal inheritance",
+      "topics": [
+        "inheritance"
+      ],
+      "paraphrased": false,
+      "source_url": "https://curriculum.nsw.edu.au/learning-areas/science/biology-11-12-2025/content/year-12/fab2288036"
+    },
+    {
+      "id": "b25-y12-hered-20",
+      "band": "y12",
+      "syllabus": "Biology 11–12 (2025)",
+      "outcome": "BI-12-01",
+      "focus_area": "Heredity",
+      "content_group": "Inheritance patterns",
+      "text": "Construct and interpret pedigree charts involving autosomal and sex-linked inheritance",
+      "topics": [
+        "inheritance"
+      ],
+      "paraphrased": false,
+      "source_url": "https://curriculum.nsw.edu.au/learning-areas/science/biology-11-12-2025/content/year-12/fab2288036"
+    },
+    {
+      "id": "b25-y12-hered-21",
+      "band": "y12",
+      "syllabus": "Biology 11–12 (2025)",
+      "outcome": "BI-12-01",
+      "focus_area": "Heredity",
+      "content_group": "Genetic variants",
+      "text": "Explain how electromagnetic radiation, chemicals and naturally occurring mutagens may result in mutations",
+      "topics": [
+        "mutation"
+      ],
+      "paraphrased": false,
+      "source_url": "https://curriculum.nsw.edu.au/learning-areas/science/biology-11-12-2025/content/year-12/fab2288036"
+    },
+    {
+      "id": "b25-y12-hered-22",
+      "band": "y12",
+      "syllabus": "Biology 11–12 (2025)",
+      "outcome": "BI-12-01",
+      "focus_area": "Heredity",
+      "content_group": "Genetic variants",
+      "text": "Explain how mutations in coding DNA affects the function of a protein",
+      "topics": [
+        "mutation",
+        "protein-synthesis",
+        "protein-folding"
+      ],
+      "paraphrased": false,
+      "source_url": "https://curriculum.nsw.edu.au/learning-areas/science/biology-11-12-2025/content/year-12/fab2288036"
+    },
+    {
+      "id": "b25-y12-hered-23",
+      "band": "y12",
+      "syllabus": "Biology 11–12 (2025)",
+      "outcome": "BI-12-01",
+      "focus_area": "Heredity",
+      "content_group": "Genetic variants",
+      "text": "Use diagrams to distinguish between base substitutions, insertions and deletions as point mutations",
+      "topics": [
+        "mutation",
+        "dna-structure"
+      ],
+      "paraphrased": false,
+      "source_url": "https://curriculum.nsw.edu.au/learning-areas/science/biology-11-12-2025/content/year-12/fab2288036"
+    },
+    {
+      "id": "b25-y12-hered-24",
+      "band": "y12",
+      "syllabus": "Biology 11–12 (2025)",
+      "outcome": "BI-12-01",
+      "focus_area": "Heredity",
+      "content_group": "Genetic variants",
+      "text": "Compare silent, missense, nonsense and frameshift mutations",
+      "topics": [
+        "mutation",
+        "protein-synthesis"
+      ],
+      "paraphrased": false,
+      "source_url": "https://curriculum.nsw.edu.au/learning-areas/science/biology-11-12-2025/content/year-12/fab2288036"
+    },
+    {
+      "id": "b25-y12-hered-25",
+      "band": "y12",
+      "syllabus": "Biology 11–12 (2025)",
+      "outcome": "BI-12-01",
+      "focus_area": "Heredity",
+      "content_group": "Genetic variants",
+      "text": "Use diagrams to distinguish between duplications, deletions, inversions and translocations as chromosomal mutations",
+      "topics": [
+        "mutation"
+      ],
+      "paraphrased": false,
+      "source_url": "https://curriculum.nsw.edu.au/learning-areas/science/biology-11-12-2025/content/year-12/fab2288036"
+    },
+    {
+      "id": "b25-y12-hered-26",
+      "band": "y12",
+      "syllabus": "Biology 11–12 (2025)",
+      "outcome": "BI-12-01",
+      "focus_area": "Heredity",
+      "content_group": "Genetic variants",
+      "text": "Compare point mutations and chromosomal mutations",
+      "topics": [
+        "mutation"
+      ],
+      "paraphrased": false,
+      "source_url": "https://curriculum.nsw.edu.au/learning-areas/science/biology-11-12-2025/content/year-12/fab2288036"
+    },
+    {
+      "id": "b25-y12-hered-27",
+      "band": "y12",
+      "syllabus": "Biology 11–12 (2025)",
+      "outcome": "BI-12-01",
+      "focus_area": "Heredity",
+      "content_group": "Genetic variants",
+      "text": "Interpret images of karyotypes, showing how chromosomes arranged as homologous pairs explain non-disjunction",
+      "topics": [
+        "mutation",
+        "meiosis"
+      ],
+      "paraphrased": false,
+      "source_url": "https://curriculum.nsw.edu.au/learning-areas/science/biology-11-12-2025/content/year-12/fab2288036"
+    },
+    {
+      "id": "b25-y12-hered-28",
+      "band": "y12",
+      "syllabus": "Biology 11–12 (2025)",
+      "outcome": "BI-12-01",
+      "focus_area": "Heredity",
+      "content_group": "Genetic variants",
+      "text": "Analyse the implications of somatic and germline variants in the context of tumour formation, genetic disease and genetic diversity",
+      "topics": [
+        "mutation",
+        "cell-cycle"
+      ],
+      "paraphrased": false,
+      "source_url": "https://curriculum.nsw.edu.au/learning-areas/science/biology-11-12-2025/content/year-12/fab2288036"
+    },
+    {
+      "id": "b25-y12-hered-29",
+      "band": "y12",
+      "syllabus": "Biology 11–12 (2025)",
+      "outcome": "BI-12-01",
+      "focus_area": "Heredity",
+      "content_group": "Genetic variants",
+      "text": "Conduct a secondary-source investigation on single nucleotide polymorphisms (SNPs) in populations and their association with a genetic disease",
+      "topics": [
+        "mutation",
+        "genes"
+      ],
+      "paraphrased": false,
+      "source_url": "https://curriculum.nsw.edu.au/learning-areas/science/biology-11-12-2025/content/year-12/fab2288036"
+    },
+    {
+      "id": "b25-y12-hered-30",
+      "band": "y12",
+      "syllabus": "Biology 11–12 (2025)",
+      "outcome": "BI-12-01",
+      "focus_area": "Heredity",
+      "content_group": "Genetic variants",
+      "text": "Assess potential limitations and constraints of SNP testing and databases in diagnostic medicine",
+      "topics": [
+        "mutation",
+        "biotechnology"
+      ],
+      "paraphrased": false,
+      "source_url": "https://curriculum.nsw.edu.au/learning-areas/science/biology-11-12-2025/content/year-12/fab2288036"
+    },
+    {
+      "id": "b25-y12-dis-01",
+      "band": "y12",
+      "syllabus": "Biology 11–12 (2025)",
+      "outcome": "BI-12-02",
+      "focus_area": "Diseases",
+      "content_group": "Non-infectious diseases",
+      "text": "Use examples to explain the impact of genetics, environment and nutrition on the development of non-infectious diseases in humans",
+      "topics": [
+        "genes",
+        "mutation"
+      ],
+      "paraphrased": false,
+      "source_url": "https://curriculum.nsw.edu.au/learning-areas/science/biology-11-12-2025/content/year-12/facdcec83d"
+    },
+    {
+      "id": "b25-y12-dis-02",
+      "band": "y12",
+      "syllabus": "Biology 11–12 (2025)",
+      "outcome": "BI-12-02",
+      "focus_area": "Diseases",
+      "content_group": "Infectious diseases",
+      "text": "Use examples of infectious diseases to classify infectious agents as macroorganisms, microorganisms or non-cellular pathogens",
+      "topics": [
+        "prokaryote-eukaryote",
+        "immunity"
+      ],
+      "paraphrased": false,
+      "source_url": "https://curriculum.nsw.edu.au/learning-areas/science/biology-11-12-2025/content/year-12/facdcec83d"
+    },
+    {
+      "id": "b25-y12-dis-03",
+      "band": "y12",
+      "syllabus": "Biology 11–12 (2025)",
+      "outcome": "BI-12-02",
+      "focus_area": "Diseases",
+      "content_group": "Infectious diseases",
+      "text": "Describe the adaptive features of prions, viruses, bacteria, protozoans, fungi and macroparasites",
+      "topics": [
+        "prokaryote-eukaryote",
+        "immunity"
+      ],
+      "paraphrased": false,
+      "source_url": "https://curriculum.nsw.edu.au/learning-areas/science/biology-11-12-2025/content/year-12/facdcec83d"
+    },
+    {
+      "id": "b25-y12-dis-04",
+      "band": "y12",
+      "syllabus": "Biology 11–12 (2025)",
+      "outcome": "BI-12-02",
+      "focus_area": "Diseases",
+      "content_group": "Infectious diseases",
+      "text": "Distinguish between innate and adaptive immune response",
+      "topics": [
+        "immunity"
+      ],
+      "paraphrased": false,
+      "source_url": "https://curriculum.nsw.edu.au/learning-areas/science/biology-11-12-2025/content/year-12/facdcec83d"
+    },
+    {
+      "id": "b25-y12-dis-05",
+      "band": "y12",
+      "syllabus": "Biology 11–12 (2025)",
+      "outcome": "BI-12-02",
+      "focus_area": "Diseases",
+      "content_group": "Infectious diseases",
+      "text": "Interpret and construct diagrams of the innate immune system including barriers, secretions, phagocytic leukocytes, antimicrobial proteins, inflammatory response and fever",
+      "topics": [
+        "immunity",
+        "specialised-cells"
+      ],
+      "paraphrased": false,
+      "source_url": "https://curriculum.nsw.edu.au/learning-areas/science/biology-11-12-2025/content/year-12/facdcec83d"
+    },
+    {
+      "id": "b25-y12-dis-06",
+      "band": "y12",
+      "syllabus": "Biology 11–12 (2025)",
+      "outcome": "BI-12-02",
+      "focus_area": "Diseases",
+      "content_group": "Infectious diseases",
+      "text": "Discuss the role of interleukin communication between innate and adaptive cells",
+      "topics": [
+        "immunity"
+      ],
+      "paraphrased": false,
+      "source_url": "https://curriculum.nsw.edu.au/learning-areas/science/biology-11-12-2025/content/year-12/facdcec83d"
+    },
+    {
+      "id": "b25-y12-dis-07",
+      "band": "y12",
+      "syllabus": "Biology 11–12 (2025)",
+      "outcome": "BI-12-02",
+      "focus_area": "Diseases",
+      "content_group": "Infectious diseases",
+      "text": "Describe the roles of helper T cells, cytotoxic T cells, memory T cells and suppressor T cells of the cell-mediated immune response within the adaptive immune system",
+      "topics": [
+        "immunity",
+        "specialised-cells"
+      ],
+      "paraphrased": false,
+      "source_url": "https://curriculum.nsw.edu.au/learning-areas/science/biology-11-12-2025/content/year-12/facdcec83d"
+    },
+    {
+      "id": "b25-y12-dis-08",
+      "band": "y12",
+      "syllabus": "Biology 11–12 (2025)",
+      "outcome": "BI-12-02",
+      "focus_area": "Diseases",
+      "content_group": "Infectious diseases",
+      "text": "Describe the roles of plasma cells, memory B cells and antibodies of the humoral immune response within the adaptive immune system",
+      "topics": [
+        "immunity",
+        "specialised-cells"
+      ],
+      "paraphrased": false,
+      "source_url": "https://curriculum.nsw.edu.au/learning-areas/science/biology-11-12-2025/content/year-12/facdcec83d"
+    },
+    {
+      "id": "b25-y12-dis-09",
+      "band": "y12",
+      "syllabus": "Biology 11–12 (2025)",
+      "outcome": "BI-12-02",
+      "focus_area": "Diseases",
+      "content_group": "Infectious diseases",
+      "text": "Interpret and construct diagrams of the adaptive immune system to demonstrate how the cell-mediated and humoral components of the immune system respond after primary and secondary exposure to a pathogen",
+      "topics": [
+        "immunity"
+      ],
+      "paraphrased": false,
+      "source_url": "https://curriculum.nsw.edu.au/learning-areas/science/biology-11-12-2025/content/year-12/facdcec83d"
+    },
+    {
+      "id": "b25-y12-biodiv-01",
+      "band": "y12",
+      "syllabus": "Biology 11–12 (2025)",
+      "outcome": "BI-12-03",
+      "focus_area": "Biodiversity",
+      "content_group": "Genetic diversity",
+      "text": "Use examples to compare asexual and sexual reproduction methods of plants for creating variation in a species",
+      "topics": [
+        "meiosis",
+        "inheritance"
+      ],
+      "paraphrased": false,
+      "source_url": "https://curriculum.nsw.edu.au/learning-areas/science/biology-11-12-2025/content/year-12/fa0a6a1d67"
+    },
+    {
+      "id": "b25-y12-biodiv-02",
+      "band": "y12",
+      "syllabus": "Biology 11–12 (2025)",
+      "outcome": "BI-12-03",
+      "focus_area": "Biodiversity",
+      "content_group": "Genetic diversity",
+      "text": "Explain how asexual reproductive methods of budding, spore formation, parthenogenesis and binary fission impact on the continuity of species in changing environments",
+      "topics": [
+        "cell-cycle",
+        "inheritance"
+      ],
+      "paraphrased": false,
+      "source_url": "https://curriculum.nsw.edu.au/learning-areas/science/biology-11-12-2025/content/year-12/fa0a6a1d67"
+    },
+    {
+      "id": "b25-y12-biodiv-03",
+      "band": "y12",
+      "syllabus": "Biology 11–12 (2025)",
+      "outcome": "BI-12-03",
+      "focus_area": "Biodiversity",
+      "content_group": "Genetic diversity",
+      "text": "Evaluate the effect of mutation, natural selection, non-random mating, gene flow and genetic drift on allele frequencies in populations",
+      "topics": [
+        "mutation",
+        "evolution",
+        "inheritance"
+      ],
+      "paraphrased": false,
+      "source_url": "https://curriculum.nsw.edu.au/learning-areas/science/biology-11-12-2025/content/year-12/fa0a6a1d67"
+    },
+    {
+      "id": "b25-y12-biodiv-04",
+      "band": "y12",
+      "syllabus": "Biology 11–12 (2025)",
+      "outcome": "BI-12-03",
+      "focus_area": "Biodiversity",
+      "content_group": "Genetic diversity",
+      "text": "Explain the physical and chemical changes of a plant in response to the presence of pathogens",
+      "topics": [
+        "immunity"
+      ],
+      "paraphrased": false,
+      "source_url": "https://curriculum.nsw.edu.au/learning-areas/science/biology-11-12-2025/content/year-12/fa0a6a1d67"
+    },
+    {
+      "id": "b25-y12-biotech-01",
+      "band": "y12",
+      "syllabus": "Biology 11–12 (2025)",
+      "outcome": "BI-12-04",
+      "focus_area": "Biotechnology",
+      "content_group": "Modern biotechnologies",
+      "text": "Discuss the roles of biological knowledge, genetic engineering and bioinformatics techniques used in biotechnology",
+      "topics": [
+        "biotechnology"
+      ],
+      "paraphrased": false,
+      "source_url": "https://curriculum.nsw.edu.au/learning-areas/science/biology-11-12-2025/content/year-12/fa610240ba"
+    },
+    {
+      "id": "b25-y12-biotech-02",
+      "band": "y12",
+      "syllabus": "Biology 11–12 (2025)",
+      "outcome": "BI-12-04",
+      "focus_area": "Biotechnology",
+      "content_group": "Modern biotechnologies",
+      "text": "Use examples to compare transgenic organisms and genetically modified organisms",
+      "topics": [
+        "biotechnology",
+        "genes"
+      ],
+      "paraphrased": false,
+      "source_url": "https://curriculum.nsw.edu.au/learning-areas/science/biology-11-12-2025/content/year-12/fa610240ba"
+    },
+    {
+      "id": "b25-y12-biotech-03",
+      "band": "y12",
+      "syllabus": "Biology 11–12 (2025)",
+      "outcome": "BI-12-04",
+      "focus_area": "Biotechnology",
+      "content_group": "Modern biotechnologies",
+      "text": "Compare germline genetic changes in reproductive and genetic engineering biotechnologies",
+      "topics": [
+        "biotechnology",
+        "mutation"
+      ],
+      "paraphrased": false,
+      "source_url": "https://curriculum.nsw.edu.au/learning-areas/science/biology-11-12-2025/content/year-12/fa610240ba"
+    },
+    {
+      "id": "b25-y12-biotech-04",
+      "band": "y12",
+      "syllabus": "Biology 11–12 (2025)",
+      "outcome": "BI-12-04",
+      "focus_area": "Biotechnology",
+      "content_group": "Biotechnology in human diseases",
+      "text": "Use examples to explain how biotechnologies diagnose genetic diseases",
+      "topics": [
+        "biotechnology",
+        "mutation"
+      ],
+      "paraphrased": false,
+      "source_url": "https://curriculum.nsw.edu.au/learning-areas/science/biology-11-12-2025/content/year-12/fa610240ba"
+    },
+    {
+      "id": "b25-y12-biotech-05",
+      "band": "y12",
+      "syllabus": "Biology 11–12 (2025)",
+      "outcome": "BI-12-04",
+      "focus_area": "Biotechnology",
+      "content_group": "Biotechnology in human diseases",
+      "text": "Outline the method and outcome of 2 selected gene therapies used to reduce the impact of genetic conditions",
+      "topics": [
+        "biotechnology",
+        "genes"
+      ],
+      "paraphrased": false,
+      "source_url": "https://curriculum.nsw.edu.au/learning-areas/science/biology-11-12-2025/content/year-12/fa610240ba"
+    },
+    {
+      "id": "b25-y12-biotech-06",
+      "band": "y12",
+      "syllabus": "Biology 11–12 (2025)",
+      "outcome": "BI-12-04",
+      "focus_area": "Biotechnology",
+      "content_group": "Biotechnology in human diseases",
+      "text": "Conduct a scientific investigation to model the process of using recombinant DNA technology to produce human insulin",
+      "topics": [
+        "biotechnology",
+        "genes",
+        "protein-synthesis"
+      ],
+      "paraphrased": false,
+      "source_url": "https://curriculum.nsw.edu.au/learning-areas/science/biology-11-12-2025/content/year-12/fa610240ba"
+    }
+  ]
+}
