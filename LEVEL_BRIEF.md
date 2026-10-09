@@ -72,3 +72,10 @@ Each converted sim keeps `sims/<slug>/index.html` but boots the 3D shell. Copy `
 
   Also test zooming out (`await e.up()`), a portrait viewport (375×812), and your missions. Close your tab when done.
 - Report: what you built, model equations and assumptions, science points you're unsure of, and any engine changes you need.
+
+## Notes added after Phase 2
+- The engine calls `update(simDt, simTime, realDt)`. `simDt` is 0 and `simTime` freezes while paused, so use `realDt` for UI refresh timers.
+- `engine.fly()` called by a level counts as deliberate framing, so it is kept on resize.
+- The Python dev server sends no cache headers. When re-testing edited modules, reload with cache-busting, e.g. `await fetch(url, {cache: "reload"})` for each changed module, or open a fresh tab.
+- Levels may share state with their parent through a `shared` object or by reading `engine.stack.at(-2).inst` (see `levels/mitochondrion.js` ↔ `sims/atp-synthase/level.js`, and `levels/chloroplast.js` ↔ `sims/photosynthesis/level.js`).
+- Genetics pathway (Phase 3). The chain is: plant cell → `nucleus` → `chromatin` → `dna` → `expression` → `folding`. Every level uses the **same gene**: a simplified fragment of human β-globin, `ATG GTG CAC CTG ACT CCT GAG GAG AAG TAA` (Met-Val-His-Leu-Thr-Pro-Glu-Glu-Lys + stop). Codon 6 (GAG → GTG, Glu → Val) is the sickle-cell mutation. It is already used in `sims/protein-synthesis/model.js`. Keep a single source of truth by importing from that module. **Be honest that it is a human gene shown inside a plant cell for teaching** (e.g. a "Model gene" note), as the membrane level does for its animal proteins.
