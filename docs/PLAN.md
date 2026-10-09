@@ -80,7 +80,7 @@ The 2D simulations remain as WebGL fallbacks (`sims/<slug>/sim2d.js`).
   - morph `swapRoot` relies on requestAnimationFrame, so a hidden tab pauses it mid-swap until it's visible again (harmless);
   - portrait: a label can overlap the top chips;
   - "other fuels" respiration term, lysis at 1.6× volume and 20 % non-osmotic volume are teaching-scale (stated on the page).
-- **Karyotype:** band patterns are schematic and partly from memory. Regenerate from UCSC `cytoBand` (hg38) with `tools/cytoband-to-karyotype.mjs` once the owner OKs the download.
+- **Karyotype:** bands regenerated from UCSC hg38 cytoBand (2026-10-10); re-run `tools/cytoband-to-karyotype.mjs` if the reference changes.
 - **Clay style:** molecular levels lose custom shaders/glows; nucleus interior reads grey; animal transporters/microvilli/cytoskeleton hidden; plant ⇄ animal morph only approximate in clay. Clay wall texture slightly grainy.
 - **Inheritance lab:** mutation card links to the protein-synthesis sim (no direct portal to `expression`).
 - **Dev server:** sends no cache headers; edited modules need a cache-busting reload.
