@@ -1,4 +1,4 @@
-// Meiosis & Variation — CellScape
+// Meiosis & Variation — CellScape (2D version: the fallback when WebGL2 / the 3D shell is unavailable)
 // A 2n = 4 germ cell (two homologous pairs) goes through meiosis. The learner places chiasmata
 // (crossing over) in prophase I and flips bivalent orientation at metaphase I (independent
 // assortment), then collects the four haploid gametes and can fertilise one.
@@ -13,105 +13,11 @@ const { ctx } = stage;
 const toast = K.toaster(stageEl);
 const reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-// ---------------------------------------------------------------- model constants
-const N = 120;                       // resolution of a chromatid (bins along its length)
-const LEN = [6.0, 4.0];              // chromosome length in units (pair 1 long, pair 2 short)
-const WID = 0.85;                    // chromatid width in units
-const CEN = [0.36, 0.42];            // centromere position (fraction from top end)
-const LOCI = [
-  [{ pos: 0.14, gene: "A" }, { pos: 0.76, gene: "B" }],
-  [{ pos: 0.74, gene: "D" }],
-];
-const COL = { M: "#f472b6", P: "#60a5fa", X: "#4fd1c5", Y: "#fbbf24" };
-// which origin carries the dominant (capital) allele at each gene
-const UPPER = { M: { A: 1, B: 1, D: 1 }, P: {}, X: { A: 1, D: 1 }, Y: { B: 1 } };
-const allele = (origin, gene) => (UPPER[origin][gene] ? gene : gene.toLowerCase());
-const PARENTAL = ["ABD", "ABd", "abD", "abd"];
-const RECOMB = ["AbD", "Abd", "aBD", "aBd"];
-const CYCLE = [[1, 0], [0, 1], [0, 0], [1, 1]]; // [maternal sister, paternal sister] for 1st, 2nd... chiasma
-const MAX_X = 3;
-
-const NAMES = ["Interphase (G1)", "S phase", "Prophase I", "Metaphase I", "Anaphase I", "Telophase I",
-  "Metaphase II", "Anaphase II", "Telophase II", "Gametes"];
-const DUR = [0.8, 2.0, 2.2, 1.8, 2.0, 2.2, 2.0, 1.8, 2.2, 1.0];
-const AUTO_PHASES = new Set([1, 4, 5, 7, 8]);  // advance on their own
-
-// ---------------------------------------------------------------- model functions
-function build(cross) {
-  const ch = [];
-  for (let k = 0; k < 4; k++) {
-    const o = k & 1 ? "P" : "M";
-    ch[k] = [new Array(N).fill(o), new Array(N).fill(o)];
-  }
-  for (let p = 0; p < 2; p++) {
-    for (const c of cross[p]) {
-      const A = ch[2 * p][c.m], B = ch[2 * p + 1][c.p];
-      const i = Math.round(c.x * N);
-      // the arm distal to the chiasma (away from the centromere) is exchanged
-      const [lo, hi] = c.x > CEN[p] ? [i, N] : [0, i];
-      for (let j = lo; j < hi; j++) { const t = A[j]; A[j] = B[j]; B[j] = t; }
-    }
-  }
-  return ch;
-}
-const atLocus = (bins, pos) => bins[Math.min(N - 1, Math.floor(pos * N))];
-function genoOf(parts) {
-  const b0 = parts[0].bins, b1 = parts[1].bins;
-  return allele(atLocus(b0, LOCI[0][0].pos), "A") + allele(atLocus(b0, LOCI[0][1].pos), "B") +
-    allele(atLocus(b1, LOCI[1][0].pos), "D");
-}
-const isRecomb = (g) => (g[0] === "A") !== (g[1] === "B");
-const sideOf = (k, orient) => (k & 1) ^ orient[k >> 1];   // 0 = left pole, 1 = right pole
-
-function gametesFrom(ch, orient, orient2) {
-  const gs = [];
-  for (let g = 0; g < 4; g++) {
-    const side = g >> 1, half = g & 1, parts = [];
-    for (let p = 0; p < 2; p++) {
-      const k = orient[p] === side ? 2 * p : 2 * p + 1;
-      const s = half ^ orient2[side][p];
-      parts.push({ k, s, p, bins: ch[k][s] });
-    }
-    gs.push({ parts, geno: genoOf(parts) });
-  }
-  return gs;
-}
-
-function validPos(p, x) {
-  x = K.clamp(x, 0.04, 0.96);
-  if (Math.abs(x - CEN[p]) < 0.06) x = CEN[p] + (x < CEN[p] ? -0.06 : 0.06);
-  for (const l of LOCI[p]) if (Math.abs(x - l.pos) < 0.04) x = l.pos + (x < l.pos ? -0.04 : 0.04);
-  return K.clamp(x, 0.04, 0.96);
-}
-function randomCross() {
-  const out = [[], []];
-  const n0 = K.pick([0, 1, 1, 1, 2, 2]), n1 = K.pick([0, 1, 1]);
-  [n0, n1].forEach((n, p) => {
-    for (let i = 0; i < n; i++) {
-      const [m, q] = K.pick(CYCLE);
-      out[p].push({ x: validPos(p, K.rand(0.06, 0.94)), m, p: q });
-    }
-  });
-  return out;
-}
-const randOrient = () => [K.randInt(0, 1), K.randInt(0, 1)];
-const randOrient2 = () => [randOrient(), randOrient()];
-
-function otherGamete() {
-  const parts = [];
-  for (let p = 0; p < 2; p++) {
-    const base = Math.random() < 0.5 ? "X" : "Y", alt = base === "X" ? "Y" : "X";
-    const bins = new Array(N).fill(base);
-    if (p === 0 && Math.random() < 0.4) {
-      const x = validPos(0, K.rand(0.2, 0.7)), i = Math.round(x * N);
-      const [lo, hi] = x > CEN[0] ? [i, N] : [0, i];
-      for (let j = lo; j < hi; j++) bins[j] = alt;
-    }
-    parts.push({ p, bins });
-  }
-  return parts;
-}
-const pairStr = (a, b) => [a, b].sort().join("");
+// ---------------------------------------------------------------- model (shared with the 3D level)
+import {
+  N, LEN, WID, CEN, LOCI, COL, allele, PARENTAL, RECOMB, CYCLE, MAX_X, NAMES, DUR, AUTO_PHASES,
+  build, atLocus, isRecomb, sideOf, gametesFrom, validPos, randomCross, randOrient, randOrient2, otherGamete, pairStr,
+} from "./model.js";
 
 // ---------------------------------------------------------------- state
 const S = {
