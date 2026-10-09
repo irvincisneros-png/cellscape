@@ -55,6 +55,18 @@ export async function boot(opts) {
   window.cellscape = { engine };
 
   upBtn.addEventListener("click", () => engine.up());
+  // pause freezes the cell's processes (the camera still moves) — for explaining a moment in class
+  const pauseBtn = document.createElement("button");
+  pauseBtn.className = "btn cs-pause";
+  pauseBtn.type = "button";
+  pauseBtn.textContent = "⏸ Pause";
+  pauseBtn.setAttribute("aria-pressed", "false");
+  pauseBtn.addEventListener("click", () => {
+    engine.paused = !engine.paused;
+    pauseBtn.textContent = engine.paused ? "▶ Play" : "⏸ Pause";
+    pauseBtn.setAttribute("aria-pressed", String(engine.paused));
+  });
+  stageEl.appendChild(pauseBtn);
   engine.onChange = (stack) => {
     crumbs.innerHTML = "";
     stack.forEach((s, i) => {
@@ -78,22 +90,25 @@ export async function boot(opts) {
   const dotParam = new URLSearchParams(location.search).get("dot");
   const focusDot = syl && dotParam ? syl.dotpoints.find((d) => d.id === dotParam) : null;
   if (focusDot) lens.set(focusDot.band);
+  const esc = (t) => String(t).replace(/[&<>]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" })[c]);
   const sylCard = K.card(panelEl, "Syllabus links");
   const sylBody = document.createElement("div");
   sylCard.appendChild(sylBody);
-  let sylVersion = null; // for Year 11/12: "Biology 11–12 (2025)" or "Biology Stage 6 (2017)"
+  let sylVersion = focusDot && focusDot.band.startsWith("y1") ? focusDot.syllabus : null; // Year 11/12 syllabus version
   function renderSyllabus() {
     const L = engine.current;
     if (!syl || !L?.topics) { sylCard.style.display = "none"; return; }
     sylCard.style.display = "";
     const band = lens.band, stage6 = band === "y11" || band === "y12";
     // the 2025 Biology syllabus starts in Year 11 from Term 1 2027 and Year 12 from Term 4 2027
-    const def = band === "y11" ? "Biology 11–12 (2025)" : "Biology Stage 6 (2017)";
+    const now = new Date(), y = now.getFullYear(), term4 = now.getMonth() >= 9;
+    const new25 = band === "y11" ? y >= 2027 : y > 2027 || (y === 2027 && term4);
+    const def = new25 ? "Biology 11–12 (2025)" : "Biology Stage 6 (2017)";
     const ver = stage6 ? (sylVersion || def) : null;
     const items = syl.dotpoints.filter((d) => d.band === band && (!ver || d.syllabus === ver) && d.topics.some((t) => L.topics.includes(t)));
     const toggle = stage6 ? `<div class="segmented" style="margin-bottom:8px">${["Biology 11–12 (2025)", "Biology Stage 6 (2017)"].map((v) => `<button type="button" data-v="${v}" aria-pressed="${v === ver}">${v.includes("2025") ? "New (2025)" : "Current (2017)"}</button>`).join("")}</div>` : "";
     sylBody.innerHTML = toggle + (items.length
-      ? `<ul style="margin:0;padding-left:18px;font-size:0.82rem;color:var(--ink-dim);display:flex;flex-direction:column;gap:6px">${items.map((d) => `<li${focusDot?.id === d.id ? ' style="color:var(--ink);font-weight:600"' : ""}>${d.text} <span style="color:var(--ink-faint)">(${d.outcome})</span></li>`).join("")}</ul>`
+      ? `<ul style="margin:0;padding-left:18px;font-size:0.82rem;color:var(--ink-dim);display:flex;flex-direction:column;gap:6px">${items.map((d) => `<li${focusDot?.id === d.id ? ' style="color:var(--ink);font-weight:600"' : ""}>${esc(d.text)} <span style="color:var(--ink-faint)">(${esc(d.outcome)})</span>${d.subpoints?.length ? `<ul style="padding-left:16px;margin:4px 0 0">${d.subpoints.map((sp) => `<li>${esc(typeof sp === "string" ? sp : sp.text || "")}</li>`).join("")}</ul>` : ""}</li>`).join("")}</ul>`
       : `<p>No ${BANDS.find((b) => b.id === band).label} dot points map directly to this level — try another year level.</p>`);
     sylBody.querySelectorAll("[data-v]").forEach((b) => b.addEventListener("click", () => { sylVersion = b.dataset.v; renderSyllabus(); }));
   }

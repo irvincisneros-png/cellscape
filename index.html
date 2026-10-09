@@ -25,10 +25,13 @@
   </div>
   <noscript>CellScape needs JavaScript. <a href="library.html">See all simulations</a>.</noscript>
   <script type="module">
+    // three.js r169 needs WebGL2; if the 3D page can't start, fall back to the simulation library
     let gl = false;
-    try { const c = document.createElement("canvas"); gl = !!(c.getContext("webgl2") || c.getContext("webgl")); } catch {}
+    try { gl = !!document.createElement("canvas").getContext("webgl2"); } catch { gl = false; }
     if (!gl) location.replace("library.html");
-    else import("./assets/js/world/shell.js").then((m) => m.boot({ start: "cell", root: "" }));
+    else import("./assets/js/world/shell.js")
+      .then((m) => m.boot({ start: "cell", root: "" }))
+      .catch((e) => { console.error(e); location.replace("library.html"); });
   </script>
 </body>
 </html>

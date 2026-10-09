@@ -31,6 +31,8 @@
   text-align: right; pointer-events: none; text-shadow: 0 1px 6px #000; max-width: 46%;
 }
 .cs-up { position: absolute; left: 14px; bottom: 46px; z-index: 3; background: rgba(5, 11, 22, 0.75); }
+.cs-pause { position: absolute; right: 14px; bottom: 40px; z-index: 3; background: rgba(5, 11, 22, 0.75); }
+@media (prefers-reduced-motion: reduce) { .lbl3d.dive { animation: none; } .cs-fade { transition: none !important; } }
 
 /* header */
 .crumbs { display: flex; align-items: center; gap: 6px; min-width: 0; overflow: hidden; font-family: var(--font-display); }
@@ -56,6 +58,8 @@
 }
 .org-row:hover { background: rgba(79, 209, 197, 0.08); }
 .org-row i { width: 10px; height: 10px; border-radius: 50%; }
+.org-row .org-name { background: none; border: 0; padding: 0; text-align: left; color: var(--ink); cursor: pointer; font-size: 0.86rem; }
+.org-row .org-name:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 4px; }
 .org-row small { display: block; color: var(--ink-faint); font-size: 0.74rem; }
 .org-row.off small { color: #fca5a5; }
 .switch { position: relative; width: 38px; height: 22px; flex: 0 0 38px; }

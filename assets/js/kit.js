@@ -356,7 +356,7 @@ export function quiz(parent, questions) {
       return;
     }
     const qq = questions[i];
-    c.innerHTML = `<h2>Check your understanding · ${i + 1}/${questions.length}</h2><div class="q">${qq.q}</div><div class="opts"></div><div class="fb"></div>`;
+    c.innerHTML = `<h2>Check your understanding · ${i + 1}/${questions.length}</h2><div class="q">${qq.q}</div><div class="opts"></div><div class="fb" aria-live="polite"></div>`;
     const opts = c.querySelector(".opts"), fb = c.querySelector(".fb");
     let answered = false;
     qq.options.forEach((o, k) => {

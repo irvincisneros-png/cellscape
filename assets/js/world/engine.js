@@ -29,6 +29,21 @@ export function formatLength(m) {
   return `${+(m * 1e9).toPrecision(3)} nm`;
 }
 
+/** Free GPU memory for everything under `root` (skips resources marked userData.shared). */
+export function disposeTree(root) {
+  const seen = new Set();
+  const free = (r) => { if (r && !seen.has(r) && !r.userData?.shared) { seen.add(r); r.dispose?.(); } };
+  root.traverse((o) => {
+    free(o.geometry);
+    const mats = Array.isArray(o.material) ? o.material : o.material ? [o.material] : [];
+    for (const m of mats) {
+      for (const v of Object.values(m)) if (v && v.isTexture) free(v);
+      free(m);
+    }
+    if (o.isInstancedMesh) o.dispose();
+  });
+}
+
 export class Engine {
   /**
    * opts: canvas, stageEl, panel (element for level cards), labelLayer, crumbs, scaleEl,
@@ -38,6 +53,7 @@ export class Engine {
     Object.assign(this, opts);
     this.levelsDef = opts.levels;
     this.quality = "high";
+    this.reducedMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
     const r = (this.renderer = new THREE.WebGLRenderer({ canvas: opts.canvas, antialias: true, powerPreference: "high-performance" }));
     r.toneMapping = THREE.ACESFilmicToneMapping;
     r.outputColorSpace = THREE.SRGBColorSpace;
@@ -158,6 +174,7 @@ export class Engine {
     this.bloom.resolution.set(w / 2, h / 2);
     this.camera.aspect = w / h;
     this.camera.updateProjectionMatrix();
+    if (this.current && !this.userMoved && !this.busy && !this.flight) this.frame(this.current.view);
     this.current?.onResize?.(w, h);
   }
 
@@ -192,42 +209,74 @@ export class Engine {
     if (!L?.pickables?.length) return null;
     this.setRay(cx, cy);
     const hit = this.ray.intersectObjects(L.pickables, true)[0];
-    return hit || null;
+    if (hit) return hit;
+    return (L.fallbackPickables && this.ray.intersectObjects(L.fallbackPickables, true)[0]) || null;
   }
 
   // ---------- input ----------
   bindInput() {
     const cv = this.canvas;
+    cv.tabIndex = 0;
     let down = null;
+    const active = new Set();      // pointer ids currently down
+    let multi = false;             // a multi-touch gesture is in progress: never treat it as a tap
+    let lastClick = { t: 0, x: 0, y: 0 };
     cv.addEventListener("pointerdown", (e) => {
+      active.add(e.pointerId);
+      if (active.size > 1) { multi = true; if (down?.handled) this.current?.onPointerUp?.(e); this.controls.enabled = true; down = null; return; }
+      multi = false;
       if (this.busy) return;
-      down = { x: e.clientX, y: e.clientY, b: e.button, t: performance.now() };
+      down = { id: e.pointerId, x: e.clientX, y: e.clientY, b: e.button, travel: 0 };
       const hit = e.button === 0 ? this.pick(e.clientX, e.clientY) : null;
       down.hit = hit;
       if (e.button === 0 && this.current?.onPointerDown?.(e, hit)) { down.handled = true; this.controls.enabled = false; }
     });
     cv.addEventListener("pointermove", (e) => {
-      const r = cv.getBoundingClientRect();
       this.pointer.x = e.clientX; this.pointer.y = e.clientY; this.pointer.inside = true;
+      if (down && e.pointerId === down.id) down.travel = Math.max(down.travel, Math.hypot(e.clientX - down.x, e.clientY - down.y));
       if (down?.handled) { this.current?.onPointerDrag?.(e); return; }
       if (e.buttons) return;
       this.hoverPending = true;
     });
     cv.addEventListener("pointerleave", () => { this.pointer.inside = false; this.setHover(null); });
-    const up = (e) => {
-      if (!down) return;
-      const moved = Math.hypot(e.clientX - down.x, e.clientY - down.y) > 6;
+    const end = (e, cancelled) => {
+      active.delete(e.pointerId);
+      if (!down || e.pointerId !== down.id) { if (!active.size) multi = false; return; }
       if (down.handled) { this.current?.onPointerUp?.(e); this.controls.enabled = true; }
-      else if (!moved && down.b === 0) this.click(e, down.hit);
+      else if (!cancelled && !multi && down.travel <= 6 && down.b === 0 && !this.busy) {
+        const now = performance.now();
+        const dbl = now - lastClick.t < 320 && Math.hypot(e.clientX - lastClick.x, e.clientY - lastClick.y) < 10;
+        lastClick = { t: dbl ? 0 : now, x: e.clientX, y: e.clientY };
+        if (dbl) {
+          // second click of a double-click: dive if it's a portal, never repeat the single-click action
+          const portal = down.hit && this.portalFor(down.hit.object);
+          if (portal) this.dive(portal);
+        } else this.click(e, down.hit);
+      }
       down = null;
+      if (!active.size) multi = false;
     };
-    cv.addEventListener("pointerup", up);
-    cv.addEventListener("pointercancel", () => { if (down?.handled) this.current?.onPointerUp?.(); this.controls.enabled = true; down = null; });
-    cv.addEventListener("dblclick", (e) => {
-      const hit = this.pick(e.clientX, e.clientY);
-      const portal = hit && this.portalFor(hit.object);
-      if (portal) this.dive(portal);
+    cv.addEventListener("pointerup", (e) => end(e, false));
+    cv.addEventListener("pointercancel", (e) => end(e, true));
+    cv.addEventListener("lostpointercapture", (e) => { if (down && e.pointerId === down.id && down.handled) end(e, true); });
+    // keyboard: arrows orbit, +/- zoom, Enter dives into the selection, Escape/Backspace goes up
+    cv.addEventListener("keydown", (e) => {
+      if (this.busy) return;
+      const k = e.key, c = this.controls, off = this.camera.position.clone().sub(c.target);
+      const sph = new THREE.Spherical().setFromVector3(off);
+      let used = true;
+      if (k === "ArrowLeft") sph.theta -= 0.12;
+      else if (k === "ArrowRight") sph.theta += 0.12;
+      else if (k === "ArrowUp") sph.phi = clamp(sph.phi - 0.1, c.minPolarAngle + 0.01, c.maxPolarAngle - 0.01);
+      else if (k === "ArrowDown") sph.phi = clamp(sph.phi + 0.1, c.minPolarAngle + 0.01, c.maxPolarAngle - 0.01);
+      else if (k === "+" || k === "=") sph.radius = clamp(sph.radius * 0.85, c.minDistance, c.maxDistance);
+      else if (k === "-" || k === "_") sph.radius = clamp(sph.radius / 0.85, c.minDistance, c.maxDistance);
+      else if (k === "Enter" && this.selected?.portal) { this.dive(this.selected.portal); return; }
+      else if ((k === "Escape" || k === "Backspace") && this.stack.length > 1) { this.up(); return; }
+      else used = false;
+      if (used) { e.preventDefault(); this.userMoved = true; this.camera.position.copy(c.target).add(off.setFromSpherical(sph)); c.update(); }
     });
+    this.controls.addEventListener("start", () => (this.userMoved = true));
     // zooming out past the level's limit climbs to the parent level
     cv.addEventListener("wheel", (e) => {
       if (this.busy || !this.current) return;
@@ -300,6 +349,7 @@ export class Engine {
     this.stack = [{ id, inst }];
     this.mount(inst);
     this.frame(inst.view);
+    this.userMoved = false;
     this.emitChange();
   }
 
@@ -338,6 +388,8 @@ export class Engine {
 
   /** Animate camera/target to a new framing. */
   fly(target, pos, dur = 0.9) {
+    if (this.flight) { const f = this.flight; this.flight = null; f.res(); }
+    if (this.reducedMotion) dur = Math.min(dur, 0.05);
     return new Promise((res) => {
       const t0 = this.controls.target.clone(), p0 = this.camera.position.clone();
       this.flight = { t: 0, dur, t0, p0, t1: target.clone(), p1: pos.clone(), res };
@@ -356,64 +408,87 @@ export class Engine {
     const def = this.levelsDef[portal.to];
     if (!def) { portal.fallback ? portal.fallback() : this.toast?.(`${portal.label}: coming soon`); return; }
     this.busy = true;
-    const C = portal.center().clone(), r = portal.radius;
     const parent = this.stack.at(-1);
     const saved = { target: this.controls.target.clone(), pos: this.camera.position.clone() };
-    // approach: aim at the portal, move in close
-    const dir = this.camera.position.clone().sub(C).normalize();
-    const loading = this.load(portal.to);
-    await this.fly(C, C.clone().addScaledVector(dir, r * 2.6), 0.8);
-    const fadeP = this.fadeTo(1, 380);
-    await this.fly(C, C.clone().addScaledVector(dir, r * 1.05), 0.4);
-    await fadeP;
-    const inst = await loading;
-    this.unmount(parent.inst);
-    parent.inst.onPause?.();
-    this.stack.push({ id: portal.to, inst, portal, saved, dir });
-    this.mount(inst);
-    // arrive: if the child is a magnified copy of the portal object, keep the same view direction
-    const v = inst.view;
-    const d = dir.clone();
-    if (inst.entryRadius) {
-      const s = inst.entryRadius / r;
-      this.controls.target.copy(v.target);
-      this.camera.position.copy(v.target).addScaledVector(d, r * 1.05 * s);
-      this.controls.update();
-      this.fadeTo(0, 450);
-      await this.fly(v.target, v.target.clone().addScaledVector(d, v.distance), 0.9);
-    } else {
-      this.controls.target.copy(v.target);
-      this.camera.position.copy(v.target).addScaledVector(v.dir.clone().normalize(), v.distance * 0.45);
-      this.controls.update();
-      this.fadeTo(0, 500);
-      await this.fly(v.target, v.target.clone().addScaledVector(v.dir.clone().normalize(), v.distance), 1.1);
+    let swapped = false;
+    try {
+      const C = portal.center().clone(), r = portal.radius;
+      const dir = this.camera.position.clone().sub(C).normalize();
+      const loading = this.load(portal.to);
+      loading.catch(() => {}); // handled below; avoids an unhandled-rejection warning while we animate
+      await this.fly(C, C.clone().addScaledVector(dir, r * 2.6), 0.8);
+      const fadeP = this.fadeTo(1, 380);
+      await this.fly(C, C.clone().addScaledVector(dir, r * 1.05), 0.4);
+      await fadeP;
+      const inst = await loading;
+      this.unmount(parent.inst);
+      parent.inst.onPause?.();
+      this.stack.push({ id: portal.to, inst, portal, saved, dir });
+      swapped = true;
+      this.mount(inst);
+      const v = inst.view;
+      this.userMoved = false;
+      if (inst.entryRadius) {
+        const s = inst.entryRadius / r;
+        this.controls.target.copy(v.target);
+        this.camera.position.copy(v.target).addScaledVector(dir, r * 1.05 * s);
+        this.controls.update();
+        this.fadeTo(0, 450);
+        await this.fly(v.target, v.target.clone().addScaledVector(dir, v.distance), 0.9);
+      } else {
+        const d = v.dir.clone().normalize();
+        this.controls.target.copy(v.target);
+        this.camera.position.copy(v.target).addScaledVector(d, v.distance * 0.45);
+        this.controls.update();
+        this.fadeTo(0, 500);
+        await this.fly(v.target, v.target.clone().addScaledVector(d, v.distance), 1.1);
+      }
+      this.userMoved = false;
+    } catch (err) {
+      console.error(err);
+      if (!swapped) {
+        this.flight = null;
+        this.controls.target.copy(saved.target);
+        this.camera.position.copy(saved.pos);
+        this.controls.update();
+      }
+      this.toast?.(`Couldn't open ${portal.label}. Check your connection and try again.`);
+    } finally {
+      this.fadeTo(0, 300);
+      this.busy = false;
+      this.emitChange();
     }
-    this.busy = false;
-    this.emitChange();
   }
 
   /** Climb back up to the parent level. */
   async up(levels = 1) {
     if (this.busy || this.stack.length <= 1) return;
     this.busy = true;
-    for (let i = 0; i < levels && this.stack.length > 1; i++) {
-      const top = this.stack.pop();
-      await this.fadeTo(1, 320);
-      this.unmount(top.inst);
-      top.inst.dispose?.();
-      const parent = this.stack.at(-1);
-      this.mount(parent.inst);
-      parent.inst.onResume?.();
-      const C = top.portal.center().clone(), r = top.portal.radius;
-      const dir = this.camera.position.clone().sub(this.controls.target).normalize();
-      this.controls.target.copy(C);
-      this.camera.position.copy(C).addScaledVector(dir, r * 1.3);
-      this.controls.update();
-      this.fadeTo(0, 420);
-      await this.fly(top.saved.target, top.saved.pos, 1.0);
+    try {
+      for (let i = 0; i < levels && this.stack.length > 1; i++) {
+        await this.fadeTo(1, 320);
+        const top = this.stack.pop();         // swap only once the screen is covered
+        this.unmount(top.inst);
+        top.inst.dispose?.();
+        disposeTree(top.inst.root);
+        const parent = this.stack.at(-1);
+        this.mount(parent.inst);
+        parent.inst.onResume?.();
+        const C = top.portal.center().clone(), r = top.portal.radius;
+        const dir = this.camera.position.clone().sub(this.controls.target).normalize();
+        this.controls.target.copy(C);
+        this.camera.position.copy(C).addScaledVector(dir, r * 1.3);
+        this.controls.update();
+        this.fadeTo(0, 420);
+        await this.fly(top.saved.target, top.saved.pos, 1.0);
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      this.fadeTo(0, 300);
+      this.busy = false;
+      this.emitChange();
     }
-    this.busy = false;
-    this.emitChange();
   }
 
   emitChange() {
@@ -485,7 +560,7 @@ export class Engine {
       const hit = this.pick(this.pointer.x, this.pointer.y);
       this.setHover(hit ? hit.object : null);
     }
-    L?.update?.(dt, t);
+    L?.update?.(this.paused ? 0 : dt, t);
     if (this.hoverInfo && this.pointer.inside && !this.busy) {
       const r = this.canvas.getBoundingClientRect();
       this.tip.innerHTML = this.hoverInfo.title + (this.hoverInfo.portal ? `<small>double-click or zoom in to enter</small>` : "");

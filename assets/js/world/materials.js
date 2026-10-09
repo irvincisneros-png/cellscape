@@ -46,6 +46,7 @@ export function softDot() {
   c.fillStyle = g; c.fillRect(0, 0, 64, 64);
   _dot = new THREE.CanvasTexture(cv);
   _dot.colorSpace = THREE.SRGBColorSpace;
+  _dot.userData.shared = true;
   return _dot;
 }
 

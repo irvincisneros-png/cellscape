@@ -10,7 +10,7 @@ export const ORGANELLES = {
       y11: "Light-dependent reactions on the <strong>thylakoid membranes</strong> split water (releasing O₂) and make ATP + NADPH; the <strong>Calvin cycle</strong> in the stroma uses them to fix CO₂ into sugar. Excess sugar is stored as starch grains.",
     },
     inputs: { "y7-8": "light, carbon dioxide, water", y11: "light, CO₂, H₂O (+ ADP, NADP⁺ recycled)" },
-    outputs: { "y7-8": "glucose, oxygen", "y9-10": "glucose (→ starch store), oxygen", y11: "glucose/starch, O₂" },
+    outputs: { "y7-8": "glucose, oxygen", "y9-10": "glucose (→ starch store), oxygen", y11: "O₂; sugar exported as triose phosphate (→ sucrose); starch stored by day and broken down at night (exported mainly as maltose)" },
     feeds: "mitochondria (glucose + O₂)",
   },
   mitochondrion: {
@@ -18,7 +18,7 @@ export const ORGANELLES = {
     role: {
       "y7-8": "The cell's power station: uses <strong>glucose</strong> and <strong>oxygen</strong> to release <strong>energy</strong> the cell can use (stored in <strong>ATP</strong>).",
       "y9-10": "Site of <strong>aerobic respiration</strong>: glucose + oxygen → carbon dioxide + water + energy (ATP). Plant cells need mitochondria too — day and night.",
-      y11: "Krebs cycle in the matrix and the <strong>electron transport chain</strong> on the cristae; ATP synthase uses the H⁺ gradient to make ~30 ATP per glucose. Rate is set by demand: when ATP is high, respiration slows.",
+      y11: "Glycolysis happens in the cytosol; its pyruvate enters the mitochondrion, becomes acetyl-CoA and feeds the <strong>Krebs cycle</strong> in the matrix. The <strong>electron transport chain</strong> on the cristae builds an H⁺ gradient that ATP synthase uses. Complete oxidation of one glucose yields roughly 30 ATP in total. Rate is demand-led: when ATP is high (little ADP), respiration slows.",
     },
     inputs: { "y7-8": "glucose, oxygen", y11: "pyruvate (from glucose), O₂, ADP + Pᵢ" },
     outputs: { "y7-8": "energy (ATP), carbon dioxide, water", y11: "ATP, CO₂, H₂O" },
@@ -39,8 +39,8 @@ export const ORGANELLES = {
     name: { "y7-8": "Rough ER + ribosomes", y11: "Rough endoplasmic reticulum" }, color: "#5eead4", portal: "ribosome", sim: "protein-synthesis",
     role: {
       "y7-8": "A network of tubes covered in <strong>ribosomes</strong>, which build <strong>proteins</strong> by following the nucleus's instructions.",
-      "y9-10": "Ribosomes on the rough ER read mRNA and join amino acids into <strong>proteins</strong>. The ER folds them and sends them on to the Golgi in vesicles.",
-      y11: "<strong>Translation</strong> at ER-bound ribosomes: tRNAs deliver amino acids matching each codon. New polypeptides enter the ER lumen to fold, then bud off in vesicles to the Golgi.",
+      "y9-10": "Ribosomes on the rough ER read mRNA and join amino acids into proteins that will be <strong>exported</strong> or sent to membranes. (Free ribosomes in the cytoplasm make the cell's other proteins.) The ER folds them and sends them to the Golgi in vesicles.",
+      y11: "<strong>Translation</strong>: a signal sequence on the growing polypeptide directs its ribosome to the ER, where the protein enters the lumen (or inserts into the membrane) and folds; it then travels in vesicles to the Golgi. Proteins for the cytosol, nucleus, mitochondria and chloroplasts are made on free ribosomes instead. Each mRNA is read many times, often by several ribosomes at once (polysomes).",
     },
     inputs: { "y7-8": "mRNA instructions, energy", y11: "mRNA, amino acids, ATP/GTP" },
     outputs: "proteins (in vesicles)",
@@ -51,16 +51,16 @@ export const ORGANELLES = {
     role: {
       "y7-8": "The cell's <strong>post office</strong>: packs proteins into little bubbles (<strong>vesicles</strong>) and sends them where they're needed.",
       "y9-10": "Modifies, sorts and packages proteins into <strong>vesicles</strong>. Some vesicles fuse with the membrane to release their contents (and build the cell wall).",
-      y11: "Modifies proteins (e.g. adds sugars), sorts them and packages them in vesicles; in plant cells it also makes cell-wall polysaccharides. Exocytosis needs ATP.",
+      y11: "Modifies proteins (e.g. adds sugars), sorts them and packages them in vesicles. In plant cells it also makes the wall's <strong>matrix polysaccharides</strong> (pectins, hemicelluloses). Exocytosis needs ATP.",
     },
-    inputs: "proteins from the ER, energy", outputs: "vesicles to the membrane and cell wall", feeds: "cell membrane and cell wall",
+    inputs: "proteins from the ER, energy", outputs: "vesicles to the membrane (secreted proteins, wall materials)", feeds: "cell membrane and cell wall",
   },
   vacuole: {
     name: "Central vacuole", color: "#7dd3fc", sim: "osmosis",
     role: {
       "y7-8": "A big bag of water. When it's full it pushes out against the cell wall and keeps the plant <strong>firm</strong>.",
-      "y9-10": "Stores water and dissolved substances. Water enters by <strong>osmosis</strong>; a full vacuole pushes on the cell wall (<strong>turgor</strong>). If it loses water, the plant wilts.",
-      y11: "Bounded by the tonoplast. Ions pumped in (using ATP) lower its water potential, so water follows by osmosis through aquaporins, creating turgor pressure against the wall.",
+      "y9-10": "Stores water and dissolved substances. Water enters by <strong>osmosis</strong> when the cell sap is more concentrated than its surroundings; a full vacuole pushes on the cell wall (<strong>turgor</strong>). In a salty solution, or if the cell can't keep its solutes, water leaves and the plant wilts.",
+      y11: "Bounded by the tonoplast. Solutes pumped in (using ATP, via both the plasma membrane and tonoplast) lower its water potential, so water enters through aquaporins until turgor pressure balances the solute difference — then net flow stops. A more negative external water potential reverses the flow (plasmolysis).",
     },
     inputs: "water, ions", outputs: "turgor (firmness)", feeds: "the whole cell's shape",
   },
@@ -78,9 +78,9 @@ export const ORGANELLES = {
     role: {
       "y7-8": "A tough outer layer made of <strong>cellulose</strong> that supports and protects the plant cell.",
       "y9-10": "Rigid cellulose wall. It stops the cell bursting when the vacuole is full. Tiny channels (plasmodesmata) connect neighbouring cells.",
-      y11: "Cellulose microfibrils in a matrix of other polysaccharides, laid down by vesicles from the Golgi. Fully permeable; resists turgor pressure. Plasmodesmata link cytoplasm of adjacent cells.",
+      y11: "Cellulose microfibrils are spun at the plasma membrane by <strong>cellulose synthase</strong> complexes; the Golgi supplies the matrix (pectins, hemicelluloses) and wall proteins by exocytosis. Fully permeable; resists turgor pressure. Plasmodesmata link the cytoplasm of adjacent cells.",
     },
-    inputs: "building materials from Golgi vesicles", outputs: "support, shape", feeds: "the whole plant's structure",
+    inputs: { "y7-8": "building materials", y11: "cellulose (made at the membrane) + matrix from Golgi vesicles" }, outputs: "support, shape", feeds: "the whole plant's structure",
   },
   peroxisome: {
     name: "Peroxisome", color: "#facc15", band: "y11",
@@ -117,48 +117,60 @@ export const MISSIONS = [
   { band: "y7-8", text: "Make it <strong>night</strong> (light under 10%) for 15 s. Does the cell still have energy (ATP)? Where is its glucose coming from?", check: (m, s) => s.nightTime > 15 && m.atp > 30 },
   { band: "y7-8", text: "Switch off the <strong>mitochondria</strong> and watch the cell's energy (ATP) run out.", check: (m) => !m.on.mitochondrion && m.atp < 10 },
   { band: "y7-8", text: "Make the <strong>vacuole shrink</strong> so the cell goes floppy. (Hint: what keeps water in?)", check: (m) => m.turgor < 40 },
-  { band: "y7-8", text: "Ship <strong>10 loads of protein</strong> to the cell wall.", check: (m, s) => m.wallBuilt - s.wall0 >= 10 },
+  { band: "y7-8", text: "Deliver <strong>10 loads</strong> of packaged proteins to the cell membrane.", check: (m, s) => m.secreted - s.sec0 >= 10 },
+  { band: "y9-10", text: "Put the cell in a <strong>salty solution</strong> until it goes flaccid, then rescue it.", check: (m, s) => s.wasFlaccid && m.turgor > 75 && m.outside < 20 },
   { band: "y9-10", text: "Block the <strong>nuclear pores</strong>. Where does the mRNA pile up, and which organelles go quiet?", check: (m) => !m.on.pores && m.mrna > 70 },
   { band: "y9-10", text: "Find a <strong>limiting factor</strong>: with bright light, cut CO₂ so photosynthesis slows.", check: (m) => m.light > 60 && m.co2Out < 8 && m.flux.photo < 2.5 },
   { band: "y11", text: "Show <strong>demand control</strong>: in bright light, ATP stays high and the mitochondria slow down.", check: (m) => m.atp > 80 && m.flux.resp < 1.5 && m.light > 60 },
   { band: "y11", text: "At night, run the <strong>starch store</strong> down below 40.", check: (m) => m.light < 10 && m.starch < 40 },
   { band: "y11", text: "Switch off the <strong>aquaporins</strong>, then the pumps: compare how fast turgor falls with and without water channels.", check: (m) => !m.on.aquaporins && !m.on.pumps && m.turgor < 60 },
+  { band: "y11", text: "Switch off <strong>transcription</strong> but leave the pores open: show that mRNA already made still reaches the ribosomes for a while.", check: (m) => !m.on.nucleus && m.on.pores && m.mrnaCyto > 5 && m.mrna < 3 },
 ];
 
 export const QUIZ = [
   { band: "y7-8", maxBand: "y7-8", q: "Which organelle uses light to make glucose?", options: ["Mitochondrion", "Chloroplast", "Nucleus", "Vacuole"], answer: 1, why: "Chloroplasts contain chlorophyll, which captures light for photosynthesis." },
   { band: "y7-8", q: "Plant cells have chloroplasts. Why do they ALSO need mitochondria?", options: ["They don't — mitochondria are only in animals", "To turn glucose into usable energy (ATP), day and night", "To store water", "To make chlorophyll"], answer: 1, why: "Chloroplasts make glucose, but mitochondria release its energy as ATP. At night there's no photosynthesis, but respiration keeps going." },
-  { band: "y7-8", q: "If the mitochondria stop working, what happens to the cell membrane pumps?", options: ["Nothing", "They stop, because they need energy (ATP)", "They speed up", "They turn into chloroplasts"], answer: 1, why: "Pumps use ATP. No ATP → no pumping → water leaves the vacuole → the cell goes floppy." },
+  { band: "y7-8", q: "If the mitochondria stop working, what happens to the cell membrane pumps?", options: ["Nothing", "They stop, because they need energy (ATP)", "They speed up", "They turn into chloroplasts"], answer: 1, why: "Pumps use ATP. No ATP → no pumping → the cell can't hold onto dissolved substances, so it gradually loses water and goes floppy." },
   { band: "y7-8", q: "What keeps a plant cell firm?", options: ["The nucleus", "A full vacuole pushing against the cell wall", "Chloroplasts", "Mitochondria"], answer: 1, why: "Water in the vacuole pushes out against the strong cell wall (turgor)." },
   { band: "y9-10", q: "The nuclear pores are blocked. What happens FIRST?", options: ["Ribosomes run out of mRNA instructions", "Photosynthesis stops", "The cell wall dissolves", "Oxygen can't get in"], answer: 0, why: "mRNA must leave the nucleus to reach ribosomes. Without it, protein production stops; the Golgi then has nothing to ship." },
-  { band: "y9-10", q: "At night, a leaf cell takes in O₂ and releases CO₂. Why?", options: ["Photosynthesis runs backwards", "Respiration continues but photosynthesis has stopped", "The cell is dying", "Chloroplasts make CO₂ at night"], answer: 1, why: "Mitochondria respire all the time. In daylight photosynthesis outpaces respiration, so net O₂ leaves; at night only respiration happens." },
+  { band: "y9-10", q: "At night, a leaf cell takes in O₂ and releases CO₂. Why?", options: ["Photosynthesis runs backwards", "Respiration continues but photosynthesis has stopped", "The cell is dying", "Chloroplasts make CO₂ at night"], answer: 1, why: "Mitochondria respire all the time. In good light photosynthesis usually outpaces respiration, so there is a net release of O₂; in dim light the two can balance (the compensation point), and at night only respiration happens." },
   { band: "y11", q: "Bright light, high CO₂: ATP is near maximum. Why does the rate of aerobic respiration fall?", options: ["Glucose runs out", "Low ADP availability slows the electron transport chain and ATP synthase (respiratory control)", "Oxygen becomes toxic", "Chloroplasts inhibit mitochondria directly"], answer: 1, why: "Respiration is demand-led: ATP synthase needs ADP + Pᵢ. When ATP is high, ADP is low and the whole pathway slows." },
-  { band: "y11", q: "Ion pumps in the membrane stop. Which sequence follows?", options: ["Ions leak out → vacuole water potential rises → water leaves by osmosis → turgor falls", "Water rushes in → cell bursts", "Turgor rises", "Nothing — water moves independently of ions"], answer: 0, why: "Pumped-in solutes keep the vacuole's water potential low. Lose them and water follows them out by osmosis." },
+  { band: "y11", q: "Ion pumps in the membrane stop (the cell is in fresh water). Which sequence follows?", options: ["Solutes leak out → cell water potential rises toward the outside's → less turgor can be sustained → water leaves until pressure and solute potentials balance again", "Water rushes in → cell bursts", "Turgor rises", "Nothing — water moves independently of solutes"], answer: 0, why: "Pumped-in solutes keep the cell's solute potential low. As they leak away, the turgor the cell can hold at equilibrium falls, so water leaves by osmosis until a new balance is reached." },
 ];
 
-/** Live "why is this happening" narrative, built from the model state. */
+/** Live "why is this happening" narrative, built from what the model is actually doing (fluxes), not just the switches. */
 export function narrative(m, band) {
   const y7 = band === "y7-8";
   const on = m.on, F = m.flux, out = [];
   const E = y7 ? "energy (ATP)" : "ATP";
-  if (m.light < 8) out.push(y7
-    ? `It's <strong>dark</strong>, so the chloroplasts can't make glucose. The cell is using its <strong>stored starch</strong> instead. Mitochondria still turn glucose into ${E}, so the cell is now taking <strong>in</strong> oxygen.`
-    : `<strong>Dark</strong>: no photosynthesis. Starch in the chloroplasts is broken down to glucose for respiration (starch ${m.starch.toFixed(0)}%). Net gas exchange has reversed: O₂ in, CO₂ out.`);
-  else if (!on.chloroplast) out.push(`Chloroplasts are <strong>off</strong>: no new glucose. The cell lives on stored starch (${m.starch.toFixed(0)}%) until it runs out.`);
-  else if (F.photo < 2 && m.co2Out < 10) out.push(`Plenty of light but very little <strong>CO₂</strong> — CO₂ is now the <strong>limiting factor</strong> for photosynthesis.`);
+  const photo = F.photo || 0, resp = F.resp || 0, o2 = F.o2Out || 0, mob = F.mobilise || 0, store = F.store || 0;
+  const gas = Math.abs(o2) < 0.15 ? (y7 ? "Oxygen going in and out is about balanced." : "Net O₂ exchange is about zero — photosynthesis and respiration are roughly balanced (compensation point).")
+    : o2 > 0 ? (y7 ? "Overall, the cell is <strong>giving out oxygen</strong>." : `Net O₂ is <strong>leaving</strong> the cell (${o2.toFixed(1)}/s): photosynthesis is faster than respiration.`)
+    : (y7 ? "Overall, the cell is <strong>taking in oxygen</strong>." : `Net O₂ is <strong>entering</strong> the cell (${(-o2).toFixed(1)}/s): respiration is faster than photosynthesis.`);
+  if (photo < 0.15) {
+    out.push(on.chloroplast
+      ? (y7 ? `There's <strong>not enough light</strong>, so the chloroplasts have stopped making glucose.` : `<strong>No photosynthesis</strong> right now (light ${m.light.toFixed(0)}%).`)
+      : `Chloroplasts are <strong>off</strong>: no new glucose is being made.`);
+  } else if (m.light > 60 && m.co2Out < 10 && on.chloroplast) out.push(`Plenty of light but very little <strong>CO₂</strong> — CO₂ is now the <strong>limiting factor</strong> for photosynthesis.`);
   else out.push(y7
-    ? `Daytime: <strong>chloroplasts</strong> use light to make <strong>glucose and oxygen</strong>. <strong>Mitochondria</strong> use them to release ${E}. Spare glucose is stored as <strong>starch</strong>.`
-    : `Chloroplasts make glucose + O₂; mitochondria use them to make ATP + CO₂, which the chloroplasts reuse. Photosynthesis is faster than respiration, so the cell <strong>releases</strong> O₂ (${F.o2Out.toFixed(1)}/s) and stores spare glucose as starch.`);
+    ? `<strong>Chloroplasts</strong> are using light to make <strong>glucose and oxygen</strong>.`
+    : `Chloroplasts are photosynthesising (${photo.toFixed(1)}/s). Mitochondria use the sugar and O₂ to make ATP; their CO₂ is reused by the chloroplasts.`);
+  if (mob > 0.05) out.push(y7 ? `The cell is using its <strong>stored starch</strong> for glucose.` : `Starch is being broken down to keep sugar flowing to the mitochondria (starch ${m.starch.toFixed(0)}%).`);
+  else if (store > 0.05) out.push(y7 ? `Spare glucose is being stored as <strong>starch</strong>.` : `Spare sugar is being stored as starch (${m.starch.toFixed(0)}%).`);
+  out.push(gas);
 
   if (!on.mitochondrion) out.push(y7
-    ? `<strong>Mitochondria off</strong> → hardly any ${E} → pumps stop → water leaks out of the vacuole → the cell goes floppy. The nucleus and ribosomes slow down too.`
-    : `<strong>Mitochondria off</strong>: only glycolysis/fermentation in the cytoplasm makes ATP (a tiny amount). ATP ${m.atp.toFixed(0)}% → pumps, transcription, translation and shipping all stall.`);
+    ? `<strong>Mitochondria off</strong> → hardly any ${E}. Everything that needs energy slows down: the pumps, the nucleus and the ribosomes.`
+    : `<strong>Mitochondria off</strong>: only glycolysis/fermentation in the cytosol makes ATP (a tiny amount). ATP ${m.atp.toFixed(0)}% → pumps, transcription, translation and shipping stall.`);
+  else if (resp > 0.3 && m.atp > 80 && !y7) out.push(`ATP is high, so respiration has slowed — it runs on demand.`);
   else if (m.atp < 15) out.push(`${E} is very low, so everything that needs energy is slowing down.`);
-  if (!on.pores) out.push(`<strong>Nuclear pores blocked</strong>: mRNA is trapped in the nucleus (${m.mrna.toFixed(0)}%), so ribosomes get no instructions → no new proteins → the Golgi has nothing to ship.`);
-  if (!on.nucleus) out.push(`<strong>Nucleus off</strong>: no new mRNA. Ribosomes finish the instructions they have, then stop.`);
-  if (!on.er) out.push(`<strong>Ribosomes/ER off</strong>: mRNA arrives but no proteins are made.`);
-  if (!on.golgi) out.push(`<strong>Golgi off</strong>: proteins pile up in the ER and nothing reaches the cell wall.`);
-  if (!on.pumps) out.push(y7 ? `<strong>Pumps off</strong>: the cell can't hold onto dissolved substances, so water leaves the vacuole and the cell goes floppy.` : `<strong>Pumps off</strong>: ions leak out of the vacuole, its water potential rises, and water leaves by osmosis → turgor ${m.turgor.toFixed(0)}%.`);
+  if (!on.pores) out.push(`<strong>Nuclear pores blocked</strong>: new mRNA is trapped in the nucleus (${m.mrna.toFixed(0)}%). Ribosomes keep reading the mRNA already outside until it breaks down, then protein production stops.`);
+  if (!on.nucleus) out.push(`<strong>Transcription off</strong>: no new mRNA. The mRNA already made still leaves the nucleus and is read until it breaks down.`);
+  if (!on.er) out.push(`<strong>Ribosomes/ER off</strong>: mRNA arrives but no secreted proteins are made.`);
+  if (!on.golgi) out.push(`<strong>Golgi off</strong>: proteins pile up in the ER and nothing is shipped to the membrane.`);
+  const w = F.water || 0;
+  if (m.outside > 25) out.push(y7 ? `The cell is sitting in <strong>salty water</strong>, so water is drawn out of the vacuole.` : `The surrounding solution is concentrated (more negative water potential), so water leaves the vacuole by osmosis${m.turgor < 30 ? " — the protoplast pulls away from the wall (plasmolysis)" : ""}.`);
+  if (!on.pumps) out.push(y7 ? `<strong>Pumps off</strong>: dissolved substances leak away, so the cell slowly loses water${w < -0.2 ? " — it's happening now" : ""}.` : `<strong>Pumps off</strong>: solutes leak out, so the turgor the cell can sustain falls; water ${w < -0.2 ? "is leaving" : "has left"} by osmosis (turgor ${m.turgor.toFixed(0)}%).`);
   if (!on.aquaporins) out.push(`<strong>Aquaporins off</strong>: water can still cross the lipid bilayer, but much more slowly.`);
   return out;
 }

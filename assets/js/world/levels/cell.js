@@ -226,7 +226,7 @@ export function create(engine) {
   const markerDisc = tag(new THREE.Mesh(new THREE.CircleGeometry(1.7, 32), new THREE.MeshBasicMaterial({ color: "#5eead4", transparent: true, opacity: 0.08, depthWrite: false })), "membrane");
   markerDisc.position.copy(MEM_SPOT);
   root.add(markerDisc);
-  pickables.push(wallHandle); wallHandle.userData.kind = "wall"; root.add(wallHandle);
+  wallHandle.userData.kind = "wall"; root.add(wallHandle);   // fallback pick only — see level.fallbackPickables
 
   // ---------- sunlight ----------
   const sun = new THREE.DirectionalLight("#fff5d6", 2.0);
@@ -312,7 +312,8 @@ export function create(engine) {
     want("co2", Math.min(F.photo, F.resp) * 1.2, () => { const m = pickM(); spawn("co2", m.pos, nearest(org.chloroplast, m.pos).pos, 5); });
     want("co2", F.co2In * 1.3, () => { const c = pickC(); spawn("co2", outPoint(c.pos), c.pos, 5); });
     want("co2", -F.co2In * 1.3, () => { const m = pickM(); spawn("co2", m.pos, outPoint(m.pos), 5); });
-    const atpRate = (F.resp * 4.2 + F.ferment) * 0.9;
+    const aerobic = F.resp * 4.2, anaerobic = F.ferment * 1.0;
+    const atpRate = (aerobic + anaerobic) * 0.9;
     const sinks = [
       [F.transcribe * 0.8, () => porePoint(new THREE.Vector3(0, 0, 0)).add(new THREE.Vector3(r() - 0.5, r() - 0.5, r() - 0.5).multiplyScalar(4))],
       [F.translate * 1.2, () => org.er[Math.floor(r() * org.er.length)].pos],
@@ -324,7 +325,9 @@ export function create(engine) {
       let x = r() * sinkTot, s = 0;
       while (s < sinks.length - 1 && x > sinks[s][0]) x -= sinks[s++][0];
       const to = sinks[s][1]();
-      const src = nearest(org.mitochondrion, to, 4).pos;
+      // ATP comes from the mitochondria (aerobic) or from glycolysis in the cytosol (when that's most of it)
+      const fromMito = M.on.mitochondrion && r() < aerobic / (aerobic + anaerobic || 1);
+      const src = fromMito ? nearest(org.mitochondrion, to, 4).pos : to.clone().add(new THREE.Vector3(r() - 0.5, r() - 0.5, r() - 0.5).multiplyScalar(10));
       spawn("atp", src, to, 6);
     });
     want("mrna", F.export * 2.2, () => { const e = org.er[Math.floor(r() * org.er.length)]; spawn("mrna", porePoint(e.pos), e.curve.getPoint(0.25 + r() * 0.5), 3); });
@@ -334,6 +337,7 @@ export function create(engine) {
     want("water", -F.water * 0.9, () => { const p = memPoint(new THREE.Vector3((r() - 0.3) * 44, (r() - 0.5) * 30, (r() - 0.5) * 30)); spawn("water", VAC.clone().lerp(p, 0.55), p.multiplyScalar(1.12), 5); });
   }
 
+  const tEu = new THREE.Euler();
   function drawFlows(dt) {
     for (const [k, fm] of Object.entries(flowMeshes)) {
       let n = 0;
@@ -341,10 +345,8 @@ export function create(engine) {
       for (const p of fm.parts) {
         const t = p.t, u = 1 - t;
         tmpV.set(0, 0, 0).addScaledVector(p.a, u * u).addScaledVector(p.c, 2 * u * t).addScaledVector(p.b, t * t);
-        if (k === "light" || k === "mrna") {
-          const dir = p.b.clone().sub(p.a).normalize();
-          tmpQ.setFromUnitVectors(UP, dir);
-        } else tmpQ.setFromEuler(new THREE.Euler(p.spin + t * 3, p.spin * 0.7 + t * 2, 0));
+        if (k === "light" || k === "mrna") tmpQ.setFromUnitVectors(UP, tA.copy(p.b).sub(p.a).normalize());
+        else tmpQ.setFromEuler(tEu.set(p.spin + t * 3, p.spin * 0.7 + t * 2, 0));
         const s = Math.min(1, t * 6, (1 - t) * 6);
         fm.mesh.setMatrixAt(n++, tmpM.compose(tmpV, tmpQ, tmpS.set(s, s, s)));
       }
@@ -354,16 +356,18 @@ export function create(engine) {
   }
 
   // ---------- per-frame organelle motion ----------
+  const tA = new THREE.Vector3(), tQ2 = new THREE.Quaternion(), tAx = new THREE.Vector3();
   function animate(t) {
+    const still = engine.reducedMotion;
     let gi = 0;
     org.chloroplast.forEach((o, i) => {
-      const drift = Math.sin(t * 0.08 + o.phase) * 0.9;
-      o.pos.copy(o.base).addScaledVector(new THREE.Vector3(o.n.y, o.n.z, o.n.x), drift);
+      const drift = still ? 0 : Math.sin(t * 0.08 + o.phase) * 0.9;
+      o.pos.copy(o.base).addScaledVector(tAx.set(o.n.y, o.n.z, o.n.x), drift);
       o.mesh.position.copy(o.pos);
       const dim = M.on.chloroplast ? 1 : 0.35;
       o.mesh.updateMatrix();
       for (const L of granaLocal) {
-        tmpV.copy(L).multiply(new THREE.Vector3(1, 1, 1)).applyQuaternion(o.q).add(o.pos);
+        tmpV.copy(L).applyQuaternion(o.q).add(o.pos);
         grana.setMatrixAt(gi++, tmpM.compose(tmpV, o.q, tmpS.set(dim, 1, dim)));
       }
       const st = 0.15 + (M.starch / 100) * 0.4;
@@ -374,19 +378,18 @@ export function create(engine) {
     starchMesh.instanceMatrix.needsUpdate = true;
     let ci = 0;
     org.mitochondrion.forEach((o) => {
-      const drift = Math.sin(t * 0.11 + o.phase) * 1.2;
-      o.pos.copy(o.base).addScaledVector(new THREE.Vector3(o.n.z, o.n.x, o.n.y), drift);
+      const drift = still ? 0 : Math.sin(t * 0.11 + o.phase) * 1.2;
+      o.pos.copy(o.base).addScaledVector(tAx.set(o.n.z, o.n.x, o.n.y), drift);
       o.mesh.position.copy(o.pos);
-      const q = o.q.clone().multiply(new THREE.Quaternion().setFromAxisAngle(UP, Math.sin(t * 0.2 + o.phase) * 0.3));
+      const q = tQ2.copy(o.q).multiply(tmpQ.setFromAxisAngle(UP, still ? 0 : Math.sin(t * 0.2 + o.phase) * 0.3));
       o.mesh.quaternion.copy(q);
       for (let k = 0; k < 5; k++) {
-        tmpV.set(-0.75 + k * 0.38, 0, 0).applyQuaternion(q).add(o.pos);
-        cristae.setMatrixAt(ci++, tmpM.compose(tmpV, q, tmpS.set(1, 1, 1)));
+        tA.set(-0.75 + k * 0.38, 0, 0).applyQuaternion(q).add(o.pos);
+        cristae.setMatrixAt(ci++, tmpM.compose(tA, q, tmpS.set(1, 1, 1)));
       }
     });
     cristae.instanceMatrix.needsUpdate = true;
     const glow = 0.25 + 0.75 * Math.min(1, M.flux.resp / 3);
-    mitoMat.emissive = mitoMat.emissive || new THREE.Color();
     mitoMat.emissive.set("#f97316").multiplyScalar(M.on.mitochondrion ? glow * 0.6 : 0);
     chloroMat.emissive.set("#22c55e").multiplyScalar(M.on.chloroplast ? Math.min(1, M.flux.photo / 4) * 0.5 : 0);
     // vacuole size follows turgor; the membrane pulls away from the wall when the cell is flaccid
@@ -394,7 +397,7 @@ export function create(engine) {
     vacuole.scale.set(vs, 0.6 + 0.4 * vs, 0.6 + 0.4 * vs);
     const ms = M.turgor < 35 ? 1 - ((35 - M.turgor) / 35) * 0.07 : 1;
     membrane.scale.setScalar(ms);
-    marker.rotation.z = t * 0.4;
+    marker.rotation.z = still ? 0 : t * 0.4;
     marker.material.emissiveIntensity = 0.9 + Math.sin(t * 2.5) * 0.4;
     sun.intensity = 0.2 + 2.6 * (M.light / 100);
     pores.material.emissiveIntensity = M.on.pores ? 0.4 : 0.0;
@@ -449,10 +452,16 @@ export function create(engine) {
   }
 
   // ---------- panel ----------
-  let panelEl, explainBody, selCard, chips = {}, chart, chartCtx, mission, nightTime = 0, wall0 = 0, rows = {};
+  let progress = null; // { band, node } — the built panel, kept across dives so missions/quiz survive
+  let panelEl, explainBody, selCard, chips = {}, chart, chartCtx, mission, nightTime = 0, sec0 = 0, rows = {}, wasFlaccid = false;
   function buildPanel(el) {
     panelEl = el;
     el.innerHTML = "";
+    const host = document.createElement("div");
+    host.style.display = "contents";
+    el.appendChild(host);
+    progress = { band: lens.band, node: host };
+    el = host;
     const band = lens.band;
     const ex = K.card(el, "What's happening", "explain");
     explainBody = document.createElement("div");
@@ -464,10 +473,15 @@ export function create(engine) {
     const env = K.card(el, "Conditions");
     K.slider(env, { label: "☀ Light", min: 0, max: 100, value: M.light, unit: " %", onInput: (v) => (M.light = v) });
     K.slider(env, { label: lens.pick({ "y7-8": "Carbon dioxide in the air", "y9-10": "CO₂ available" }), min: 0, max: 100, value: M.co2Out, unit: " %", onInput: (v) => (M.co2Out = v) });
+    if (lens.atLeast("y9-10")) K.slider(env, { label: "Salt in the surrounding solution", min: 0, max: 100, value: M.outside, unit: " %", format: (v) => (v === 0 ? "pure water" : `${v} %`), onInput: (v) => (M.outside = v) });
     const r = K.buttonRow(env);
     K.button(r, "☀ Day", () => setLight(85));
     K.button(r, "☾ Night", () => setLight(0));
-    K.button(r, "Reset cell", () => { M.reset(); wall0 = 0; buildPanel(panelEl); });
+    K.button(r, "Reset cell", () => {
+      M.reset(); sec0 = 0; tour = null; showStep(); engine.select(null);
+      for (const fm of Object.values(flowMeshes)) { fm.parts.length = 0; fm.acc = 0; }
+      progress = null; buildPanel(panelEl);
+    });
     function setLight(v) { M.light = v; env.querySelector("input").value = v; env.querySelector("input").dispatchEvent(new Event("input")); }
 
     const sw = K.card(el, lens.pick({ "y7-8": "Switch organelles on and off", "y9-10": "Knock out a part" }));
@@ -480,10 +494,14 @@ export function create(engine) {
       const row = document.createElement("div");
       row.className = "org-row";
       const col = ORGANELLES[s.key]?.color || (s.key === "pores" ? "#ede9fe" : s.key === "pumps" ? "#c4b5fd" : "#38bdf8");
-      row.innerHTML = `<i style="background:${col}"></i><div>${lens.pick(s.label)}<small></small></div><label class="switch"><input type="checkbox" ${M.on[s.key] ? "checked" : ""} aria-label="${lens.pick(s.label)} on"><span></span></label>`;
+      row.innerHTML = `<i style="background:${col}"></i><button type="button" class="org-name" title="Show me">${lens.pick(s.label)}<small></small></button><label class="switch"><input type="checkbox" ${M.on[s.key] ? "checked" : ""} aria-label="${lens.pick(s.label)} on"><span></span></label>`;
       const cb = row.querySelector("input");
-      cb.addEventListener("change", () => { M.on[s.key] = cb.checked; K.$("#stage") && engine.toast?.(`${lens.pick(s.label)} ${cb.checked ? "on" : "off"}`); });
-      row.addEventListener("click", (e) => { if (e.target.closest(".switch")) return; const kind = ORGANELLES[s.key] ? s.key : s.key === "pores" ? "nucleus" : s.key === "pumps" || s.key === "aquaporins" ? "membrane" : null; if (kind) focusOn(kind); });
+      cb.addEventListener("change", () => {
+        M.on[s.key] = cb.checked;
+        engine.toast?.(`${lens.pick(s.label)} ${cb.checked ? "on" : "off"}`);
+        if (engine.selected) showSelection(engine.selected);
+      });
+      row.querySelector(".org-name").addEventListener("click", () => { const kind = ORGANELLES[s.key] ? s.key : s.key === "pores" ? "nucleus" : s.key === "pumps" || s.key === "aquaporins" ? "membrane" : null; if (kind) focusOn(kind); });
       list.appendChild(row);
       rows[s.key] = row;
     }
@@ -512,6 +530,7 @@ export function create(engine) {
     const ch = K.card(el, "Cell supplies over time");
     chart = document.createElement("canvas");
     chart.className = "mini-chart";
+    chart.setAttribute("role", "img");
     ch.appendChild(chart);
     chartCtx = chart.getContext("2d");
     ch.insertAdjacentHTML("beforeend", `<div class="legend" style="margin-top:6px"><span><i style="background:#fbbf24"></i>${lens.pick({ "y7-8": "Energy (ATP)", "y9-10": "ATP" })}</span><span><i style="background:#a3e635"></i>Glucose</span><span><i style="background:#f8fafc"></i>Starch</span><span><i style="background:#38bdf8"></i>Water (turgor)</span></div>`);
@@ -519,10 +538,11 @@ export function create(engine) {
     const tours = K.card(el, "Guided tours");
     const tr = K.buttonRow(tours);
     K.button(tr, "Follow the energy", () => startTour("energy"));
-    K.button(tr, "Follow a protein", () => startTour("protein"));
+    K.button(tr, "Follow a secreted protein", () => startTour("protein"));
 
-    nightTime = 0; wall0 = M.wallBuilt;
-    mission = K.missions(el, lens.filter(MISSIONS).map((m) => ({ text: m.text, check: () => m.check(M, { nightTime, wall0 }) })), (m) => engine.toast(`🎯 Mission complete: ${m.text.replace(/<[^>]+>/g, "")}`, 3400));
+    nightTime = 0; sec0 = M.secreted;
+    wasFlaccid = false;
+    mission = K.missions(el, lens.filter(MISSIONS).map((m) => ({ text: m.text, check: () => m.check(M, { nightTime, sec0, wasFlaccid }) })), (m) => engine.toast(`🎯 Mission complete: ${m.text.replace(/<[^>]+>/g, "")}`, 3400));
     K.quiz(el, lens.filter(QUIZ));
     buildChips();
   }
@@ -546,7 +566,7 @@ export function create(engine) {
     const o = M.flux.o2Out || 0;
     chips.o2(`${d("#f87171")}O₂ <b>${Math.abs(o) < 0.15 ? "balanced" : o > 0 ? "↑ released" : "↓ taken in"}</b>`);
     chips.water(`${d("#38bdf8")}${y7 ? "Firmness" : "Turgor"} <b>${M.turgor.toFixed(0)}%</b>`);
-    chips.wall(`${d("#f472b6")}Proteins shipped <b>${(M.wallBuilt - wall0).toFixed(0)}</b>`);
+    chips.wall(`${d("#f472b6")}${y7 ? "Proteins delivered" : "Secreted cargo"} <b>${(M.secreted - sec0).toFixed(0)}</b>`);
   }
 
   function drawChart() {
@@ -559,6 +579,7 @@ export function create(engine) {
     c.strokeStyle = "rgba(255,255,255,0.08)";
     for (let i = 0; i <= 4; i++) { c.beginPath(); c.moveTo(0, (h * i) / 4); c.lineTo(w, (h * i) / 4); c.stroke(); }
     const H = M.history;
+    chart.setAttribute("aria-label", `Cell supplies now: ATP ${M.atp.toFixed(0)}, glucose ${M.glucose.toFixed(0)}, starch ${M.starch.toFixed(0)}, turgor ${M.turgor.toFixed(0)} percent.`);
     if (H.length < 2) return;
     for (const [k, col] of [["turgor", "#38bdf8"], ["starch", "#f8fafc"], ["glucose", "#a3e635"], ["atp", "#fbbf24"]]) {
       c.strokeStyle = col; c.lineWidth = 2; c.beginPath();
@@ -606,6 +627,7 @@ export function create(engine) {
   }
 
   function focusOn(kind) {
+    if (engine.busy) return;
     const target = kind === "chloroplast" ? org.chloroplast[2].mesh : kind === "mitochondrion" ? org.mitochondrion[5].mesh : kind === "nucleus" ? nucShell
       : kind === "er" ? org.er[3].mesh : kind === "golgi" ? org.golgi[0].mesh.children[0] : kind === "vacuole" ? vacuole : kind === "membrane" ? marker : null;
     if (!target) return;
@@ -620,7 +642,7 @@ export function create(engine) {
   const TOURS = {
     energy: [
       { kind: "chloroplast", text: { "y7-8": "<b>1. Chloroplast.</b> Light energy is captured here. Carbon dioxide and water are turned into <b>glucose</b> and <b>oxygen</b>.", y11: "<b>1. Chloroplast.</b> Light-dependent reactions (thylakoids) make ATP + NADPH and release O₂; the Calvin cycle fixes CO₂ into sugar. Spare sugar → starch." } },
-      { kind: "mitochondrion", text: { "y7-8": "<b>2. Mitochondrion.</b> Glucose and oxygen travel here. Respiration releases their energy as <b>ATP</b>, giving off carbon dioxide — which the chloroplast reuses!", y11: "<b>2. Mitochondrion.</b> Pyruvate from glycolysis enters the Krebs cycle; the ETC and ATP synthase make most of the ATP. CO₂ diffuses back to the chloroplasts." } },
+      { kind: "mitochondrion", text: { "y7-8": "<b>2. Mitochondrion.</b> Glucose and oxygen travel here. Respiration releases their energy as <b>ATP</b>, giving off carbon dioxide — which the chloroplast reuses!", y11: "<b>2. Mitochondrion.</b> Glycolysis in the cytosol makes pyruvate, which enters the mitochondrion and becomes acetyl-CoA for the Krebs cycle; the ETC and ATP synthase make most of the ATP. CO₂ diffuses back to the chloroplasts." } },
       { kind: "nucleus", text: { "y7-8": "<b>3. Where the energy goes.</b> ATP (gold) powers the nucleus, the ribosomes, the Golgi and the membrane pumps.", y11: "<b>3. ATP sinks.</b> Transcription (NTPs), translation (ATP/GTP), vesicle trafficking and the membrane H⁺-ATPase all draw on the ATP pool." } },
       { kind: "vacuole", text: { "y7-8": "<b>4. Staying firm.</b> Pumps use ATP to hold substances in, so water flows into the vacuole. No energy → no pumping → the plant wilts. Try it: switch off the mitochondria!", y11: "<b>4. Turgor depends on ATP.</b> Pumped solutes keep vacuolar water potential low, so water enters by osmosis. Knock out the mitochondria and watch turgor collapse." } },
     ],
@@ -628,14 +650,14 @@ export function create(engine) {
       { kind: "nucleus", text: { "y7-8": "<b>1. Nucleus.</b> A gene's instructions are copied into a message called <b>mRNA</b>.", y11: "<b>1. Transcription.</b> RNA polymerase copies the gene; processed mRNA exits through nuclear pores." } },
       { kind: "er", text: { "y7-8": "<b>2. Ribosomes on the rough ER.</b> The mRNA (blue) reaches the ribosomes, which read it and build a <b>protein</b>.", y11: "<b>2. Translation.</b> ER-bound ribosomes translate the mRNA; the polypeptide enters the ER lumen and folds." } },
       { kind: "golgi", text: { "y7-8": "<b>3. Golgi apparatus.</b> Proteins arrive in vesicles (pink). The Golgi packs and labels them.", y11: "<b>3. Golgi.</b> Proteins are modified (e.g. glycosylated), sorted and packaged into secretory vesicles." } },
-      { kind: "membrane", text: { "y7-8": "<b>4. Delivery.</b> Vesicles fuse with the cell membrane and release their cargo — some builds the cell wall. Zoom into the glowing ring to see the membrane up close.", y11: "<b>4. Exocytosis.</b> Vesicles fuse with the plasma membrane (ATP-dependent), delivering wall components and membrane proteins. Dive into the membrane to see transport up close." } },
+      { kind: "membrane", text: { "y7-8": "<b>4. Delivery.</b> Vesicles fuse with the cell membrane and release their cargo outside the cell. Zoom into the glowing ring to see the membrane up close.", y11: "<b>4. Exocytosis.</b> Vesicles fuse with the plasma membrane (ATP-dependent), releasing secreted proteins and wall-matrix polysaccharides and adding membrane proteins. (Cellulose itself is made at the membrane by cellulose synthase.) Dive into the membrane to see transport up close." } },
     ],
   };
   let tour = null;
   const cap = document.createElement("div");
   cap.className = "tour-cap";
   engine.stageEl.appendChild(cap);
-  function startTour(name) { tour = { steps: TOURS[name], i: 0 }; showStep(); }
+  function startTour(name) { if (engine.busy) return; tour = { steps: TOURS[name], i: 0 }; showStep(); }
   function showStep() {
     if (!tour) { cap.style.display = "none"; return; }
     const s = tour.steps[tour.i];
@@ -653,6 +675,7 @@ export function create(engine) {
     title: "Plant cell",
     topics: ["cell-structure", "organelles", "photosynthesis", "respiration", "atp", "osmosis", "protein-synthesis"],
     root, pickables, portals,
+    fallbackPickables: [wallHandle],
     metersPerUnit: 1e-6,
     get view() { const a = engine.camera.aspect; return { target: new THREE.Vector3(0, 0, 0), distance: Math.min(190, Math.max(100, 33 / (0.344 * a))), dir: new THREE.Vector3(0.12, 0.34, 1) }; },
     minDistance: 6, maxDistance: 190, near: 0.2, far: 1200,
@@ -664,13 +687,18 @@ export function create(engine) {
       return infoFor(kind, obj);
     },
     onSelect(info) { showSelection(info); },
-    mountPanel(el) { makeLabels(); buildPanel(el); },
+    mountPanel(el) {
+      makeLabels();
+      if (progress && progress.band === lens.band) { panelEl = el; el.appendChild(progress.node); buildChips(); }
+      else buildPanel(el);
+    },
     unmountPanel() { for (const el of Object.values(labels)) el.style.display = "none"; diveLbl.style.display = "none"; cap.style.display = "none"; engine.overlay.innerHTML = ""; },
     onResume() { makeLabels(); },
-    onLens() { showLabels = lens.band === "y7-8" || lens.band === "y9-10"; buildPanel(panelEl); },
+    onLens() { showLabels = lens.band === "y7-8" || lens.band === "y9-10"; progress = null; buildPanel(panelEl); },
     update(dt, t) {
       M.step(dt);
       nightTime = M.light < 10 ? nightTime + dt : 0;
+      if (M.turgor < 35 && M.outside > 20) wasFlaccid = true;
       emitFlows(dt);
       drawFlows(dt);
       animate(t);

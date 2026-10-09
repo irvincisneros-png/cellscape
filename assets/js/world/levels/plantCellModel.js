@@ -5,7 +5,10 @@
 //  glucose + O₂ ──mitochondria──▶ ATP + CO₂ + H₂O          (glycolysis in cytoplasm gives a little ATP without O₂)
 //  ATP powers: membrane pumps (keep ions in → water in → turgor), the nucleus (making mRNA),
 //              ribosomes on the rough ER (making proteins), Golgi + vesicles (shipping proteins to the wall)
-//  DNA ─nucleus─▶ mRNA ─nuclear pore─▶ ribosomes/ER ─▶ protein ─▶ Golgi ─▶ vesicle ─▶ membrane / wall
+//  DNA ─nucleus─▶ mRNA ─nuclear pore─▶ ribosomes on the rough ER ─▶ secreted protein ─▶ Golgi ─▶ vesicle ─▶ membrane
+//  (simplified: only the secretory route is modelled; free cytosolic ribosomes make many other proteins)
+//  Water: the vacuole gains water while its water potential is lower than the surroundings; turgor pressure
+//  builds until the two balance. Pumps hold solutes in; a salty outside solution pulls water out.
 
 const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 const sat = (x, k) => (x <= 0 ? 0 : x / (x + k));
@@ -18,13 +21,14 @@ export class PlantCellModel {
   reset() {
     this.light = 70;        // % of full sun
     this.co2Out = 50;       // CO₂ available outside (% of normal × 50)
+    this.outside = 0;       // solutes in the surrounding solution (0 = pure water, 100 = very salty)
     this.on = Object.fromEntries(PARTS.map((p) => [p, true]));
     this.glucose = 55; this.o2 = 40; this.co2 = 35; this.atp = 70;
     this.mrna = 20; this.mrnaCyto = 15; this.erProtein = 15; this.golgiProtein = 10;
     this.turgor = 90;       // % — vacuole full and pressing on the wall
     this.starch = 60;       // starch grains in the chloroplasts (glucose store, 0–100)
     this.ions = 80;         // solute held inside by pumps (drives water uptake)
-    this.wallBuilt = 0;     // proteins/wall material delivered
+    this.secreted = 0;      // secretory cargo (proteins, wall matrix) delivered to the membrane
     this.time = 0;
     this.flux = {};
     this.history = [];
@@ -53,7 +57,7 @@ export class PlantCellModel {
     const atpOK = sat(this.atp, 12);
     F.pump = on.pumps ? 2.2 * atpOK : 0;
     F.transcribe = on.nucleus ? 1.4 * atpOK : 0;
-    F.export = on.nucleus && on.pores ? 1.2 * sat(this.mrna, 8) : 0;
+    F.export = on.pores ? 1.2 * sat(this.mrna, 8) : 0;   // already-made mRNA still leaves if the pores are open
     F.translate = on.er ? 1.6 * sat(this.mrnaCyto, 10) * atpOK : 0;
     F.toGolgi = on.golgi ? 1.3 * sat(this.erProtein, 10) * atpOK : 0;
     F.secrete = on.golgi ? 1.0 * sat(this.golgiProtein, 8) * atpOK : 0;
@@ -63,10 +67,11 @@ export class PlantCellModel {
     F.o2Out = (this.o2 - 25) * 0.18;                           // + = O₂ leaving the cell
     F.co2In = (this.co2Out * 0.7 - this.co2) * 0.15;           // + = CO₂ entering
 
-    // water: pumps hold ions in, ions draw water into the vacuole (osmosis via aquaporins)
-    const ionTarget = F.pump > 0 ? 100 * sat(F.pump, 0.4) : 0;
+    // water: pumps hold solutes in; water moves toward the lower water potential until turgor
+    // pressure balances the solute difference (net flow then stops even though solutes still differ)
+    const ionTarget = F.pump > 0 ? 100 * sat(F.pump, 0.4) : 10;
     this.ions += (ionTarget - this.ions) * 0.05 * dt;
-    const turgorTarget = clamp(this.ions * 1.1, 0, 100);
+    const turgorTarget = clamp(this.ions * 1.1 - this.outside * 1.3, 0, 100);
     F.water = (turgorTarget - this.turgor) * (on.aquaporins ? 0.12 : 0.02);
 
     // starch: chloroplasts store spare glucose as starch by day and break it down when glucose runs low
@@ -80,10 +85,10 @@ export class PlantCellModel {
     this.co2 += (F.resp - F.photo + F.co2In) * dt;
     this.atp += (F.resp * 4.2 + F.ferment * 1.0 - F.pump - F.transcribe * 0.8 - F.translate * 1.2 - F.toGolgi * 0.5 - F.secrete * 0.5 - F.upkeep) * dt;
     this.mrna += (F.transcribe - F.export - this.mrna * 0.01) * dt;           // in the nucleus
-    this.mrnaCyto += (F.export - F.translate * 0.3 - this.mrnaCyto * 0.03) * dt; // out at the ribosomes
+    this.mrnaCyto += (F.export - this.mrnaCyto * 0.03) * dt;   // mRNA is a reusable template: it is lost only by decay
     this.erProtein += (F.translate - F.toGolgi) * dt;
     this.golgiProtein += (F.toGolgi - F.secrete) * dt;
-    this.wallBuilt += F.secrete * dt * 0.2;
+    this.secreted += F.secrete * dt * 0.2;
     this.turgor += F.water * dt;
 
     for (const k of ["glucose", "o2", "co2", "atp", "mrna", "mrnaCyto", "erProtein", "golgiProtein", "turgor"]) this[k] = clamp(this[k], 0, 100);
@@ -102,10 +107,10 @@ export class PlantCellModel {
     const F = this.flux, on = this.on, s = {};
     s.chloroplast = !on.chloroplast ? "switched off" : F.photo < 0.6 ? (this.light < 5 ? "idle — no light" : "slow") : "making glucose + O₂";
     s.mitochondrion = !on.mitochondrion ? "switched off" : F.resp < 0.4 ? (this.glucose < 3 ? "starved of glucose" : this.o2 < 3 ? "no O₂" : "resting (ATP is high)") : "making ATP";
-    s.nucleus = !on.nucleus ? "switched off" : this.atp < 5 ? "stalled — no ATP" : "copying genes into mRNA";
+    s.nucleus = !on.nucleus ? "transcription off" : this.atp < 5 ? "stalled — no ATP" : "copying genes into mRNA";
     s.er = !on.er ? "switched off" : F.translate < 0.3 ? (!on.pores || this.mrnaCyto < 3 ? "waiting — no mRNA arriving" : "slow") : "ribosomes making proteins";
     s.golgi = !on.golgi ? "switched off" : F.secrete < 0.2 ? "little to ship" : "packaging + shipping proteins";
-    s.vacuole = this.turgor > 75 ? "full — cell is turgid" : this.turgor > 40 ? "losing water" : "shrunk — cell is flaccid";
+    s.vacuole = this.turgor > 75 ? "full — cell is turgid" : this.turgor > 40 ? (F.water < -0.2 ? "losing water" : "partly full") : F.water < -0.2 ? "losing water — cell going flaccid" : "shrunk — cell is flaccid";
     s.pumps = !on.pumps ? "switched off" : this.atp < 5 ? "stopped — no ATP" : "pumping ions in";
     return s;
   }

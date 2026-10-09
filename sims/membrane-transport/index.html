@@ -27,10 +27,14 @@
     <aside class="panel" id="panel"></aside>
   </div>
   <script type="module">
+    // three.js r169 needs WebGL2; without it (or if 3D fails to start) use the 2D version of this simulation
     let gl = false;
-    try { const c = document.createElement("canvas"); gl = !!(c.getContext("webgl2") || c.getContext("webgl")); } catch {}
-    if (gl) import("../../assets/js/world/shell.js").then((m) => m.boot({ start: "membrane", root: "../../" }));
-    else import("./sim2d.js");
+    try { gl = !!document.createElement("canvas").getContext("webgl2") && sessionStorage.getItem("cs2d") !== "1"; } catch { gl = false; }
+    const fallback = () => { document.getElementById("labels")?.remove(); import("./sim2d.js"); };
+    if (!gl) fallback();
+    else import("../../assets/js/world/shell.js")
+      .then((m) => m.boot({ start: "membrane", root: "../../" }))
+      .catch((e) => { console.error(e); try { sessionStorage.setItem("cs2d", "1"); } catch {} location.reload(); });
   </script>
 </body>
 </html>

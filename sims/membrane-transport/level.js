@@ -54,6 +54,7 @@ export function create(engine) {
   const G = new Scene3D(M, engine, labelLayer);
   const stage = { dpr: Math.min(window.devicePixelRatio || 1, 2) };
   const L = { running: true, speed: 1, toggle() { this.running = !this.running; return this.running; } };
+  let activeDrag = null, disposed = false;
 
   let sel = "glc";          // species chosen in the palette
   let focus = "intro";      // what the explain card talks about
@@ -402,7 +403,9 @@ export function create(engine) {
     b.setAttribute("aria-label", `Select ${SP[sp].long}`);
     tray.appendChild(b);
     trayBtns[sp] = b;
+    b.addEventListener("click", (e) => { if (e.detail === 0) { selectSpecies(sp); addSel("out"); } }); // keyboard: Enter/Space adds 5 outside
     b.addEventListener("pointerdown", (e) => {
+      if (e.button !== 0) return;
       e.preventDefault();
       selectSpecies(sp);
       const ghost = document.createElement("div");
@@ -413,14 +416,16 @@ export function create(engine) {
         if (Math.hypot(ev.clientX - e.clientX, ev.clientY - e.clientY) > 6 && !moved) { moved = true; document.body.appendChild(ghost); }
         ghost.style.transform = `translate(${ev.clientX - 14}px, ${ev.clientY - 14}px)`;
       };
+      const cleanup = () => { removeEventListener("pointermove", mv); removeEventListener("pointerup", up); removeEventListener("pointercancel", cleanup); ghost.remove(); activeDrag = null; };
       const up = (ev) => {
-        removeEventListener("pointermove", mv); removeEventListener("pointerup", up);
-        ghost.remove();
+        cleanup();
+        if (disposed) return;
         const r = engine.canvas.getBoundingClientRect();
         if (moved && ev.clientX > r.left && ev.clientX < r.right && ev.clientY > r.top && ev.clientY < r.bottom) addAt(sp, ev.clientX, ev.clientY, 5);
         else if (!moved) toast(`${SP[sp].long} selected — drag it onto a side, or tap empty space to add 3`);
       };
-      addEventListener("pointermove", mv); addEventListener("pointerup", up);
+      addEventListener("pointermove", mv); addEventListener("pointerup", up); addEventListener("pointercancel", cleanup);
+      activeDrag = cleanup;
     });
   }
   const _sel = selectSpecies;
@@ -454,6 +459,12 @@ export function create(engine) {
 
   // chips get the mt-chip class so their styles don't leak into other levels
   for (const c of overlay.children) c.classList.add("mt-chip");
+
+  // shown when this level is entered from the plant cell
+  const plantNote = document.createElement("section");
+  plantNote.className = "card";
+  plantNote.innerHTML = `<h2>Model membrane</h2><p>This close-up uses the transport proteins of an <strong>animal cell</strong> (the Na⁺/K⁺ pump, GLUT). Plant cell membranes have the same kinds of transport — diffusion, channels, carriers, pumps, vesicles — but their main pump is a <strong>proton pump (H⁺-ATPase)</strong>, whose H⁺ gradient powers the other carriers.</p>`;
+  panel.prepend(plantNote);
 
   // ---------- level object ----------
   let uiTimer = 0;
@@ -490,13 +501,16 @@ export function create(engine) {
       return true;
     },
     mountPanel(el) {
+      // entered from the plant cell: be honest that this patch shows animal-cell transport proteins
+      const parent = engine.stack.at(-1)?.id === "cell" ? "cell" : engine.stack.at(-2)?.id;
+      plantNote.style.display = parent === "cell" ? "" : "none";
       el.appendChild(panel);
       engine.overlay.appendChild(overlay);
       engine.labelLayer.appendChild(labelLayer);
       engine.stageEl.appendChild(tray);
     },
-    unmountPanel() { overlay.remove(); tray.remove(); labelLayer.remove(); },
-    dispose() { overlay.remove(); tray.remove(); labelLayer.remove(); },
+    unmountPanel() { activeDrag?.(); overlay.remove(); tray.remove(); labelLayer.remove(); },
+    dispose() { disposed = true; activeDrag?.(); M.feeding = false; overlay.remove(); tray.remove(); labelLayer.remove(); },
     update(dt, t) {
       const d = L.running ? dt * L.speed : 0;
       M.step(d);
