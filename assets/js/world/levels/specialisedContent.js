@@ -9,6 +9,7 @@
 //   - mature red blood cells have no nucleus and no mitochondria (so "all cells have..." is never written).
 
 const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+const lerp = (a, b, t) => a + (b - a) * t;
 const smooth = (x, a, b) => { const t = clamp((x - a) / (b - a), 0, 1); return t * t * (3 - 2 * t); };
 const f0 = (v) => Math.round(v);
 const f1 = (v) => v.toFixed(1);
@@ -19,12 +20,24 @@ const f2 = (v) => v.toFixed(2);
 // =====================================================================================================================
 export const RBC = {
   V: 90,                 // volume, fL = um^3 (mean corpuscular volume of a healthy adult is about 80-100 fL)
-  A_BI: 135,             // membrane area of a real biconcave red cell, um^2 (about 130-140)
+  A_BI: 130,             // set below from the drawn profile (real cells: about 130-140 um^2)
   T95_BI: 45,            // ms: time to ~95 % oxygen saturation for the real shape (in vitro half-times are tens of ms)
   D_BI: 1.25,            // um: greatest distance from the inside of a biconcave cell to its surface (about half the rim thickness)
 };
+/** Evans-Fung biconcave profile blended from a sphere (s = 0); scaled so the volume stays 90 fL. Area is integrated from that same profile. */
+export function rbcShape(s) {
+  const co = [lerp(1, 0.2072, s), lerp(0, 2.0026, s), lerp(0, -1.1228, s)], f = lerp(1, 0.5, s);
+  const zeta = (r) => f * Math.sqrt(Math.max(0, 1 - r * r)) * (co[0] + co[1] * r * r + co[2] * r ** 4);
+  let I = 0; const n = 400;
+  for (let i = 0; i < n; i++) { const r = (i + 0.5) / n; I += (r * zeta(r)) / n; }
+  const R = Math.cbrt(RBC.V / (4 * Math.PI * I));
+  let A = 0, px = 0, pz = zeta(0); const m = 800;
+  for (let i = 1; i <= m; i++) { const rho = Math.sin((i / m) * Math.PI / 2), z = zeta(rho); A += ((rho + px) / 2) * Math.hypot(rho - px, z - pz); px = rho; pz = z; }
+  return { R, zeta, area: 4 * Math.PI * R * R * A };
+}
 RBC.R_SPHERE = Math.cbrt((3 * RBC.V) / (4 * Math.PI));          // 2.78 um
 RBC.A_SPHERE = 4 * Math.PI * RBC.R_SPHERE ** 2;                  // 97.1 um^2
+RBC.A_BI = rbcShape(1).area;                                      // about 130 um^2 from the drawn profile (real cells: about 130-140)
 /** Area needed to fold the cell into a capsule (cylinder with hemispherical ends) that fills a tube of radius a. */
 export function areaInTube(a) {
   const capV = (4 / 3) * Math.PI * a ** 3;
@@ -41,7 +54,7 @@ export function minTubeRadius(area) {
 }
 /** s: 0 = sphere, 1 = biconcave disc. tubeDiam: capillary diameter in um. */
 export function rbcState(s, tubeDiam = 4) {
-  const A = RBC.A_SPHERE + (RBC.A_BI - RBC.A_SPHERE) * s;
+  const A = rbcShape(s).area;                                   // the same volume-normalised profile that is drawn
   const sav = A / RBC.V;
   const savBi = RBC.A_BI / RBC.V;
   const t95 = RBC.T95_BI * (savBi / sav);                       // loading is limited by the membrane area: tau = V / (P A)
@@ -93,11 +106,13 @@ export class MuscleModel {
     const M = MuscleModel;
     const a = this.act;
     // dx/dt = supply - use. Supply: aerobic respiration in the mitochondria refills ATP; use: cross-bridge cycling needs ATP per pull.
+    const atp0 = this.atp;
     const sub = Math.max(1, Math.ceil(dt / 0.05));
     for (let i = 0; i < sub; i++) {
       const h = dt / sub;
       this.atp = clamp(this.atp + h * (M.P * this.mito * (1 - this.atp) - M.C * a * this.atp / (this.atp + 0.1)), 0, 1);
     }
+    this.trend = (this.trend ?? 0) + (((this.atp - atp0) / Math.max(dt, 1e-3)) - (this.trend ?? 0)) * clamp(dt / 0.6, 0, 1);
     this.force = a * this.fForce(this.atp);
     const target = 2.6 - 0.8 * this.force;
     this.SL += (target - this.SL) * clamp(dt / 0.12, 0, 1);
@@ -116,14 +131,14 @@ export class MuscleModel {
 // =====================================================================================================================
 export class SpermModel {
   constructor() { this.atp = 0.7; this.mito = 1; this.F = 0.9; this.speed = 0; this.moved = 0; this.peak = 0; this.timeFast = 0; }
-  static P = 0.6; static U = 0.5; static K = 0.5; static VMAX = 110; static FMAX = 12;   // um/s, Hz (real beat ~10-20 Hz)
+  static P = 0.6; static G = 0.025; static U = 0.5; static K = 0.5; static VMAX = 110; static FMAX = 12;   // um/s, Hz (real beat ~10-20 Hz)
   step(dt) {
     const S = SpermModel;
     const sub = Math.max(1, Math.ceil(dt / 0.05));
     for (let i = 0; i < sub; i++) {
       const h = dt / sub;
       const F = (this.atp * (1 + S.K)) / (this.atp + S.K);
-      this.atp = clamp(this.atp + h * (S.P * this.mito * (1 - this.atp) - S.U * F * this.atp), 0, 1);
+      this.atp = clamp(this.atp + h * ((S.P * this.mito + S.G) * (1 - this.atp) - S.U * F * this.atp), 0, 1);   // mitochondria + a small glycolytic supply along the tail
     }
     this.F = (this.atp * (1 + SpermModel.K)) / (this.atp + SpermModel.K);
     this.speed = SpermModel.VMAX * this.F;
@@ -133,7 +148,11 @@ export class SpermModel {
     return this;
   }
   /** steady-state speed for a given mitochondrial fraction (for tests / narrative) */
-  static steady(m) { const sp = new SpermModel(); sp.mito = m; for (let i = 0; i < 4000; i++) sp.step(0.05); return sp.speed; }
+  static steady(m) {
+    const k = Math.round(m * 1000), c = (SpermModel._c ||= new Map());
+    if (!c.has(k)) { const sp = new SpermModel(); sp.mito = k / 1000; for (let i = 0; i < 4000; i++) sp.step(0.05); c.set(k, sp.speed); }
+    return c.get(k);
+  }
 }
 
 // =====================================================================================================================
@@ -171,8 +190,11 @@ export function palisadeState(light, co2 = 1, avoidance = true) {
   const absorbed = light * (1 - 0.3 * avoid);                 // chloroplasts edge-on to the light absorb less
   const K = 0.25, Kc = 0.3;
   const rate = clamp(100 * (absorbed * (1 + K) / (absorbed + K)) * (co2 * (1 + Kc) / (co2 + Kc)), 0, 100);
-  const limiting = co2 < 0.45 ? "co2" : light < 0.5 ? "light" : "both";
-  return { light, co2, avoid, absorbed, rate, limiting, o2: rate, glucose: rate };
+  // limiting factor from the model's own sensitivity: how much +10 % of full light or CO2 would add
+  const at = (l, c) => { const a = l * (1 - 0.3 * (avoidance ? smooth(l, 0.7, 1.0) : 0)); return clamp(100 * (a * (1 + K) / (a + K)) * (c * (1 + Kc) / (c + Kc)), 0, 100); };
+  const gainLight = at(Math.min(1, light + 0.1), co2) - rate, gainCo2 = at(light, Math.min(1, co2 + 0.1)) - rate;
+  const limiting = gainLight > 1.6 * gainCo2 ? "light" : gainCo2 > 1.6 * gainLight ? "co2" : "both";
+  return { light, co2, avoid, absorbed, rate, limiting, gainLight, gainCo2, o2: rate, glucose: rate };
 }
 
 // =====================================================================================================================
@@ -206,7 +228,9 @@ export class GuardModel {
 export function xylemState(d, tension, bubble) {
   const rel = (d / 20) ** 4;                                   // flow per unit pressure gradient ~ r^4 (relative to a 20 um vessel)
   const flow = bubble ? 0 : rel * tension;
-  return { d, tension, bubble, rel, flow, risk: smooth(d, 40, 140) };
+  // the neighbouring (22 um) vessel: its own flow, plus the share of water bypassing a blocked vessel through pits; zero when there is no pull
+  const relNb = (22 / 20) ** 4, flowNb = tension * (relNb + (bubble ? 0.5 * rel : 0));
+  return { d, tension, bubble, rel, flow, flowNb, risk: smooth(d, 40, 140) };
 }
 
 // =====================================================================================================================
@@ -225,7 +249,7 @@ export const SPEC = {
       { part: "Biconcave disc", how: {
         "y7-8": "The dip in the middle makes the cell thin, so oxygen has only a short way to go. The flat shape also gives it lots of surface for its size.",
         "y9-10": "A flattened disc has a large surface area compared with its volume (a high <strong>SA:V</strong>), so oxygen moves in and out quickly.",
-        y11: "Area ≈ 135 µm² for a volume ≈ 90 fL (SA:V ≈ 1.5 µm⁻¹); a sphere of the same volume has only ≈ 97 µm². The disc also keeps every part of the cytoplasm within about 1 µm of the membrane (a short diffusion distance), and the spare membrane lets the cell fold without stretching." } },
+        y11: "Area ≈ 130 µm² for a volume ≈ 90 fL (SA:V ≈ 1.45 µm⁻¹); a sphere of the same volume has only ≈ 97 µm². The disc also keeps every part of the cytoplasm within about 1 µm of the membrane (a short diffusion distance), and the spare membrane lets the cell fold without stretching." } },
       { part: "No nucleus or mitochondria (when mature)", how: {
         "y7-8": "A mature red blood cell has lost its nucleus, which leaves more room for the oxygen-carrying protein. It has no mitochondria, so it does not use up the oxygen it carries.",
         "y9-10": "Mature mammalian red blood cells have no nucleus and no mitochondria. More space for haemoglobin, and the cell does not respire aerobically, so it does not consume the oxygen it carries.",
@@ -233,7 +257,7 @@ export const SPEC = {
       { part: "Packed with haemoglobin", how: {
         "y7-8": "Each cell is full of <strong>haemoglobin</strong>, a red protein that picks up oxygen in the lungs and lets go of it where it is needed.",
         "y9-10": "About a third of the cell's content is the protein <strong>haemoglobin</strong>, which contains iron and binds oxygen reversibly, so it loads in the lungs and unloads in the tissues.",
-        y11: "Roughly 270 million haemoglobin molecules per cell; each binds up to four O₂ at its haem groups. Binding is cooperative, so haemoglobin loads steeply where pO₂ is high and unloads where it is low." } },
+        y11: "Roughly 270 million haemoglobin molecules per cell; each binds up to four O₂ at its haem groups. Binding is cooperative, so the O₂ saturation curve is S-shaped: haemoglobin is almost full across the high-pO₂ plateau in the lungs, and the steep middle part means a small fall in pO₂ in working tissue releases a lot of O₂." } },
       { part: "Flexible", how: {
         "y7-8": "The cell can squash and bend to squeeze through the tiniest blood vessels, which can be narrower than the cell.",
         "y9-10": "The cell is soft and flexible: it folds to pass through capillaries as narrow as about 3 µm, then springs back.",
@@ -260,7 +284,7 @@ export const SPEC = {
       { part: "Long axon", how: {
         "y7-8": "A long thin 'wire' that carries the signal away from the cell body, sometimes for a metre.",
         "y9-10": "A long, thin extension that carries the impulse away from the cell body to the next cell.",
-        y11: "An axon of a motor neuron can reach about 1 m, but is only a few µm wide: a high ratio of length to width. The thicker the fibre, the faster the impulse." } },
+        y11: "An axon of a motor neuron can reach about 1 m, but is only a few µm wide: a high ratio of length to width. The wider the axon, the faster the impulse (much more so with myelin)." } },
       { part: "Myelin sheath and nodes of Ranvier", how: {
         "y7-8": "A fatty insulating coat with small gaps. The signal jumps from gap to gap, which makes it much faster.",
         "y9-10": "Myelin insulates the axon. The impulse jumps between the gaps (<strong>nodes of Ranvier</strong>), so it travels faster (about 100 m/s instead of 1 m/s).",
@@ -271,7 +295,7 @@ export const SPEC = {
         y11: "The arriving action potential opens Ca²⁺ channels, so vesicles fuse and release neurotransmitter (acetylcholine at a neuromuscular junction) into the synaptic cleft." } },
     ],
     limit: "Neurons vary in shape and connections. This is a motor neuron; sensory and inter-neurons look different.",
-    chain: ["neuron", "nervous tissue", "brain", "nervous system", "human"],
+    chain: ["motor neuron", "nervous tissue (grey matter)", "spinal cord", "nervous system", "human"],
   },
   muscle: {
     name: "Skeletal muscle fibre", color: "#ef6f6c", band: "y7-8",
@@ -289,8 +313,8 @@ export const SPEC = {
         y11: "Each sarcomere is thick <strong>myosin</strong> filaments between thin <strong>actin</strong> filaments. In the <strong>sliding filament</strong> model, myosin heads bind actin, pivot and pull the thin filaments inwards, so the sarcomere shortens while the filaments keep their length. Each cross-bridge cycle uses one ATP." } },
       { part: "Many mitochondria", how: {
         "y7-8": "Lots of tiny power stations that release the energy the muscle needs.",
-        "y9-10": "Many <strong>mitochondria</strong> supply the ATP for contraction by aerobic respiration. If ATP runs low the muscle tires.",
-        y11: "ATP is needed for the myosin power stroke and to detach myosin from actin, and for the Ca²⁺ pumps that relax the fibre. Fatigue is more than ATP running out: it also involves phosphate, H⁺ (from lactate) and ion shifts. This model shows only the supply-and-use idea." } },
+        "y9-10": "Many <strong>mitochondria</strong> supply the ATP for contraction by aerobic respiration. If ATP supply cannot keep up, the muscle tires (a simplification used in this demo).",
+        y11: "ATP is needed for the myosin power stroke and to detach myosin from actin, and for the Ca²⁺ pumps that relax the fibre. Real fatigue is not just ATP running out: it comes from interacting metabolic changes (for example phosphate, ADP and pH), ionic shifts (such as K⁺) and failures in excitation–contraction coupling. This demo simplifies it to ATP supply versus use." } },
     ],
     limit: "A fibre is one specialised cell, not the whole biceps muscle.",
     chain: ["skeletal muscle fibre", "skeletal muscle tissue", "biceps brachii", "muscular system", "human"],
@@ -361,8 +385,8 @@ export const SPEC = {
         y11: "Water moves by osmosis down a water-potential gradient from soil to the vacuole (cell sap has a more negative solute potential). If the soil is drier than the cell, water leaves instead." } },
       { part: "Many mitochondria", how: {
         "y7-8": "Power stations supply the energy for taking in minerals.",
-        "y9-10": "Mineral ions are often at a lower concentration in the soil than in the cell, so they are taken in by <strong>active transport</strong>, which needs ATP from respiration.",
-        y11: "Proton pumps (H⁺-ATPase) in the membrane use ATP to build a gradient that drives uptake of ions such as nitrate and potassium through transporter proteins against their concentration gradient. In waterlogged, low-oxygen soil, ATP supply drops and uptake falls." } },
+        "y9-10": "Many mineral ions (for example nitrate) are scarce in the soil and the inside of the cell is electrically negative, so they are taken in by <strong>active transport</strong>, which needs ATP from respiration.",
+        y11: "Proton pumps (H⁺-ATPase) use ATP to push H⁺ out, making the outside acidic and the inside negative (about −120 mV). Nitrate is then brought in with H⁺ by a cotransporter (NO₃⁻/H⁺) against its electrochemical gradient: the negative inside repels the anion as well as its concentration being low. In waterlogged, low-oxygen soil, ATP supply drops and uptake falls." } },
       { part: "No chloroplasts", how: {
         "y7-8": "No chloroplasts: it is underground where there is no light.",
         "y9-10": "It has no chloroplasts because it is underground, out of the light.",
@@ -449,8 +473,8 @@ export const LADDER_TEXT = {
   ],
   neuron: [
     null,
-    { "y7-8": "Nervous tissue: many neurons and supporting cells.", "y9-10": "<strong>Nervous tissue</strong>: neurons plus supporting glial cells." },
-    { "y7-8": "The brain is an organ made of nervous tissue and other tissues.", "y9-10": "The <strong>brain</strong> is an organ: nervous tissue with blood vessels and protective connective tissue." },
+    { "y7-8": "Nervous tissue: many nerve cells and supporting cells packed together.", "y9-10": "<strong>Nervous tissue</strong> (grey matter): motor neuron cell bodies and dendrites with supporting glial cells." },
+    { "y7-8": "The spinal cord is an organ. Our motor neuron starts here and sends its long axon out to a muscle.", "y9-10": "The <strong>spinal cord</strong> is an organ: nervous tissue (grey matter with motor neuron cell bodies, white matter with axons) plus blood vessels and protective coverings. A lower motor neuron has its cell body here." },
     { "y7-8": "The brain, spinal cord and nerves form the nervous system.", "y9-10": "The <strong>nervous system</strong>: brain, spinal cord and nerves." },
     { "y7-8": "The whole human.", "y9-10": "The organism: a human." },
   ],
@@ -492,14 +516,14 @@ export const LADDER_TEXT = {
 };
 
 export const DIFFERENTIATION = {
-  "y9-10": "All these cells carry the <strong>same genome</strong>, copied from one fertilised egg (or zygote). They look different because different genes are switched on in each. The nucleus decides which; that is why a muscle fibre makes muscle proteins and a red blood cell makes haemoglobin.",
-  y11: "All cells of an organism carry the same genome. <strong>Cell differentiation</strong> is a pattern of gene expression: transcription factors and epigenetic marks (such as DNA methylation and histone modification) switch genes on or off, and the pattern is passed on when the cell divides. <strong>Stem cells</strong> keep the ability to divide and to differentiate; a hepatocyte or a muscle fibre has switched most of the genome off. Links: the Nucleus and Chromatin levels, and the hepatocyte (liver cell) in the Animal cell level, which is itself specialised for metabolism and detoxification, with abundant mitochondria and smooth ER.",
+  "y9-10": "The nucleated body cells of one organism (for example the muscle fibre, neuron and ciliated cell of a person) carry the <strong>same genome</strong>, copied from one fertilised egg. They look different because different genes are switched on in each. Exceptions: a mature red blood cell has lost its nucleus, a sperm carries only half the genome, and a xylem vessel is dead at maturity. The plant cells share the genome of their plant, not ours.",
+  y11: "Within one organism, nucleated somatic cells share the same genome, but not every cell does: mature erythrocytes have no nucleus, gametes are haploid and recombined, and xylem vessel elements are dead at maturity. <strong>Cell differentiation</strong> is a heritable pattern of gene expression: transcription factors and epigenetic marks (such as DNA methylation and histone modification) switch genes on or off, and the pattern is passed on when the cell divides. <strong>Stem cells</strong> keep the ability to divide and to differentiate; a differentiated cell expresses only part of its genome. The human and plant cells here belong to different organisms with different genomes. Links: the Nucleus and Chromatin levels, and the hepatocyte (liver cell) in the Animal cell level, itself specialised for metabolism and detoxification, with abundant mitochondria and smooth ER.",
 };
 
 export const NOTE = {
   "y7-8": "This is a model. Cell sizes are to scale on the shelf (use the scale bar), but long cells are drawn shortened, and the animations are slowed down so you can see them. Real cells vary from one to the next.",
   "y9-10": "Honest simplifications: sizes are to scale on the shelf, but a neuron's axon (up to ~1 m), a muscle fibre (up to many cm) and a root hair (up to 1 mm or more) are drawn truncated and marked with a break. Animations are slowed down (the clock shows real time), and the numbers are teaching-scale. Real cells vary: each is one example.",
-  y11: "Honest simplifications: sizes are to scale on the shelf, except the truncated axon, fibre and root hair. Models: RBC loading time ∝ V/A (membrane-limited, not the full diffusion-and-binding picture; capillary transit is about 0.75 s, so a healthy cell is loaded well before it leaves the lungs); impulse speed v ≈ 1.1√d (unmyelinated) or 6d (myelinated, m/s with d in µm); muscle fatigue as an ATP supply–use balance (real fatigue also involves Pi, H⁺, K⁺ and Ca²⁺ handling); guard-cell K⁺ and turgor responses are sped up from minutes to seconds. Only the mature mammalian red cell has no nucleus or mitochondria.",
+  y11: "Honest simplifications: sizes are to scale on the shelf, except the truncated axon, fibre and root hair. Models: RBC loading time ∝ V/A (membrane-limited, not the full diffusion-and-binding picture; capillary transit is about 0.75 s, so a healthy cell is loaded well before it leaves the lungs); impulse speed v ≈ 1.1√d m/s (unmyelinated; d = axon diameter in µm) or 6D m/s (myelinated; D = whole fibre width including myelin = d / 0.65); muscle fatigue as an ATP supply–use balance (real fatigue also involves Pi, H⁺, K⁺ and Ca²⁺ handling); guard-cell K⁺ and turgor responses are sped up from minutes to seconds. Only the mature mammalian red cell has no nucleus or mitochondria.",
 };
 
 // =====================================================================================================================
@@ -529,19 +553,28 @@ export function narrative(id, S, band) {
     return out;
   }
   if (id === "muscle") {
-    const m = S.model;
-    out.push(m.act < 0.05 ? (y7 ? "The muscle fibre is relaxed. Each repeating unit (sarcomere) is long." : `Relaxed: sarcomere length <b>${f1(m.SL)} µm</b>, filaments overlap only a little.`)
-      : (y7 ? `The fibre is contracting: each stripe unit shortens, so the whole cell gets shorter (by about <b>${f0(100 * m.shorten)} %</b>).` : `Sarcomeres shorten from 2.6 to <b>${f1(m.SL)} µm</b> (the fibre ${f0(100 * m.shorten)} % shorter) as myosin heads pull the thin actin filaments inwards. The filaments keep their length; they slide.`));
-    out.push(m.atp < 0.35 && m.act > 0.2
-      ? (y7 ? "The muscle is running low on energy (ATP), so it pulls less hard: it is getting tired. Rest to let the mitochondria refill it." : `ATP use outruns supply: ATP is down to <b>${f0(100 * m.atp)} %</b> and force has fallen to ${f0(100 * m.force)} % of the drive. This is <b>fatigue</b>. With ${f1(m.mito)}× mitochondria, aerobic respiration refills ATP at a limited rate.`)
-      : (y7 ? "Plenty of energy (ATP) from the mitochondria, so the muscle pulls strongly." : `ATP stays at <b>${f0(100 * m.atp)} %</b> of its resting level: supply from the mitochondria (${f1(m.mito)}×) keeps up with use, so force is ${f0(100 * m.force)} %.`));
+    const m = S.model, drive = f0(100 * m.act), fr = m.act > 0.05 ? m.force / m.act : 1;
+    out.push(m.act < 0.05
+      ? (y7 ? `The muscle fibre is relaxed. Each repeating unit (sarcomere) is long: ${f1(m.SL)} µm.` : `Relaxed: sarcomere length <b>${f1(m.SL)} µm</b>, so the thin and thick filaments overlap only a little.`)
+      : (y7 ? `The fibre is contracting: each stripe unit shortens, so the whole cell is about <b>${f0(100 * m.shorten)} %</b> shorter.` : `Sarcomeres have shortened from 2.6 to <b>${f1(m.SL)} µm</b> (the fibre is ${f0(100 * m.shorten)} % shorter) as myosin heads pull the thin actin filaments inwards. The filaments keep their length; they slide, so the I band and H zone shrink but the A band does not.`));
+    if (m.act < 0.05) {
+      out.push(m.atp < 0.97 ? (y7 ? `The mitochondria are refilling the energy (ATP): ${f0(100 * m.atp)} % so far.` : `ATP is recovering (<b>${f0(100 * m.atp)} %</b> of the resting level) as the mitochondria (${f1(m.mito)}×) resupply it.`) : (y7 ? "The energy store (ATP) is full." : "ATP is back at its resting level."));
+    } else {
+      const falling = (m.trend ?? 0) < -0.02, rising = (m.trend ?? 0) > 0.02;
+      const energy = m.atp < 0.35 ? (y7 ? "The muscle is running low on energy (ATP), so it pulls much less hard than the signal asks for: it is getting tired. Rest to let the mitochondria refill it." : `ATP is low (<b>${f0(100 * m.atp)} %</b>): force is only ${f0(100 * fr)} % of what full ATP would give at this drive (${drive} %). In this demo that is <b>fatigue</b>; with ${f1(m.mito)}× mitochondria, aerobic supply is too slow to keep up.`)
+        : falling ? (y7 ? `The energy (ATP) is being used faster than it is made (${f0(100 * m.atp)} %), so the pull will weaken if this goes on.` : `ATP is falling (<b>${f0(100 * m.atp)} %</b>): use exceeds supply from the mitochondria (${f1(m.mito)}×). Force is ${f0(100 * m.force)} % at a drive of ${drive} %.`)
+        : (y7 ? `The mitochondria are keeping up: energy (ATP) is ${f0(100 * m.atp)} %, so the muscle pulls ${fr > 0.9 ? "at full strength" : "fairly strongly"}.` : `ATP is ${rising ? "recovering" : "steady"} at <b>${f0(100 * m.atp)} %</b>: supply (${f1(m.mito)}×) roughly matches use, so force is ${f0(100 * m.force)} % at a drive of ${drive} %.`);
+      out.push(energy);
+    }
+    out.push(y7 ? "(In this demo, tiredness is shown as the energy running low. Real muscle tiredness has several causes.)" : "<span class=\"hint\">Simplification: real fatigue is multifactorial (phosphate, ADP, pH, K⁺ shifts, excitation–contraction coupling); this demo models only ATP supply versus use.</span>");
     return out;
   }
   if (id === "sperm") {
-    const m = S.model;
-    out.push(m.mito < 0.05 ? (y7 ? "With no working mitochondria the sperm has no energy, so its tail stops." : "Without ATP from the midpiece the dynein motors stall: the flagellum stops beating and the cell drifts.")
-      : (y7 ? `The mitochondria in the middle supply energy for the tail. The tail beats and the sperm swims at about <b>${f0(m.speed)} µm per second</b>.` : `Midpiece mitochondria keep ATP at <b>${f0(100 * m.atp)} %</b> of full, so the flagellum beats at ${f1(m.hz)} Hz (real; shown slowed) and the cell swims at <b>${f0(m.speed)} µm/s</b>, about ${f1(m.speed / 55)} body lengths per second.`));
-    out.push(m.mito < 0.5 ? "With fewer mitochondria less ATP is made, so the beat is weaker and slower." : "More mitochondria mean a faster ATP supply, and the sperm swims faster. The speed levels off because the motors can only beat so fast.");
+    const m = S.model, off = m.mito < 0.05, steady = SpermModel.steady(m.mito);
+    out.push(off
+      ? (y7 ? `The mitochondria are switched off, so the main energy supply is gone. The tail beats more weakly (${f0(m.speed)} µm per second).` : `Mitochondrial ATP is off. ATP is at <b>${f0(100 * m.atp)} %</b> and the beat is ${f1(m.hz)} Hz, so the cell swims at <b>${f0(m.speed)} µm/s</b>. ${m.speed > steady + 3 ? "Supply is still declining toward the level that glycolysis along the tail alone can support." : `Only glycolysis along the tail keeps this weak beat going (about ${f0(steady)} µm/s).`}`)
+      : (y7 ? `The mitochondria in the middle supply energy for the tail. The tail beats and the sperm swims at about <b>${f0(m.speed)} µm per second</b>.` : `Midpiece mitochondria (and some glycolysis) keep ATP at <b>${f0(100 * m.atp)} %</b> of full, so the flagellum beats at ${f1(m.hz)} Hz (real; shown slowed) and the cell swims at <b>${f0(m.speed)} µm/s</b>, about ${f1(m.speed / 55)} body lengths per second.`));
+    out.push(m.mito < 0.5 ? "With fewer mitochondria less ATP is made, so the beat is weaker and slower, though glycolysis along the tail still gives a little." : "More mitochondria mean a faster ATP supply, and the sperm swims faster. The speed levels off because the motors can only beat so fast.");
     return out;
   }
   if (id === "cilia") {
@@ -560,14 +593,16 @@ export function narrative(id, S, band) {
       ? (y7 ? "The soil is so dry that water is pulled <b>out</b> of the cell. The plant would wilt." : `The soil water potential (${S.psi.toFixed(2)} MPa) is lower than the cell's (${ROOT.PSI_CELL} MPa), so water leaves the cell by osmosis: <b>negative uptake</b>, and the plant wilts.`)
       : (y7 ? "Water moves into the cell from the wetter soil to the saltier cell sap. That is <b>osmosis</b>." : `Water enters by <b>osmosis</b> down a water-potential difference of ${f2(r.dPsi)} MPa: relative uptake <b>${f1(r.water)}</b> (a hairless cell in wet soil = 1).`));
     out.push(S.o2
-      ? (y7 ? "Minerals are in short supply in the soil, so the cell uses energy from its mitochondria to pull them in (<b>active transport</b>)." : `Soil solution has about ${ROOT.CSOIL} mM of an ion such as K⁺, the cell about ${ROOT.CCELL} mM, so it is taken in against the gradient by <b>active transport</b>, using ATP: relative uptake <b>${f1(r.ion)}</b>.`)
+      ? (y7 ? "Minerals are in short supply in the soil, so the cell uses energy from its mitochondria to pull them in (<b>active transport</b>)." : `Nitrate is scarce in the soil solution (about ${ROOT.CSOIL} mM here) and the inside of the cell is electrically negative, so it is brought in with H⁺ by a cotransporter driven by ATP-powered proton pumps (<b>active transport</b>): relative uptake <b>${f1(r.ion)}</b>.`)
       : (y7 ? "In waterlogged soil there is little oxygen, so the cell cannot make enough energy and mineral uptake almost stops." : `Waterlogged soil has little O₂, so aerobic ATP supply falls to about 10 % and active uptake collapses (relative <b>${f2(r.ion)}</b>). Osmosis of water carries on, because it needs no ATP.`));
     return out;
   }
   if (id === "palisade") {
-    const p = palisadeState(S.light, S.co2, S.avoid);
-    out.push(y7 ? `Photosynthesis is running at <b>${f0(p.rate)} %</b> of its maximum. ${p.limiting === "light" ? "More light would help." : p.limiting === "co2" ? "There is not enough carbon dioxide, so more light will not help." : "It is close to its limit."}`
-      : `Rate: <b>${f0(p.rate)} %</b> of maximum. The limiting factor is ${p.limiting === "light" ? "<b>light</b> (more light raises the rate)" : p.limiting === "co2" ? "<b>CO₂</b> (more light would not help)" : "now both light and CO₂: the curve levels off"}.`);
+    const p = palisadeState(S.light, S.co2, S.avoid), gl = p.gainLight, gc = p.gainCo2;
+    const lim = p.limiting;
+    out.push(y7
+      ? `Photosynthesis is running at <b>${f0(p.rate)} %</b> of its maximum. ${lim === "light" ? "More light would help most." : lim === "co2" ? "More carbon dioxide would help more than more light." : "More of either would help a little: it is close to its limit."}`
+      : `Rate: <b>${f0(p.rate)} %</b> of maximum. Raising light by 10 % of full would change it by <b>${gl >= 0 ? "+" : ""}${f1(gl)} %</b>; raising CO₂ by 10 % of full would give <b>${gc >= 0 ? "+" : ""}${f1(gc)} %</b>. So the limiting factor is ${lim === "light" ? "<b>light</b>" : lim === "co2" ? "<b>CO₂</b>" : "<b>both light and CO₂ about equally</b>"}.`);
     if (S.avoid && p.avoid > 0.15) out.push(adv ? `In bright light about ${f0(100 * p.avoid)} % of the chloroplasts have moved to the side walls (<b>chloroplast avoidance</b>), which reduces light absorbed to ${f0(100 * p.absorbed / Math.max(p.light, 0.01))} % of the incident light and protects the photosystems.` : "In very bright light the chloroplasts slide to the sides of the cell, away from the light, so they do not get damaged.");
     out.push(`Oxygen made and glucose made rise and fall with the rate (here ${f0(p.o2)} % of max).`);
     return out;
@@ -608,7 +643,7 @@ export const MISSIONS = [
   { id: "muscle", band: "y7-8", maxBand: "y7-8", text: "<strong>Muscle:</strong> contract the fibre 5 times.", check: (s) => s.muscleCycles >= 5 },
   { id: "muscle2", band: "y9-10", text: "<strong>Muscle:</strong> hold a contraction until the fibre <b>fatigues</b>, then rest until ATP recovers.", check: (s) => s.muscleRecovered },
   { id: "sperm", band: "y7-8", maxBand: "y9-10", text: "<strong>Sperm:</strong> give it enough mitochondria to swim at <b>80 µm/s or more</b>.", check: (s) => s.spermFast },
-  { id: "sperm2", band: "y11", text: "<strong>Sperm:</strong> compare 0 %, 20 % and 100 % mitochondria: reach <b>80 µm/s</b>, then switch the mitochondria off and watch ATP fall.", check: (s) => s.spermFast && s.spermOff },
+  { id: "sperm2", band: "y11", text: "<strong>Sperm:</strong> compare <b>0 %</b>, <b>20 %</b> and <b>100 %</b> mitochondria, giving each setting time to settle (the speed must level off for about 4 s), and note the speed at each.", check: (s) => s.sperm0 && s.sperm20 && s.sperm100 },
   { id: "stoma", band: "y7-8", text: "<strong>Stoma:</strong> open it at least <b>80 %</b>.", check: (s) => s.stomaOpen },
   { id: "drought", band: "y9-10", text: "<strong>Drought:</strong> close the stoma again by drying the leaf, not by switching off the light.", check: (s) => s.stomaDrought },
   { id: "match", band: "y7-8", text: "<strong>Match the job:</strong> drag each job card onto the right cell.", check: (s) => s.matched() },
@@ -643,6 +678,6 @@ export const QUIZ = [
   { band: "y11", q: "Why do the nodes of Ranvier speed up conduction?", options: ["Voltage-gated Na⁺ channels are concentrated there and the current jumps between them (saltatory conduction)", "They store neurotransmitter", "They pump K⁺ out faster", "They stop the impulse"], answer: 0, why: "Myelin insulates the internodes; the action potential is regenerated only at the nodes, so it jumps from node to node." },
   { band: "y11", q: "Light triggers stomatal opening. Which sequence is correct?", options: ["K⁺ uptake, water enters by osmosis, turgor rises, the cells bow apart", "Water enters, then K⁺ is taken up, then turgor falls", "K⁺ leaves, turgor rises, the pore opens", "The cell wall dissolves"], answer: 0, why: "Light drives H⁺-pumping and K⁺ uptake; the water potential falls, water enters by osmosis, turgor rises and the thicker inner walls make the cells curve apart." },
   { band: "y11", q: "Why does a root hair cell in waterlogged soil take up fewer minerals, even though it still takes up water?", options: ["Osmosis stops", "Little O₂ means little aerobic ATP, so active transport slows", "The vacuole disappears", "Minerals cannot dissolve"], answer: 1, why: "Active transport needs ATP; with little oxygen the supply falls. Osmosis needs no ATP, so water uptake continues while the water potential gradient allows." },
-  { band: "y11", q: "All of these cells have the same genome. What explains their different structures?", options: ["They have lost different genes", "Different genes are switched on in each (differential gene expression)", "They come from different species", "They use different DNA bases"], answer: 1, why: "Cell differentiation is the result of different patterns of gene expression, set by transcription factors and epigenetic marks." },
+  { band: "y11", q: "A muscle fibre and a motor neuron in the same person are both nucleated body cells with the same genome. What mainly explains their different structures?", options: ["They have lost different genes", "Different genes are expressed in each (differential gene expression)", "They use different DNA bases", "Their chromosomes differ in number"], answer: 1, why: "Differentiation is a heritable pattern of gene expression set by transcription factors and epigenetic marks. (Exceptions to 'same genome': mature red blood cells have no nucleus, and sperm are haploid.)" },
   { band: "y11", q: "A palisade cell is moved from medium to very bright light. What can happen to its chloroplasts?", options: ["They move to the side walls, reducing light absorbed (avoidance)", "They all disappear", "They fuse into one", "They move to the nucleus"], answer: 0, why: "In strong light, chloroplasts move to the walls parallel to the light, which reduces absorption and protects the photosystems." },
 ];

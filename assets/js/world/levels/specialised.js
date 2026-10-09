@@ -130,15 +130,8 @@ const hitBox = (w, h, d) => { const m = new THREE.Mesh(new THREE.BoxGeometry(w, 
 const TUBE_W = 13;                                           // radius of the wide vessel either side of the capillary, µm
 const tubeR = (x, a) => a + (TUBE_W - a) * clamp(smooth(x, 10, 34) + smooth(-x, 6, 26), 0, 1);
 
-/** biconcave profile (Evans–Fung) blended from a sphere (s = 0), scaled so the volume stays 90 fL */
-function rbcShape(s) {
-  const co = [lerp(1, 0.2072, s), lerp(0, 2.0026, s), lerp(0, -1.1228, s)];
-  const f = lerp(1, 0.5, s);                                   // Evans-Fung gives the full thickness: half-thickness = 0.5 x (that / 2)
-  const zeta = (r) => f * Math.sqrt(Math.max(0, 1 - r * r)) * (co[0] + co[1] * r * r + co[2] * r ** 4);
-  let I = 0; const n = 300;
-  for (let i = 0; i < n; i++) { const r = (i + 0.5) / n; I += (r * zeta(r)) / n; }
-  return { R: Math.cbrt(C.RBC.V / (4 * Math.PI * I)), zeta };
-}
+/** biconcave profile: shared with the content module so the drawn shape, its area and capillary passage agree */
+const rbcShape = (s) => C.rbcShape(s);
 const RBC_N = 36, RBC_SEG = 44, RBC_M = 2 * RBC_N + 1;
 function rbcGeometry(s) {
   const { R, zeta } = rbcShape(s);
@@ -282,7 +275,7 @@ function buildRBC(X) {
     // pose
     S.align += ((inTube && S.x > -17 ? 1 : 0) - S.align) * clamp(dt * 3, 0, 1);
     S.spin += dt * 0.5;
-    eul.set(1.05 + 0.22 * Math.sin(t * 0.31), S.spin, 0.45 * Math.sin(t * 0.23)); qFree.setFromEuler(eul);
+    eul.set(0.45 + 0.12 * Math.sin(t * 0.31), S.spin, 0.5 * Math.sin(t * 0.23)); qFree.setFromEuler(eul);
     qAlign.setFromEuler(eul.set(S.spin * 0.3, 0, -Math.PI / 2, "XYZ"));
     tilt.quaternion.copy(qFree).slerp(qAlign, smooth(S.align, 0, 1));
     hero.position.set(S.x, inTube ? 0 : Math.sin(t * 0.7) * 0.7, 0);
@@ -539,15 +532,18 @@ function buildNeuron(X) {
 
 // ---------- 3. Skeletal muscle fibre ----------
 /** myofibril material: A bands, I bands and Z lines striped in object space, so scaling the mesh in x shortens the sarcomeres */
-function stripedMaterial(light = "#f4b6b6", dark = "#a8323a") {
+function stripedMaterial(light = "#f4b6b6", dark = "#a8323a", U = { value: 2.6 }) {
   const m = new THREE.MeshPhysicalMaterial({ color: "#ffffff", roughness: 0.42, clearcoat: 0.5, clearcoatRoughness: 0.3, sheen: 0.4, sheenColor: col("#ffd0d0") });
   m.onBeforeCompile = (sh) => {
-    sh.uniforms.cLight = { value: col(light) }; sh.uniforms.cDark = { value: col(dark) };
+    sh.uniforms.cLight = { value: col(light) }; sh.uniforms.cDark = { value: col(dark) }; sh.uniforms.uSL = U;
     sh.vertexShader = sh.vertexShader.replace("#include <common>", "#include <common>\nvarying float vSx;").replace("#include <begin_vertex>", "#include <begin_vertex>\nvSx = position.x;");
-    sh.fragmentShader = sh.fragmentShader.replace("#include <common>", "#include <common>\nvarying float vSx; uniform vec3 cLight, cDark;")
+    sh.fragmentShader = sh.fragmentShader.replace("#include <common>", "#include <common>\nvarying float vSx; uniform vec3 cLight, cDark; uniform float uSL;")
       .replace("#include <color_fragment>", `#include <color_fragment>
-        float fz = fract(vSx / 2.6), dz = min(fz, 1.0 - fz) * 2.6, dm = abs(fz - 0.5) * 2.6;
-        float aBand = 1.0 - smoothstep(0.74, 0.86, dm), hZone = 1.0 - smoothstep(0.12, 0.26, dm), zLine = 1.0 - smoothstep(0.03, 0.11, dz);
+        // phase is fixed along the (scaled) fibre; distances are in real micrometres from the current sarcomere length uSL:
+        // the A band stays 1.6 um wide, while the I band and the H zone (thick filaments only) shrink
+        float fz = fract(vSx / 2.6), dz = min(fz, 1.0 - fz) * uSL, dm = abs(fz - 0.5) * uSL;
+        float hHalf = max(0.0, uSL * 0.5 - 1.0);
+        float aBand = 1.0 - smoothstep(0.74, 0.86, dm), hZone = hHalf > 0.001 ? 1.0 - smoothstep(hHalf, hHalf + 0.1, dm) : 0.0, zLine = 1.0 - smoothstep(0.03, 0.11, dz);
         vec3 sc = mix(cLight, cDark, aBand * (0.78 - 0.32 * hZone));
         sc = mix(sc, cDark * 0.55, zLine * 0.9);
         diffuseColor.rgb = sc;`);
@@ -586,7 +582,9 @@ function buildMuscle(X) {
   const fib = new THREE.Group(); g.add(fib);
   const HALF = 120, RAD = 24;
   // a slot cut through the front of the sarcolemma lets us look in at the myofibrils (clipped only where all three planes agree)
-  const planes = [new THREE.Plane(new THREE.Vector3(0, 0, -1), 7), new THREE.Plane(new THREE.Vector3(0, 1, 0), -15), new THREE.Plane(new THREE.Vector3(0, -1, 0), -15)];
+  // clipping planes are world-space: keep the local definitions and re-transform them by the fibre's world matrix every frame
+  const planesLocal = [new THREE.Plane(new THREE.Vector3(0, 0, -1), 7), new THREE.Plane(new THREE.Vector3(0, 1, 0), -15), new THREE.Plane(new THREE.Vector3(0, -1, 0), -15)];
+  const planes = planesLocal.map((p) => p.clone());
   const sarco = glass("#f27c7a", { rim: "#ffc0bd", rimPower: 2.0, rimStrength: 0.7, minAlpha: 0.12, maxAlpha: 0.6, clippingPlanes: planes, clipIntersection: true, side: THREE.DoubleSide });
   sarco.userData.clayColor = "#f3a798"; sarco.userData.clayOpacity = 0.4;
   const shell = add(fib, new THREE.CylinderGeometry(RAD, RAD, HALF * 2, 72, 1, true).rotateZ(Math.PI / 2), sarco);
@@ -595,7 +593,8 @@ function buildMuscle(X) {
   const capMat = new THREE.MeshStandardMaterial({ map: tex, roughness: 0.6 });
   for (const s of [-1, 1]) { const c = add(fib, new THREE.CircleGeometry(RAD * 0.995, 56), capMat, s * HALF, 0, 0); c.rotation.y = s * Math.PI / 2; c.userData.clayColor = "#e7a3a6"; }
   // myofibrils: a hexagonal lattice of striped rods (z <= 6 so the clipped window sees them whole)
-  const rodMat = stripedMaterial();
+  const stripeU = { value: 2.6 };
+  const rodMat = stripedMaterial("#f4b6b6", "#a8323a", stripeU);
   const rodGeo = new THREE.CylinderGeometry(2.05, 2.05, HALF * 2 - 2, 10, 1).rotateZ(Math.PI / 2);
   const sites = [];
   for (let r = -5; r <= 5; r++) for (let q = -5; q <= 5; q++) {
@@ -652,7 +651,10 @@ function buildMuscle(X) {
     model.step(dt);
     ms.muscleCycles = model.cycles; ms.muscleRecovered = model.recovered; ms.muscleFatigue = model.fatigueSeen;
     const sx = model.SL / 2.6;
+    stripeU.value = model.SL;
     fib.scale.set(sx, 1 + 0.5 * (1 / Math.sqrt(sx) - 1), 1 + 0.5 * (1 / Math.sqrt(sx) - 1));
+    fib.updateWorldMatrix(true, false);
+    for (let i = 0; i < 3; i++) planes[i].copy(planesLocal[i]).applyMatrix4(fib.matrixWorld);
     const nm = Math.round(clamp((S.mito ?? 1) / 1.5, 0, 1) * NM);
     if (nm !== lastMito) { lastMito = nm; mitoDrawn(nm); }
     // the magnified sarcomere: Z discs approach as thin filaments slide inward
@@ -685,7 +687,7 @@ function buildMuscle(X) {
     const hold = K.button(r, "Hold contraction", (on) => { S.holding = on; }, { toggle: true, pressed: S.holding });
     K.slider(el, { label: y7 ? "How hard the nerve signals" : "Neural drive", min: 20, max: 100, value: Math.round(S.strength * 100), unit: " %", onInput: (v) => { S.strength = v / 100; } });
     K.slider(el, { label: y7 ? "Mitochondria (power stations)" : "Mitochondrial density", min: 20, max: 150, value: Math.round((S.mito ?? 1) * 100), format: (v) => `${(v / 100).toFixed(1)}×`, onInput: (v) => { S.mito = v / 100; X.refresh(); } });
-    el.insertAdjacentHTML("beforeend", `<p class="hint">${y7 ? "Hold the contraction for a while. What happens when the energy (ATP) runs low? Rest to recover." : "Contract, then hold: ATP use outruns supply and force falls (fatigue). More mitochondria slow that. The inset is the same fibre magnified 14×."}</p>`);
+    el.insertAdjacentHTML("beforeend", `<p class="hint">${y7 ? "Hold the contraction for a while. What happens when the energy (ATP) runs low? Rest to recover." : "Contract, then hold: ATP use outruns supply and force falls. More mitochondria slow that. (Real fatigue has several causes; this demo shows only ATP supply versus use.) The inset is the same fibre magnified 14×; the A band keeps its length while the I band shrinks."}</p>`);
   }
   const D = V3(0.1, 0.5, 1);
   const views = [
@@ -778,7 +780,10 @@ function buildSperm(X) {
     model.mito = S.mito;
     model.step(dt);
     ms.spermSpeed = model.speed; if (model.speed >= 80) ms.spermFast = true;
-    if (model.mito === 0 && model.atp < 0.3 && ms.spermFast) ms.spermOff = true;
+    S.settle ||= {};
+    for (const [m0, flag] of [[0, "sperm0"], [0.2, "sperm20"], [1, "sperm100"]]) {
+      if (Math.abs(S.mito - m0) < 0.03 && Math.abs(model.speed - C.SpermModel.steady(S.mito)) < 6) { S.settle[flag] = (S.settle[flag] || 0) + dt; if (S.settle[flag] >= 4) ms[flag] = true; } else S.settle[flag] = 0;
+    }
     const F = model.F;
     if (!X.engine.reducedMotion) S.phase += dt * TAU * (model.hz / SLOW);
     const amp = clamp(F, 0, 1);
@@ -875,20 +880,20 @@ function buildCilia(X) {
   cilia.userData.keepMaterial = true;
   { let n = 0; cil.forEach((c) => { for (let k = 0; k < 14; k++) { const p = ciliaPos[n]; setI(cilia, n++, p[0], 0.1, p[1], 1); } }); upd(cilia); }
   // periciliary fluid and the mucus blanket riding on top
-  const fluid = add(g, new THREE.BoxGeometry(96, 20, 44), M.fluid, 0, 10, 0); fluid.userData.clayHide = true;
-  const mucus = add(g, new THREE.BoxGeometry(96, 4.5, 44), M.mucus, 0, 22.8, 0); mucus.userData.clayColor = "#d9e5a4"; mucus.userData.clayOpacity = 0.4;
+  const fluid = add(g, new THREE.BoxGeometry(96, 6, 44), M.fluid, 0, 3, 0); fluid.userData.clayHide = true;
+  const mucus = add(g, new THREE.BoxGeometry(96, 4.5, 44), M.mucus, 0, 8.25, 0); mucus.userData.clayColor = "#d9e5a4"; mucus.userData.clayOpacity = 0.4;
   // trapped particles: soot, pollen-like grains and bacteria
   const NP = 40, pm = (geo, c) => inst(geo, physical(c, { roughness: 0.5 }), NP, g);
   const soot = pm(new THREE.IcosahedronGeometry(0.75, 1), "#3f3f46"), grain = pm(new THREE.DodecahedronGeometry(1.1, 0), "#d9a441"), bac = pm(new THREE.CapsuleGeometry(0.34, 1.1, 3, 6), "#7bd88f");
   soot.userData.clayColor = "#b8aebd"; grain.userData.clayColor = "#f8c29d"; bac.userData.clayColor = "#a6ddc2";
-  const parts = Array.from({ length: NP }, (_, i) => ({ x: -46 + hash(i * 3.1) * 92, y: 21.2 + hash(i * 7.3) * 3.2, z: (hash(i * 5.9) - 0.5) * 34, type: i % 3, ph: hash(i) * 6.28, on: true }));
+  const parts = Array.from({ length: NP }, (_, i) => ({ x: -46 + hash(i * 3.1) * 92, hy: hash(i * 7.3), z: (hash(i * 5.9) - 0.5) * 34, type: i % 3, ph: hash(i) * 6.28, on: true }));
   const nVis = () => (S.smoke ? 40 : 22);
   function drawParts(t) {
     const n = nVis();
     parts.forEach((p, i) => {
       const s = i < n ? 1 : 0, T = i % 3;
       const wob = Math.sin(t * 1.4 + p.ph) * 0.12;
-      setI(T === 0 ? soot : T === 1 ? grain : bac, i, p.x, p.y + wob, p.z, s, s, s, 0, p.ph, p.ph * 0.5);
+      setI(T === 0 ? soot : T === 1 ? grain : bac, i, p.x, 6.5 + p.hy * Math.max(0.4, 4.5 * mucus.scale.y - 1.4) + wob, p.z, s, s, s, 0, p.ph, p.ph * 0.5);
       if (T !== 0) setI(soot, i, 0, 0, 0, 0);
       if (T !== 1) setI(grain, i, 0, 0, 0, 0);
       if (T !== 2) setI(bac, i, 0, 0, 0, 0);
@@ -905,6 +910,7 @@ function buildCilia(X) {
     if (!X.engine.reducedMotion) S.phase += dt * TAU * (st.beatHz / SLOW);
     cU.uPhase.value = S.phase; cU.uAmp.value = clamp(S.amp, 0, 1) * 1.0; cU.uCoord.value = S.coord;
     mucus.scale.y += ((S.smoke ? 1.7 : 1) - mucus.scale.y) * clamp(dt * 2, 0, 1);
+    mucus.position.y = 6.0 + 2.25 * mucus.scale.y;            // the blanket rests on the cilia tips (6 um) however thick it gets
     const v = (st.umPerS / SLOW) * dt;
     const n = nVis();
     let waiting = 0;
@@ -928,15 +934,15 @@ function buildCilia(X) {
     el.insertAdjacentHTML("beforeend", `<p class="hint">${y7 ? "Watch the dust and germs stuck in the mucus being carried along. Turn the cilia right down, then back up." : "Beating and mucus flow are slowed 6×; the readout shows real speed (about 4–20 mm/min in healthy airways). Smoke slows the beat and thickens the mucus, so clearance falls."}</p>`);
   }
   const views = [
-    { label: "The airway lining", x: 0, y: 0, z: 0, w: 110, h: 64 },
-    { label: "Cilia close-up", x: 0, y: 8, z: 0, w: 32, h: 24 },
-    { label: "Mucus and trapped particles", x: 10, y: 20, z: 0, w: 70, h: 24 },
+    { label: "The airway lining", x: 0, y: -8, z: 0, w: 110, h: 50 },
+    { label: "Cilia close-up", x: 0, y: 3, z: 0, w: 32, h: 16 },
+    { label: "Mucus and trapped particles", x: 10, y: 7, z: 0, w: 70, h: 18 },
   ];
   const anchors = [
-    { p: () => V3(0, 11, 4), t: { "y7-8": "Cilia (tiny hairs)", "y9-10": "Cilia beat in waves" } },
+    { p: () => V3(0, 5, 4), t: { "y7-8": "Cilia (tiny hairs)", "y9-10": "Cilia beat in waves" } },
     { p: () => V3(-4.7, -3.2, 5), t: { "y7-8": "Power stations", "y9-10": "Mitochondria (ATP)" } },
     { p: () => V3(-0, -20, 6), t: { "y7-8": "Nucleus", "y9-10": "Nucleus" } },
-    { p: () => V3(-40, 25.5, 0), t: { "y7-8": "Mucus (sticky)", "y9-10": "Mucus layer + trapped particles" } },
+    { p: () => V3(-40, 11.5, 0), t: { "y7-8": "Mucus (sticky)", "y9-10": "Mucus layer + trapped particles" } },
     { p: () => V3(-28.2, -2, 11), t: { "y7-8": "A mucus-making cell", "y9-10": "Goblet cell (makes mucus)" } },
   ];
   return { g, hit: [112, 66, 50], view: views[0], anchors, views, update, chips, controls, narr: () => ({ activity: S.activity, smoke: S.smoke, cleared: S.cleared, waiting: S.waiting }), focus: () => views[0], live: true };
@@ -1081,7 +1087,7 @@ function buildRootHair(X) {
     K.slider(el, { label: "Hair length", min: 0, max: 400, step: 10, value: S.L, format: (v) => `${v} µm`, onInput: (v) => { S.L = v; X.refresh(); } });
     K.slider(el, { label: y7 ? "How wet the soil is" : "Soil water (dry ↔ wet)", min: 0, max: 100, value: S.wet, format: (v) => (v < 35 ? "very dry" : v < 70 ? "moist" : "wet"), onInput: (v) => { S.wet = v; X.refresh(); } });
     K.checkbox(el, y7 ? "Waterlogged soil (no air)" : "Waterlogged soil (little O₂)", S.waterlogged, (v) => { S.waterlogged = v; X.refresh(); });
-    el.insertAdjacentHTML("beforeend", `<p class="hint">${y7 ? "Blue dots are water. Purple and yellow dots are minerals. A longer hair touches more soil. What happens if the soil is very dry, or has no air?" : `Water enters by <b>osmosis</b> (no ATP); mineral ions (about ${C.ROOT.CSOIL} mM outside, ${C.ROOT.CCELL} mM inside) enter by <b>active transport</b>, which needs ATP from respiration (so oxygen). Uptake is shown relative to a hairless cell in wet, aerated soil = 1.`}</p>`);
+    el.insertAdjacentHTML("beforeend", `<p class="hint">${y7 ? "Blue dots are water. Purple and yellow dots are minerals. A longer hair touches more soil. What happens if the soil is very dry, or has no air?" : `Water enters by <b>osmosis</b> (no ATP); nitrate (about ${C.ROOT.CSOIL} mM outside) enters with H⁺ through a cotransporter driven by ATP-powered proton pumps (<b>active transport</b>, so it needs oxygen for respiration). Uptake is shown relative to a hairless cell in wet, aerated soil = 1.`}</p>`);
   }
   const views = [
     { label: "Cell body and hair base", x: -128, y: 0, z: 0, w: 180, h: 80 },
@@ -1408,7 +1414,7 @@ function buildXylem(X) {
       setI(wm, i, Math.cos(w.a) * w.r * R0, w.y, Math.sin(w.a) * w.r * R0, hidden ? 0 : 0.95);
     }
     upd(wm);
-    const vn = (S.bubble ? 11 : 6) * (0.35 + S.tension);
+    const vn = st.flowNb > 0 ? 5 + 9 * Math.log10(1 + 20 * st.flowNb) : 0;     // same flow model as the main vessel: zero when there is no pull
     for (let i = 0; i < NNW; i++) { const w = wnd[i]; w.y += vn * dt; if (w.y > 100) w.y = -100; setI(wn, i, Math.cos(w.a) * w.r * 11, w.y, Math.sin(w.a) * w.r * 11, 1); }
     upd(wn);
   }
@@ -1568,7 +1574,7 @@ function humanFigure(show) {
     g.add(new THREE.Mesh(taperedTube(new THREE.CatmullRomCurve3([P(0, 43, 0.5), P(0, 36, 0.8), P(0, 28, 0.8)]), () => 1.1, 12, 8), S.lung));
     for (const s of [-1, 1]) { add(g, blob(6.2, 11, 4.8, 0.07, 4 + s, 3), S.lung, s * 6.6, 21, 1.2); g.add(new THREE.Mesh(taperedTube(new THREE.CatmullRomCurve3([P(0, 28, 0.8), P(s * 3, 26, 1), P(s * 5.5, 20, 1.2)]), (u) => lerp(0.8, 0.3, u), 10, 6), S.lung)); }
   }
-  g.userData.organAt = { biceps: P(16.6, 24, 5.4), brain: P(0, 50.5, 0.2), trachea: P(0, 36, 2) };
+  g.userData.organAt = { biceps: P(16.6, 24, 5.4), brain: P(0, 50.5, 0.2), cord: P(0, 18, -3.2), trachea: P(0, 36, 2) };
   return g;
 }
 /** a flowering plant: shoot above ground, roots below */
@@ -1689,6 +1695,43 @@ function sceneBrain() {
   g.rotation.set(0.1, -0.7, 0);
   return { g, w: 70, h: 54, anchors: [{ p: V3(0, 19, 0), t: { "y7-8": "The brain: an organ", "y9-10": "Brain (nervous tissue + blood vessels)" } }, { p: V3(0, -26, -13), t: { "y9-10": "Cerebellum" } }] };
 }
+function sceneSpinalCord() {
+  const S = hm(), g = new THREE.Group(), rng = mulberry32(12), HL = 46;
+  // white matter (axon tracts) around grey matter (cell bodies): a butterfly of ventral and dorsal horns
+  add(g, new THREE.CylinderGeometry(8.2, 8.2, HL * 2, 44, 1, true).rotateZ(Math.PI / 2), gl("#f3efe6", "#ffffff", { minAlpha: 0.2, maxAlpha: 0.65 })).userData.clayOpacity = 0.3;
+  const grey = gl("#d9a6c0", "#f7d8e8", { minAlpha: 0.35, maxAlpha: 0.9 });
+  const horn = (y, z, ry, rz) => { const m = add(g, blob(HL * 0.98, ry, rz, 0.02, 2, 3), grey, 0, y, z); m.userData.clayColor = "#d8b4cc"; };
+  horn(0, 0, 2.3, 1.7);
+  for (const sg of [-1, 1]) { horn(3.9, sg * 2.3, 3.4, 1.0); horn(-2.9, sg * 3.7, 2.6, 2.6); }
+  // motor neuron cell bodies in the ventral horns
+  const N = 12, so = inst(new THREE.IcosahedronGeometry(1, 2), mats().memViolet2, N, g), pos = [];
+  for (let i = 0; i < N; i++) { const sg = i % 2 ? 1 : -1, x = -36 + (i >> 1) * 13.5 + rng() * 3; pos.push(V3(x, -2.9 + (rng() - 0.5) * 1.4, sg * 3.8)); setI(so, i, pos[i].x, pos[i].y, pos[i].z, 1.05); }
+  upd(so);
+  // ventral root: axons leave the cord, join the spinal nerve and run off to the muscle; ours is lit gold
+  const axons = [], hubV = V3(-6, -13, 14), outV = V3(-14, -28, 24);
+  pos.forEach((p, i) => { if (i === 4) return; axons.push(taperedTube(new THREE.CatmullRomCurve3([p.clone(), p.clone().add(V3(0, -3, p.z > 0 ? 3 : -3)), V3(p.x * 0.3 + hubV.x * 0.7, -9, p.z > 0 ? 11 : -11).lerp(hubV, 0.6), hubV]), () => 0.3, 14, 5)); });
+  g.add(new THREE.Mesh(mergeGeometries(axons), mats().memViolet));
+  g.add(new THREE.Mesh(taperedTube(new THREE.CatmullRomCurve3([hubV, hubV.clone().lerp(outV, 0.5), outV]), () => 2.1, 14, 10), gl("#f1e2bd", "#fff6dc", { minAlpha: 0.3, maxAlpha: 0.8 })));
+  const hp = pos[4];
+  const heroMesh = add(g, new THREE.IcosahedronGeometry(1.8, 3), hm().nerve, hp.x, hp.y, hp.z);
+  g.add(new THREE.Mesh(taperedTube(new THREE.CatmullRomCurve3([hp.clone(), hp.clone().add(V3(0, -3, 3)), V3(hp.x * 0.3 + hubV.x * 0.7, -9, 11).lerp(hubV, 0.6), hubV, hubV.clone().lerp(outV, 0.5), outV]), () => 0.45, 30, 6), hm().nerve));
+  // dorsal root and its ganglion (sensory neurons)
+  const gang = add(g, blob(2.4, 2.0, 2.0, 0.05, 4, 3), mats().memViolet2, 10, 13, 12);
+  g.add(new THREE.Mesh(taperedTube(new THREE.CatmullRomCurve3([V3(10, 7, 4), V3(10, 10, 8), V3(10, 13, 12)]), () => 0.5, 10, 5), mats().memViolet));
+  g.add(new THREE.Mesh(taperedTube(new THREE.CatmullRomCurve3([V3(10, 13, 12), V3(2, 11, 15), hubV.clone().add(V3(0, 1, 0))]), () => 0.6, 14, 5), mats().memViolet));
+  // cut end with the butterfly outline
+  const cv = document.createElement("canvas"); cv.width = cv.height = 256; const c = cv.getContext("2d");
+  c.fillStyle = "#e9e1d3"; c.beginPath(); c.arc(128, 128, 126, 0, TAU); c.fill();
+  c.fillStyle = "#c98fae"; c.beginPath(); c.ellipse(128, 128, 22, 18, 0, 0, TAU); c.fill();
+  for (const sg of [-1, 1]) { c.beginPath(); c.ellipse(128 + sg * 22, 78, 9, 38, sg * -0.25, 0, TAU); c.fill(); c.beginPath(); c.ellipse(128 + sg * 38, 164, 28, 24, 0, 0, TAU); c.fill(); }
+  c.fillStyle = "#6d4fc4"; for (const [x, y] of [[96, 168], [160, 168], [88, 150], [168, 150]]) { c.beginPath(); c.arc(x, y, 6, 0, TAU); c.fill(); }
+  const tex = new THREE.CanvasTexture(cv); tex.colorSpace = THREE.SRGBColorSpace;
+  const end = add(g, new THREE.CircleGeometry(8.1, 40), new THREE.MeshStandardMaterial({ map: tex, roughness: 0.8, color: "#a8a094" }), HL + 0.1, 0, 0); end.rotation.y = Math.PI / 2; end.rotation.z = Math.PI; end.userData.clayColor = "#efe3d6";
+  heroGlow(g, hp, 3.6).lookAt(0, 0, 200);
+  g.rotation.set(0.35, -0.6, 0.05);
+  return { g, w: 120, h: 80, anchors: [{ p: V3(0, 11, 0), t: { "y7-8": "Spinal cord: an organ", "y9-10": "Spinal cord (organ)" } }, { p: V3(-24, 0, 6), t: { "y9-10": "Grey matter: cell bodies" } }, { p: V3(hp.x, hp.y - 3.5, hp.z + 4), t: { "y7-8": "Our motor neuron", "y9-10": "Our motor neuron (cell body)" } }, { p: V3(-10, -22, 19), t: { "y7-8": "Its axon runs out to a muscle", "y9-10": "Ventral root, then spinal nerve to the muscle" } }, { p: V3(10, 17, 12), t: { "y9-10": "Dorsal root ganglion (sensory)" } }] };
+}
+
 function sceneRootTissue() {
   const S = hm(), g = new THREE.Group(), rng = mulberry32(61);
   const cellGeo = lathe([[0, -9], [3.4, -8.6], [5.4, -6], [5.8, 0], [5.4, 6], [3.4, 8.6], [0, 9]], 20).rotateZ(Math.PI / 2);
@@ -1786,7 +1829,7 @@ function sceneXylemTissue() {
 }
 function sceneStem() {
   const S = hm(), M = mats(), g = new THREE.Group(), rng = mulberry32(27);
-  const plane = new THREE.Plane(new THREE.Vector3(0, 0, -1), 0);
+  const planeLocal = new THREE.Plane(new THREE.Vector3(0, 0, -1), 0), plane = planeLocal.clone();
   const skin = gl("#9bd88f", "#eaffea", { minAlpha: 0.1, maxAlpha: 0.6, clippingPlanes: [plane] });
   skin.side = THREE.DoubleSide;
   add(g, new THREE.CylinderGeometry(15, 15, 90, 56, 1, true), skin);
@@ -1804,21 +1847,21 @@ function sceneStem() {
   const lf = leafBlade(34, 18); lf.position.set(12, 14, -3); lf.rotation.set(-1.2, 0.3, -1.2); g.add(lf);
   const hero = heroGlow(g, V3(Math.cos(0.2) * 9.6 - Math.cos(0.2) * 1.8, 45.4, Math.sin(0.2) * 9.6 - Math.sin(0.2) * 1.8), 2.8); hero.rotation.x = Math.PI / 2;
   g.rotation.set(0.5, -0.5, 0.15);
-  return { g, w: 80, h: 110, anchors: [{ p: V3(18, 40, 0), t: { "y7-8": "Stem: an organ", "y9-10": "Stem (organ): carries water up" } }, { p: V3(-18, 20, 0), t: { "y9-10": "Vascular bundles (xylem + phloem)" } }] };
+  return { g, w: 80, h: 110, update: () => { g.updateWorldMatrix(true, false); plane.copy(planeLocal).applyMatrix4(g.matrixWorld); }, anchors: [{ p: V3(18, 40, 0), t: { "y7-8": "Stem: an organ", "y9-10": "Stem (organ): carries water up" } }, { p: V3(-18, 20, 0), t: { "y9-10": "Vascular bundles (xylem + phloem)" } }] };
 }
 
 /** map: specimen id -> scenes for tissue, organ, system and organism steps (steps 1..4) */
 const HIER = {
   muscle: [sceneMuscleTissue, sceneBiceps, () => sceneFigure({ muscles: true, bones: true, biceps: true }, "biceps", { "y7-8": "Muscles + skeleton", "y9-10": "Muscular system (with the skeleton)" }), () => sceneFigure({ solid: true }, "biceps", { "y7-8": "A human: our biceps is in here", "y9-10": "Human: biceps highlighted" })],
-  neuron: [sceneNerveTissue, sceneBrain, () => sceneFigure({ nerves: true }, "brain", { "y7-8": "Brain, spinal cord and nerves", "y9-10": "Nervous system" }), () => sceneFigure({ solid: true }, "brain", { "y7-8": "A human: the brain is in the head", "y9-10": "Human: brain highlighted" })],
+  neuron: [sceneNerveTissue, sceneSpinalCord, () => sceneFigure({ nerves: true }, "cord", { "y7-8": "Brain, spinal cord and nerves", "y9-10": "Nervous system" }), () => sceneFigure({ solid: true }, "cord", { "y7-8": "A human: the spinal cord runs down the back", "y9-10": "Human: spinal cord highlighted" })],
   roothair: [sceneRootTissue, sceneRootOrgan, sceneRootSystem, () => scenePlant({ solid: true }, "root", { "y7-8": "A flowering plant", "y9-10": "Flowering plant: roots underground" })],
   palisade: [sceneLeafSection, sceneLeafOrgan, () => scenePlant({ shoot: true }, "leaf", { "y7-8": "Stem and leaves: the shoot system", "y9-10": "Shoot system (stems + leaves)" }), () => scenePlant({ solid: true }, "leaf", { "y7-8": "A flowering plant", "y9-10": "Flowering plant: leaf highlighted" })],
   xylem: [sceneXylemTissue, sceneStem, () => scenePlant({ shoot: true }, "stem", { "y7-8": "Stem and leaves: the shoot system", "y9-10": "Shoot system" }), () => scenePlant({ solid: true }, "stem", { "y7-8": "A flowering plant", "y9-10": "Flowering plant: stem highlighted" })],
 };
 function sceneFigure(show, organ, label) {
   const g = new THREE.Group(), f = humanFigure(show); g.add(f);
-  const p = f.userData.organAt[organ === "brain" ? "brain" : "biceps"];
-  const hero = heroGlow(g, p, organ === "brain" ? 8 : 5); hero.lookAt(0, 0, 100);
+  const p = f.userData.organAt[organ];
+  const hero = heroGlow(g, p, organ === "brain" ? 8 : organ === "cord" ? 6 : 5); hero.lookAt(0, 0, 100);
   g.position.y = 4; g.scale.setScalar(0.9); g.rotation.y = -0.35;
   return { g, w: 70, h: 120, anchors: [{ p: p.clone().multiplyScalar(0.9).add(V3(0, 12, 0)), t: label }, { p: V3(0, -62 * 0.9 + 4, 0), t: { "y9-10": "Not to scale" } }] };
 }
@@ -2258,7 +2301,7 @@ export function create(engine) {
     buildMatch(node);
     // differentiation
     const dif = K.card(node, lens.pick({ "y7-8": "Same instructions, different jobs", "y9-10": "Same genes, different cells", y11: "Cell differentiation" }));
-    dif.insertAdjacentHTML("beforeend", `<p style="margin:0">${lens.pick({ "y7-8": "All of these cells carry the same set of instructions (DNA). Each one uses only the instructions it needs, so a muscle cell and a nerve cell end up different.", "y9-10": C.DIFFERENTIATION["y9-10"], y11: C.DIFFERENTIATION.y11 })}</p>`);
+    dif.insertAdjacentHTML("beforeend", `<p style="margin:0">${lens.pick({ "y7-8": "The cells with a nucleus in one living thing (like your muscle cells and nerve cells) carry the same set of instructions (DNA). Each one uses only the instructions it needs, so they end up different. (Red blood cells have lost their nucleus, and sperm carry only half the set.)", "y9-10": C.DIFFERENTIATION["y9-10"], y11: C.DIFFERENTIATION.y11 })}</p>`);
     const dots = document.createElement("div"); dots.className = "flow-key"; dots.style.marginTop = "8px";
     for (const id of ids) dots.insertAdjacentHTML("beforeend", `<span><i style="background:${specs[id].info.color};box-shadow:0 0 8px ${specs[id].info.color}"></i>${esc(specs[id].info.name.replace(" (airway)", "").replace(" (with a stoma)", ""))}</span>`);
     dif.appendChild(dots);
@@ -2342,7 +2385,7 @@ export function create(engine) {
       engine.bokeh.uniforms.aperture.value = 0.0065 / Math.max(10, camD) * (engine.style.clay ? 0.8 : 1);
       if (engine.style.clay) { const f = clamp(46 / camD, 0.025, 5); engine.style.U.freq.value = f; engine.style.U.amt.value = 1.15 / Math.max(0.2, f * 6); }
       for (const id of ids) { const b = specs[id].beacon, k = smooth(camD, 350, 1300); b.visible = k > 0.01; b.material.opacity = 0.75 * k; b.scale.setScalar(clamp(camD * 0.045, 20, 420)); }
-      if (hierStep) { /* illustrations are still */ }
+      if (hierStep) hierScene(sel, hierStep).update?.();
       else if (sel === null) for (const id of ids) specs[id].update(dt, t, false);
       else if (specs[sel]) specs[sel].update(dt, t, true);
       if ((uiT -= rdt) <= 0) { uiT = 0.25; updateChips(); mission?.update(); }
