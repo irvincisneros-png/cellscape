@@ -3,6 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <script>(function(){var t="auto";try{t=localStorage.getItem("cellscape.theme")||"auto"}catch(e){}if(t!=="light"&&t!=="dark"){try{t=matchMedia("(prefers-color-scheme: light)").matches?"light":"dark"}catch(e){t="dark"}}document.documentElement.dataset.theme=t;document.documentElement.style.colorScheme=t})()</script>
   <title>Cell Explorer · CellScape</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Space+Grotesk:wght@500;600&display=swap" rel="stylesheet" />
@@ -56,6 +57,7 @@
       <a class="back" href="../../index.html">← CellScape</a>
       <h1>Cell Explorer</h1>
       <span class="tag">Stage 4 · Cells &amp; classification / Biology Y11 · Module 1 · Cell structure</span>
+      <span class="cs-theme-slot"></span>
     </header>
     <main class="stage" id="stage">
       <canvas id="canvas" tabindex="0" aria-label="Cell Explorer simulation: a living animal, plant or bacterial cell you can pan by dragging and zoom with the mouse wheel, pinch or the plus and minus buttons (or the + and − keys and arrow keys). Tap any organelle to see its name, function and size in the side panel. The What's happening panel describes what is currently on screen."></canvas>
@@ -64,5 +66,6 @@
     <aside class="panel" id="panel"></aside>
   </div>
   <script type="module" src="./sim.js"></script>
+  <script type="module">import("../../assets/js/world/theme.js").then((m) => { const s = document.querySelector(".cs-theme-slot"); if (s) m.mountThemeToggle(s); });</script>
 </body>
 </html>

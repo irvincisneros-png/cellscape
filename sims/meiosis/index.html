@@ -3,6 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <script>(function(){var t="auto";try{t=localStorage.getItem("cellscape.theme")||"auto"}catch(e){}if(t!=="light"&&t!=="dark"){try{t=matchMedia("(prefers-color-scheme: light)").matches?"light":"dark"}catch(e){t="dark"}}document.documentElement.dataset.theme=t;document.documentElement.style.colorScheme=t})()</script>
   <title>Meiosis &amp; Variation · CellScape</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Space+Grotesk:wght@500;600&display=swap" rel="stylesheet" />
@@ -16,7 +17,7 @@
     .tcell {
       display: flex; flex-direction: column; align-items: center; gap: 1px;
       padding: 6px 2px; border-radius: 8px; min-width: 0; border: 1px solid var(--panel-border);
-      background: rgba(255,255,255,0.02); color: var(--ink-faint); font-size: 0.72rem;
+      background: var(--tint-1); color: var(--ink-faint); font-size: 0.72rem;
     }
     .tcell b { font-family: var(--font-display); font-size: 0.95rem; letter-spacing: 0.04em; color: var(--ink-faint); }
     .tcell span { font-variant-numeric: tabular-nums; }
@@ -41,6 +42,7 @@
       <a class="back" href="../../index.html">← CellScape</a>
       <h1>Meiosis &amp; Variation</h1>
       <span class="tag">Biology Y12 · Module 5 · Meiosis &amp; variation</span>
+      <span class="cs-theme-slot"></span>
     </header>
     <main class="stage" id="stage">
       <canvas id="canvas" aria-label="Meiosis and variation simulation: a diploid germ cell with two homologous chromosome pairs divides by meiosis into four haploid cells. Place crossovers, flip bivalent orientation, cause nondisjunction, then fertilise a product and compare offspring with a Punnett square. The What&#39;s happening panel describes the current stage."></canvas>
@@ -59,5 +61,6 @@
       .then((m) => m.boot({ start: "meiosis", root: "../../" }))
       .catch((e) => { console.error(e); try { sessionStorage.setItem("cs2d", "1"); } catch {} location.reload(); });
   </script>
+  <script type="module">import("../../assets/js/world/theme.js").then((m) => { const s = document.querySelector(".cs-theme-slot"); if (s) m.mountThemeToggle(s); });</script>
 </body>
 </html>

@@ -818,9 +818,9 @@ function drawPotato() {
   const x0 = 36, x1 = w - 10, y0 = 12, y1 = h - 26;
   const X = (s) => x0 + (s / 3) * (x1 - x0), Y = (m) => y0 + ((25 - m) / 55) * (y1 - y0);
   c.font = "600 10px Inter, system-ui, sans-serif";
-  c.fillStyle = C.inkFaint; c.textAlign = "right"; c.textBaseline = "middle";
+  c.fillStyle = K.cssVar("--ink-faint", C.inkFaint); c.textAlign = "right"; c.textBaseline = "middle";
   for (const m of [20, 10, 0, -10, -20]) {
-    c.strokeStyle = m === 0 ? "rgba(232,241,255,0.35)" : "rgba(232,241,255,0.08)";
+    c.strokeStyle = K.cssVar(m === 0 ? "--ink-faint" : "--grid-line", "rgba(232,241,255,0.2)");
     c.beginPath(); c.moveTo(x0, Y(m)); c.lineTo(x1, Y(m)); c.stroke();
     c.fillText(`${m > 0 ? "+" : ""}${m}%`, x0 - 4, Y(m));
   }

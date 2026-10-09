@@ -17,9 +17,9 @@ const CSS = `
 .ez-hint { position: absolute; left: 50%; bottom: 86px; transform: translateX(-50%); z-index: 3; max-width: calc(100% - 32px); text-align: center;
   background: rgba(5,11,22,0.82); border: 1px solid var(--panel-border); border-radius: 12px; padding: 7px 12px; font-size: 0.8rem; color: var(--ink); pointer-events: none; transition: opacity 0.6s; }
 .ez-meter { min-width: 170px; }
-.ez-meter .bar { display: flex; height: 8px; border-radius: 4px; overflow: hidden; background: rgba(255,255,255,0.08); margin-top: 4px; }
+.ez-meter .bar { display: flex; height: 8px; border-radius: 4px; overflow: hidden; background: var(--tint-3); margin-top: 4px; }
 .ez-meter .bar i { display: block; height: 100%; }
-.ez-graph { width: 100%; height: 210px; display: block; margin-top: 10px; border-radius: 10px; background: rgba(5,11,22,0.55); }
+.ez-graph { width: 100%; height: 210px; display: block; margin-top: 10px; border-radius: 10px; background: var(--well-bg); }
 .ez-sel .io { display: grid; grid-template-columns: auto 1fr; gap: 3px 8px; font-size: 0.84rem; margin: 6px 0; }
 .ez-sel .io b { color: var(--ink-faint); font-weight: 600; }
 .explain .now { border-top: 1px solid var(--panel-border); padding-top: 8px; margin-top: 8px; font-size: 0.86rem; }
@@ -197,23 +197,23 @@ export function create(engine) {
     ymax = Math.ceil((ymax * 1.15) / ys) * ys;
     const X = (x) => L0 + ((x - v.min) / (v.max - v.min)) * pw, Y = (y) => T0 + ph - (y / ymax) * ph;
     g.font = "11px Inter, system-ui, sans-serif";
-    g.strokeStyle = "rgba(159,179,207,0.15)"; g.fillStyle = "#6a7f9c"; g.lineWidth = 1;
+    g.strokeStyle = K.cssVar("--grid-line", "rgba(159,179,207,0.15)"); g.fillStyle = K.cssVar("--ink-faint", "#6a7f9c"); g.lineWidth = 1;
     g.textAlign = "right"; g.textBaseline = "middle";
     for (let y = 0; y <= ymax + 1e-9; y += ys) { g.beginPath(); g.moveTo(L0, Y(y)); g.lineTo(L0 + pw, Y(y)); g.stroke(); g.fillText(ys < 1 ? y.toFixed(1) : String(y), L0 - 5, Y(y)); }
     g.textAlign = "center"; g.textBaseline = "top";
     const xs = (v.max - v.min) / (gVar === "pH" ? 7 : gVar === "nE" ? 6 : 8);
     for (let x = v.min; x <= v.max + 1e-9; x += xs) g.fillText(String(Math.round(x)), X(x), T0 + ph + 4);
-    g.fillStyle = "#9fb3cf";
+    g.fillStyle = K.cssVar("--ink-dim", "#9fb3cf");
     g.fillText(v.axis, L0 + pw / 2, h - 14);
     g.save(); g.translate(10, T0 + ph / 2); g.rotate(-Math.PI / 2); g.textBaseline = "middle"; g.fillText("Rate (products/s)", 0, 0); g.restore();
-    g.strokeStyle = "rgba(159,179,207,0.5)";
+    g.strokeStyle = K.cssVar("--ink-faint", "rgba(159,179,207,0.5)");
     g.beginPath(); g.moveTo(L0, T0); g.lineTo(L0, T0 + ph); g.lineTo(L0 + pw, T0 + ph); g.stroke();
     for (const r of list) {
       if (r.pts.length > 1) {
         g.strokeStyle = K.withAlpha(r.color, 0.7); g.lineWidth = 2; g.lineJoin = "round";
         g.beginPath(); r.pts.forEach((p, i) => (i ? g.lineTo(X(p.x), Y(p.y)) : g.moveTo(X(p.x), Y(p.y)))); g.stroke();
       }
-      for (const p of r.pts) { g.fillStyle = r.color; g.beginPath(); g.arc(X(p.x), Y(p.y), 3.6, 0, K.TAU); g.fill(); g.strokeStyle = "#050b16"; g.lineWidth = 1; g.stroke(); }
+      for (const p of r.pts) { g.fillStyle = r.color; g.beginPath(); g.arc(X(p.x), Y(p.y), 3.6, 0, K.TAU); g.fill(); g.strokeStyle = K.cssVar("--bg-0", "#050b16"); g.lineWidth = 1; g.stroke(); }
       if (r.done && (gVar === "temp" || gVar === "pH") && r.pts.length) {
         const b = r.pts.reduce((a, c) => (c.y > a.y ? c : a), r.pts[0]);
         g.strokeStyle = K.withAlpha(r.color, 0.5); g.setLineDash([3, 3]);
@@ -237,12 +237,12 @@ export function create(engine) {
     const cur = state[v.key];
     if (cur >= v.min && cur <= v.max) {
       const px = X(cur), py = Y(Math.min(liveRate, ymax));
-      g.strokeStyle = "#e8f1ff"; g.lineWidth = 1.5;
+      g.strokeStyle = K.cssVar("--ink", "#e8f1ff"); g.lineWidth = 1.5;
       g.beginPath(); g.arc(px, py, 5.5, 0, K.TAU); g.stroke();
-      g.fillStyle = "#e8f1ff"; g.textAlign = px > L0 + pw - 40 ? "right" : "left"; g.textBaseline = "bottom";
+      g.fillStyle = K.cssVar("--ink", "#e8f1ff"); g.textAlign = px > L0 + pw - 40 ? "right" : "left"; g.textBaseline = "bottom";
       g.fillText("live", px + (px > L0 + pw - 40 ? -8 : 8), py - 4);
     }
-    if (!list.length) { g.fillStyle = "#6a7f9c"; g.textAlign = "center"; g.textBaseline = "middle"; g.fillText("Press “Run experiment” to measure rate", L0 + pw / 2, T0 + ph / 2); }
+    if (!list.length) { g.fillStyle = K.cssVar("--ink-faint", "#6a7f9c"); g.textAlign = "center"; g.textBaseline = "middle"; g.fillText("Press “Run experiment” to measure rate", L0 + pw / 2, T0 + ph / 2); }
   }
 
   function updateLegend() {

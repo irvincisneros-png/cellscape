@@ -23,7 +23,7 @@ const ENTRY = new THREE.Vector3(-5.6, 4.6, -0.6);
 const CSS = `
 .mito-chip .w { color: var(--ink-faint); }
 .mito .flow { list-style: none; padding: 0; margin: 8px 0 10px; display: flex; flex-direction: column; gap: 12px; }
-.mito .flow li { position: relative; display: grid; grid-template-columns: 1fr auto; gap: 1px 8px; padding: 7px 9px; border-radius: 9px; font-size: 0.84rem; background: rgba(255,255,255,0.03); border: 1px solid var(--panel-border); }
+.mito .flow li { position: relative; display: grid; grid-template-columns: 1fr auto; gap: 1px 8px; padding: 7px 9px; border-radius: 9px; font-size: 0.84rem; background: var(--tint-1); border: 1px solid var(--panel-border); }
 .mito .flow li b { color: var(--ink); font-weight: 600; }
 .mito .flow li span { grid-column: 1; color: var(--ink-faint); font-size: 0.76rem; }
 .mito .flow li em { grid-column: 2; grid-row: 1 / span 2; align-self: center; text-align: right; font-style: normal; color: var(--accent-3); font-size: 0.78rem; }
@@ -535,7 +535,7 @@ export function create(engine) {
     const c = chartCtx;
     c.setTransform(dpr, 0, 0, dpr, 0, 0);
     c.clearRect(0, 0, w, h);
-    c.strokeStyle = "rgba(255,255,255,0.08)";
+    c.strokeStyle = K.cssVar("--grid-line", "rgba(255,255,255,0.08)");
     for (let i = 0; i <= 4; i++) { c.beginPath(); c.moveTo(0, (h * i) / 4); c.lineTo(w, (h * i) / 4); c.stroke(); }
     const H = M.hist;
     chart.setAttribute("aria-label", `ATP output ${M.smooth.atp.toFixed(0)} per second, oxygen use ${M.F.o2.toFixed(1)} per second, H⁺ gradient ${Math.round(M.G * 100)} percent.`);

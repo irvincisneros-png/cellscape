@@ -228,7 +228,7 @@ function drawGraph() {
   const X = (x) => L0 + ((x - v.min) / (v.max - v.min)) * pw;
   const Y = (y) => T0 + ph - (y / ymax) * ph;
   g.font = "11px Inter, system-ui, sans-serif";
-  g.strokeStyle = "rgba(159,179,207,0.15)"; g.fillStyle = "#6a7f9c"; g.lineWidth = 1;
+  g.strokeStyle = K.cssVar("--grid-line", "rgba(159,179,207,0.15)"); g.fillStyle = K.cssVar("--ink-faint", "#6a7f9c"); g.lineWidth = 1;
   g.textAlign = "right"; g.textBaseline = "middle";
   for (let y = 0; y <= ymax + 1e-9; y += ys) {
     g.beginPath(); g.moveTo(L0, Y(y)); g.lineTo(L0 + pw, Y(y)); g.stroke();
@@ -237,11 +237,11 @@ function drawGraph() {
   g.textAlign = "center"; g.textBaseline = "top";
   const xs = (v.max - v.min) / (gVar === "pH" ? 7 : gVar === "nE" ? 6 : 8);
   for (let x = v.min; x <= v.max + 1e-9; x += xs) g.fillText(String(Math.round(x)), X(x), T0 + ph + 4);
-  g.fillStyle = "#9fb3cf";
+  g.fillStyle = K.cssVar("--ink-dim", "#9fb3cf");
   g.fillText(v.axis, L0 + pw / 2, h - 14);
   g.save(); g.translate(10, T0 + ph / 2); g.rotate(-Math.PI / 2); g.textBaseline = "middle";
   g.fillText("Rate (products/s)", 0, 0); g.restore();
-  g.strokeStyle = "rgba(159,179,207,0.5)";
+  g.strokeStyle = K.cssVar("--ink-faint", "rgba(159,179,207,0.5)");
   g.beginPath(); g.moveTo(L0, T0); g.lineTo(L0, T0 + ph); g.lineTo(L0 + pw, T0 + ph); g.stroke();
 
   for (const r of list) {
@@ -253,7 +253,7 @@ function drawGraph() {
     }
     for (const p of r.pts) {
       g.fillStyle = r.color; g.beginPath(); g.arc(X(p.x), Y(p.y), 3.6, 0, K.TAU); g.fill();
-      g.strokeStyle = "#050b16"; g.lineWidth = 1; g.stroke();
+      g.strokeStyle = K.cssVar("--bg-0", "#050b16"); g.lineWidth = 1; g.stroke();
     }
     if (r.done && (gVar === "temp" || gVar === "pH") && r.pts.length) {
       const b = r.pts.reduce((a, c) => (c.y > a.y ? c : a), r.pts[0]);
@@ -265,13 +265,13 @@ function drawGraph() {
   const cur = state[v.key];
   if (cur >= v.min && cur <= v.max) {
     const px = X(cur), py = Y(Math.min(liveRate, ymax));
-    g.strokeStyle = "#e8f1ff"; g.lineWidth = 1.5;
+    g.strokeStyle = K.cssVar("--ink", "#e8f1ff"); g.lineWidth = 1.5;
     g.beginPath(); g.arc(px, py, 5.5, 0, K.TAU); g.stroke();
-    g.fillStyle = "#e8f1ff"; g.textAlign = px > L0 + pw - 40 ? "right" : "left"; g.textBaseline = "bottom";
+    g.fillStyle = K.cssVar("--ink", "#e8f1ff"); g.textAlign = px > L0 + pw - 40 ? "right" : "left"; g.textBaseline = "bottom";
     g.fillText("live", px + (px > L0 + pw - 40 ? -8 : 8), py - 4);
   }
   if (!list.length) {
-    g.fillStyle = "#6a7f9c"; g.textAlign = "center"; g.textBaseline = "middle";
+    g.fillStyle = K.cssVar("--ink-faint", "#6a7f9c"); g.textAlign = "center"; g.textBaseline = "middle";
     g.fillText("Press “Run experiment” to measure rate", L0 + pw / 2, T0 + ph / 2);
   }
 }

@@ -1212,7 +1212,7 @@ export function create(engine) {
   const css = document.getElementById("animal-style") || Object.assign(document.head.appendChild(document.createElement("style")), { id: "animal-style" });
   css.textContent = `.cmp-list{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:7px;font-size:.82rem;color:var(--ink-dim)}
 .cmp-list li{display:grid;grid-template-columns:20px 1fr;gap:6px;line-height:1.35}.cmp-list li i{font-style:normal;font-weight:700;text-align:center}
-.cmp-list .gain i{color:#86efac}.cmp-list .loss i{color:#fca5a5}.cmp-list .change i{color:#fcd34d}
+.cmp-list .gain i{color:var(--t-good)}.cmp-list .loss i{color:var(--t-bad)}.cmp-list .change i{color:var(--t-warn)}
 .animal-reset{margin-top:10px}.tour-cap.burst{border-color:rgba(248,113,113,.6)}`;
 
   function resetCell() {
@@ -1367,7 +1367,7 @@ export function create(engine) {
     const c = chartCtx;
     c.setTransform(dpr, 0, 0, dpr, 0, 0);
     c.clearRect(0, 0, w, h);
-    c.strokeStyle = "rgba(255,255,255,0.08)";
+    c.strokeStyle = K.cssVar("--grid-line", "rgba(255,255,255,0.08)");
     for (let i = 0; i <= 4; i++) { c.beginPath(); c.moveTo(0, (h * i) / 4); c.lineTo(w, (h * i) / 4); c.stroke(); }
     chart.setAttribute("aria-label", `Cell supplies now: ATP ${M.atp.toFixed(0)}, glycogen ${M.glycogen.toFixed(0)}, cell glucose ${M.gi.toFixed(1)} millimolar, volume ${Math.round(M.vol * 100)} percent.`);
     const H = M.history;

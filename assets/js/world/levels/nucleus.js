@@ -26,13 +26,13 @@ const HBB_INTRONS = [[0.089, 0.17], [0.31, 0.84]];
 const CSS = `
 .nuc-chip .w { color: var(--ink-faint); }
 .nuc .flow { list-style: none; padding: 0; margin: 8px 0 10px; display: flex; flex-direction: column; gap: 12px; }
-.nuc .flow li { position: relative; display: grid; grid-template-columns: 1fr auto; gap: 1px 8px; padding: 7px 9px; border-radius: 9px; font-size: 0.84rem; background: rgba(255,255,255,0.03); border: 1px solid var(--panel-border); }
+.nuc .flow li { position: relative; display: grid; grid-template-columns: 1fr auto; gap: 1px 8px; padding: 7px 9px; border-radius: 9px; font-size: 0.84rem; background: var(--tint-1); border: 1px solid var(--panel-border); }
 .nuc .flow li b { color: var(--ink); font-weight: 600; }
 .nuc .flow li span { grid-column: 1; color: var(--ink-faint); font-size: 0.76rem; }
 .nuc .flow li em { grid-column: 2; grid-row: 1 / span 2; align-self: center; text-align: right; font-style: normal; color: var(--accent-3); font-size: 0.78rem; }
 .nuc .flow li + li::before { content: "↓"; position: absolute; top: -13px; left: 14px; color: var(--ink-faint); font-size: 0.7rem; }
 .nuc .ko small { display: block; color: var(--ink-faint); font-size: 0.74rem; margin: -2px 0 6px 24px; }
-.nuc .gene-bar { height: 4px; border-radius: 2px; background: rgba(255,255,255,0.08); margin-top: 3px; overflow: hidden; }
+.nuc .gene-bar { height: 4px; border-radius: 2px; background: var(--tint-3); margin-top: 3px; overflow: hidden; }
 .nuc .gene-bar i { display: block; height: 100%; background: #60a5fa; transition: width 0.3s; }
 `;
 
@@ -821,12 +821,12 @@ export function create(engine) {
     const c = chartCtx;
     c.setTransform(dpr, 0, 0, dpr, 0, 0);
     c.clearRect(0, 0, w, h);
-    c.strokeStyle = "rgba(255,255,255,0.08)";
+    c.strokeStyle = K.cssVar("--grid-line", "rgba(255,255,255,0.08)");
     for (let i = 0; i <= 4; i++) { c.beginPath(); c.moveTo(0, (h * i) / 4); c.lineTo(w, (h * i) / 4); c.stroke(); }
     const H = M.history;
     chart.setAttribute("aria-label", `Transcription ${M.smooth.tx.toFixed(1)} per second, mRNA export ${M.smooth.exp.toFixed(1)} per second, ribosomal subunit export ${M.smooth.subExp.toFixed(1)} per second, import ${M.smooth.imp.toFixed(1)} per second.`);
     if (H.length < 2) return;
-    for (const [k, col] of [["imp", "#fbbf24"], ["sub", "#a5b4fc"], ["exp", MRNA_COL], ["tx", "#f8fafc"]]) {
+    for (const [k, col] of [["imp", "#fbbf24"], ["sub", "#a5b4fc"], ["exp", MRNA_COL], ["tx", K.cssVar("--ink", "#f8fafc")]]) {
       c.strokeStyle = col; c.lineWidth = 2; c.beginPath();
       H.forEach((p, i) => { const x = (i / 239) * w, y = h - Math.min(1, p[k] / 6) * (h - 4) - 2; i ? c.lineTo(x, y) : c.moveTo(x, y); });
       c.stroke();

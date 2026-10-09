@@ -20,7 +20,7 @@ const CSS = `
   background: rgba(5,11,22,0.82); border: 1px solid var(--panel-border); border-radius: 12px; padding: 7px 12px; font-size: 0.8rem; color: var(--ink); pointer-events: none; transition: opacity 0.6s; }
 .fd-seq { display: flex; flex-wrap: wrap; gap: 3px; margin: 6px 0 4px; align-items: center; }
 .fd-seq span { font-size: 0.7rem; font-weight: 700; padding: 2px 4px; border-radius: 6px; color: #06121f; }
-.fd-seq span.mut { outline: 2px solid #fde047; outline-offset: 1px; }
+.fd-seq span.mut { outline: 2px solid var(--t-warn); outline-offset: 1px; }
 .fd-seq em { font-style: normal; font-size: 0.72rem; color: var(--ink-faint); margin-left: 4px; }
 .fd-kind { font-weight: 700; margin: 6px 0 2px; }
 .fd-try { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-top: 8px; }
@@ -28,7 +28,7 @@ const CSS = `
 .fd-try .btn[aria-pressed="true"] { border-color: var(--accent); color: var(--ink); background: rgba(79,209,197,0.14); }
 .fd-steps .segmented button { padding: 6px 2px; font-size: 0.78rem; }
 .fd-meter { min-width: 150px; }
-.fd-meter .bar { height: 7px; border-radius: 4px; background: rgba(255,255,255,0.1); margin-top: 4px; overflow: hidden; }
+.fd-meter .bar { height: 7px; border-radius: 4px; background: var(--tint-3); margin-top: 4px; overflow: hidden; }
 .fd-meter .bar i { display: block; height: 100%; border-radius: 4px; transition: width 0.3s; }
 .chip.fd-rbc { position: absolute; right: 0; top: 48px; padding: 6px 8px 4px; text-align: center; border-radius: 14px; }
 .stage .chip.fd-rbc canvas { position: static; inset: auto; width: 128px; height: 84px; display: block; }

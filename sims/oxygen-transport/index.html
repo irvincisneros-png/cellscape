@@ -3,6 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <script>(function(){var t="auto";try{t=localStorage.getItem("cellscape.theme")||"auto"}catch(e){}if(t!=="light"&&t!=="dark"){try{t=matchMedia("(prefers-color-scheme: light)").matches?"light":"dark"}catch(e){t="dark"}}document.documentElement.dataset.theme=t;document.documentElement.style.colorScheme=t})()</script>
   <title>Oxygen Transport: Haemoglobin &amp; Red Blood Cells · CellScape</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Space+Grotesk:wght@500;600&display=swap" rel="stylesheet" />
@@ -26,6 +27,7 @@
       <a class="back" href="../../index.html">← CellScape</a>
       <h1>Oxygen Transport: Haemoglobin &amp; Red Blood Cells</h1>
       <span class="tag">Biology Y11 · Module 2 · Gas exchange &amp; transport</span>
+      <span class="cs-theme-slot"></span>
     </header>
     <main class="stage" id="stage">
       <canvas id="canvas" aria-label="Oxygen transport simulation: red blood cells circulate from an alveolus in the lungs, through the heart, to a capillary in working muscle and back. Tap a red blood cell to follow it and see its haemoglobin saturation."></canvas>
@@ -34,5 +36,6 @@
     <aside class="panel" id="panel"></aside>
   </div>
   <script type="module" src="./sim.js"></script>
+  <script type="module">import("../../assets/js/world/theme.js").then((m) => { const s = document.querySelector(".cs-theme-slot"); if (s) m.mountThemeToggle(s); });</script>
 </body>
 </html>

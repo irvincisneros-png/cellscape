@@ -21,6 +21,11 @@ export const C = {
   lipidHead: "#b9a7c9", lipidTail: "#5b4a3a",
 };
 
+/** Read a CSS custom property (e.g. "--ink-dim") from the page at draw time, so panel canvases follow the theme. */
+export function cssVar(name, fallback = "") {
+  try { return getComputedStyle(document.documentElement).getPropertyValue(name).trim() || fallback; } catch { return fallback; }
+}
+
 // ---------- stage ----------
 /** HiDPI canvas that tracks its container size. ctx is pre-scaled so you draw in CSS pixels. */
 export function createStage(canvas, onResize) {

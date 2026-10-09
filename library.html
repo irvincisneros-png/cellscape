@@ -3,6 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <script>(function(){var t="auto";try{t=localStorage.getItem("cellscape.theme")||"auto"}catch(e){}if(t!=="light"&&t!=="dark"){try{t=matchMedia("(prefers-color-scheme: light)").matches?"light":"dark"}catch(e){t="dark"}}document.documentElement.dataset.theme=t;document.documentElement.style.colorScheme=t})()</script>
   <title>All simulations · CellScape</title>
   <meta name="description" content="Interactive cell biology simulations: membranes, osmosis, enzymes, photosynthesis, ATP synthase, haemoglobin, mitosis, meiosis and protein synthesis." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -53,6 +54,7 @@
 <body>
   <header class="hero">
     <canvas id="hero" aria-hidden="true"></canvas>
+    <span class="cs-theme-slot" style="position:absolute;top:14px;right:18px;z-index:3"></span>
     <div class="hero-copy">
       <div class="brand">CELLSCAPE</div>
       <h1>Don't just watch the cell. <em>Run it.</em></h1>
@@ -72,5 +74,6 @@
   <footer>CellScape · Simulations are simplified models and not to scale.</footer>
 
   <script type="module" src="assets/js/hub.js"></script>
+  <script type="module">import("./assets/js/world/theme.js").then((m) => m.mountThemeToggle(document.querySelector(".cs-theme-slot")));</script>
 </body>
 </html>

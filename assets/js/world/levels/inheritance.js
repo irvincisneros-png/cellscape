@@ -37,14 +37,14 @@ const CSS = `
 .inh-tbl th{font-weight:600;color:var(--ink-faint);text-align:left;padding:2px 4px;font-size:.74rem}
 .inh-tbl td{padding:3px 4px;vertical-align:middle;color:var(--ink-dim)}
 .inh-tbl td.n{font-variant-numeric:tabular-nums;text-align:right;color:var(--ink)}
-.inh-tbl .bar{display:block;height:5px;border-radius:3px;margin-top:3px;background:rgba(255,255,255,.1);position:relative;overflow:hidden}
+.inh-tbl .bar{display:block;height:5px;border-radius:3px;margin-top:3px;background:var(--tint-3);position:relative;overflow:hidden}
 .inh-tbl .bar i{position:absolute;left:0;top:0;bottom:0;border-radius:3px;opacity:.85}
-.inh-tbl .bar u{position:absolute;top:-1px;bottom:-1px;width:2px;background:#fff;opacity:.85;text-decoration:none}
+.inh-tbl .bar u{position:absolute;top:-1px;bottom:-1px;width:2px;background:var(--ink);opacity:.85;text-decoration:none}
 .inh-sw{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:6px;vertical-align:-1px}
 .inh-legend{display:flex;flex-wrap:wrap;gap:4px 12px;font-size:.76rem;color:var(--ink-dim);margin-top:6px}
 .inh-note{border-left:3px solid var(--accent);padding:2px 0 2px 9px;margin:8px 0 0;font-size:.82rem;color:var(--ink-dim)}
 .inh-gene{font-family:ui-monospace,Menlo,monospace;letter-spacing:.04em;font-size:.82rem}
-.inh-codon{display:inline-flex;flex-direction:column;align-items:center;margin:2px 3px;padding:3px 7px;border-radius:8px;background:rgba(255,255,255,.05);font-family:ui-monospace,Menlo,monospace;font-size:.78rem}
+.inh-codon{display:inline-flex;flex-direction:column;align-items:center;margin:2px 3px;padding:3px 7px;border-radius:8px;background:var(--tint-2);font-family:ui-monospace,Menlo,monospace;font-size:.78rem}
 .inh-codon.hit{background:rgba(248,113,113,.18);outline:1px solid rgba(248,113,113,.6)}
 .inh-codon small{font-size:.7rem}
 .lbl3d.inh-tag{background:rgba(5,11,22,.74);border:1px solid rgba(125,190,255,.3);padding:1px 8px;border-radius:999px;color:var(--ink);font-size:.74rem;backdrop-filter:blur(3px)}

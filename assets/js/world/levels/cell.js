@@ -662,12 +662,12 @@ export function create(engine) {
     const c = chartCtx;
     c.setTransform(dpr, 0, 0, dpr, 0, 0);
     c.clearRect(0, 0, w, h);
-    c.strokeStyle = "rgba(255,255,255,0.08)";
+    c.strokeStyle = K.cssVar("--grid-line", "rgba(255,255,255,0.08)");
     for (let i = 0; i <= 4; i++) { c.beginPath(); c.moveTo(0, (h * i) / 4); c.lineTo(w, (h * i) / 4); c.stroke(); }
     const H = M.history;
     chart.setAttribute("aria-label", `Cell supplies now: ATP ${M.atp.toFixed(0)}, glucose ${M.glucose.toFixed(0)}, starch ${M.starch.toFixed(0)}, turgor ${M.turgor.toFixed(0)} percent.`);
     if (H.length < 2) return;
-    for (const [k, col] of [["turgor", "#38bdf8"], ["starch", "#f8fafc"], ["glucose", "#a3e635"], ["atp", "#fbbf24"]]) {
+    for (const [k, col] of [["turgor", "#38bdf8"], ["starch", K.cssVar("--ink", "#f8fafc")], ["glucose", "#a3e635"], ["atp", "#fbbf24"]]) {
       c.strokeStyle = col; c.lineWidth = 2; c.beginPath();
       H.forEach((p, i) => { const x = (i / 239) * w, y = h - (p[k] / 100) * (h - 4) - 2; i ? c.lineTo(x, y) : c.moveTo(x, y); });
       c.stroke();

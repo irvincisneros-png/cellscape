@@ -442,12 +442,12 @@ export function create(engine) {
     const c = chartCtx;
     c.setTransform(dpr, 0, 0, dpr, 0, 0);
     c.clearRect(0, 0, w, h);
-    c.strokeStyle = "rgba(255,255,255,0.08)";
+    c.strokeStyle = K.cssVar("--grid-line", "rgba(255,255,255,0.08)");
     for (let i = 0; i <= 4; i++) { c.beginPath(); c.moveTo(0, (h * i) / 4); c.lineTo(w, (h * i) / 4); c.stroke(); }
     const H = M.history;
     chart.setAttribute("aria-label", `Now: O₂ released ${M.flux.J.toFixed(1)} per minute, CO₂ fixed ${M.flux.V.toFixed(1)} per minute, carriers ${Math.round(M.e * 100)}% charged, starch ${M.starch.toFixed(0)}.`);
     if (H.length < 2) return;
-    for (const [f, col] of [[(p) => p.starch, "#f8fafc"], [(p) => p.e * 100, "#fbbf24"], [(p) => (p.V / 80) * 100, "#2dd4bf"], [(p) => (p.J / 80) * 100, "#f87171"]]) {
+    for (const [f, col] of [[(p) => p.starch, K.cssVar("--ink", "#f8fafc")], [(p) => p.e * 100, "#fbbf24"], [(p) => (p.V / 80) * 100, "#2dd4bf"], [(p) => (p.J / 80) * 100, "#f87171"]]) {
       c.strokeStyle = col; c.lineWidth = 2; c.beginPath();
       H.forEach((p, i) => { const x = (i / 239) * w, y = h - (clamp(f(p), 0, 100) / 100) * (h - 4) - 2; i ? c.lineTo(x, y) : c.moveTo(x, y); });
       c.stroke();

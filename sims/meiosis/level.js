@@ -13,7 +13,7 @@ const { P } = C;
 const CSS = `
 .mei .tally { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 5px; margin: 8px 0; }
 .mei .tcell { display: flex; flex-direction: column; align-items: center; gap: 1px; padding: 6px 2px; border-radius: 8px; min-width: 0;
-  border: 1px solid var(--panel-border); background: rgba(255,255,255,0.02); color: var(--ink-faint); font-size: 0.72rem; }
+  border: 1px solid var(--panel-border); background: var(--tint-1); color: var(--ink-faint); font-size: 0.72rem; }
 .mei .tcell b { font-family: var(--font-display); font-size: 0.95rem; letter-spacing: 0.04em; color: var(--ink-faint); }
 .mei .tcell span { font-variant-numeric: tabular-nums; }
 .mei .tcell em { font-style: normal; font-size: 0.58rem; text-transform: uppercase; letter-spacing: 0.02em; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }

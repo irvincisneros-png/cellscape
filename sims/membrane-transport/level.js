@@ -161,7 +161,7 @@ export function create(engine) {
   lg.innerHTML = ORDER.map((sp) => `<span><i style="background:${SP[sp].color}"></i>${SP[sp].long}${sp === "prot" ? "" : ` (${SP[sp].name})`}</span>`).join("")
     + `<span><i style="background:${K.C.amber}"></i>ATP</span>`;
   legend.appendChild(lg);
-  legend.insertAdjacentHTML("beforeend", `<p class="hint">Chips show <b>outside · inside</b> counts and the net flux: <span style="color:#4ade80">↓ into the cell</span>, <span style="color:#fbbf24">↑ out of the cell</span>.</p>`);
+  legend.insertAdjacentHTML("beforeend", `<p class="hint">Chips show <b>outside · inside</b> counts and the net flux: <span style="color:var(--good)">↓ into the cell</span>, <span style="color:var(--accent-3)">↑ out of the cell</span>.</p>`);
 
   // ---------- missions ----------
   let naPeak = false;

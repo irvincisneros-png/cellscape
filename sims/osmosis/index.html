@@ -3,6 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <script>(function(){var t="auto";try{t=localStorage.getItem("cellscape.theme")||"auto"}catch(e){}if(t!=="light"&&t!=="dark"){try{t=matchMedia("(prefers-color-scheme: light)").matches?"light":"dark"}catch(e){t="dark"}}document.documentElement.dataset.theme=t;document.documentElement.style.colorScheme=t})()</script>
   <title>Osmosis &amp; Tonicity · CellScape</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Space+Grotesk:wght@500;600&display=swap" rel="stylesheet" />
@@ -11,7 +12,7 @@
     .card .hint { font-size: 0.8rem; color: var(--ink-faint); margin: 6px 0 0; }
     .explain .note { font-size: 0.78rem; color: var(--ink-faint); font-style: italic; }
     .explain .state { display: inline-block; font-weight: 600; padding: 1px 8px; border-radius: 999px; font-size: 0.8rem; margin-bottom: 6px; border: 1px solid currentColor; }
-    .potato canvas { width: 100%; height: 190px; display: block; border-radius: 10px; background: rgba(5, 11, 22, 0.5); margin: 4px 0 8px; }
+    .potato canvas { width: 100%; height: 190px; display: block; border-radius: 10px; background: var(--well-bg); margin: 4px 0 8px; }
     .potato .readout { font-size: 0.85rem; color: var(--ink-dim); min-height: 1.3em; }
     .potato .readout strong { color: var(--accent-3); }
     .gap { height: 10px; }
@@ -30,6 +31,7 @@
       <a class="back" href="../../index.html">← CellScape</a>
       <h1>Osmosis &amp; Tonicity</h1>
       <span class="tag">Stage 5 / Biology Y11 · Module 1 · Osmosis</span>
+      <span class="cs-theme-slot"></span>
     </header>
     <main class="stage" id="stage">
       <canvas id="canvas" aria-label="Osmosis and tonicity simulation: three beakers of salt solution with a red blood cell or plant cell you can drag between them, a close-up of water moving through aquaporins in the cell membrane, and a graph of cell volume over time"></canvas>
@@ -38,5 +40,6 @@
     <aside class="panel" id="panel"></aside>
   </div>
   <script type="module" src="./sim.js"></script>
+  <script type="module">import("../../assets/js/world/theme.js").then((m) => { const s = document.querySelector(".cs-theme-slot"); if (s) m.mountThemeToggle(s); });</script>
 </body>
 </html>

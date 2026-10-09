@@ -18,10 +18,10 @@ const CSS = `
 .mi-tl .seg.on { color: var(--ink); background: rgba(79,209,197,0.45); }
 .mi-tl .seg.m.on { background: rgba(167,139,250,0.5); }
 .mi-tl .seg.c.on { background: rgba(248,113,113,0.5); }
-.mi-tl .cur { position: absolute; top: -4px; bottom: -4px; width: 3px; margin-left: -1.5px; background: #fff; border-radius: 2px; box-shadow: 0 0 8px #fff; pointer-events: none; }
-.mi-tl .chk { position: absolute; top: -15px; transform: translateX(-50%); font-size: 0.66rem; color: #fde68a; text-shadow: 0 1px 4px #000; pointer-events: none; white-space: nowrap; }
-.mi-tl .chk.held { color: #fca5a5; animation: mi-pulse 1s ease-in-out infinite; }
-.mi-tl .grp { position: relative; height: 12px; font-size: 0.64rem; color: var(--ink-faint); margin-top: 2px; text-shadow: 0 1px 4px #000; }
+.mi-tl .cur { position: absolute; top: -4px; bottom: -4px; width: 3px; margin-left: -1.5px; background: var(--ink); border-radius: 2px; box-shadow: 0 0 8px var(--ink); pointer-events: none; }
+.mi-tl .chk { position: absolute; top: -15px; transform: translateX(-50%); font-size: 0.66rem; color: var(--t-warn); text-shadow: 0 1px 4px var(--shadow); pointer-events: none; white-space: nowrap; }
+.mi-tl .chk.held { color: var(--t-bad); animation: mi-pulse 1s ease-in-out infinite; }
+.mi-tl .grp { position: relative; height: 12px; font-size: 0.64rem; color: var(--ink-faint); margin-top: 2px; text-shadow: 0 1px 4px var(--shadow); }
 @keyframes mi-pulse { 50% { opacity: 0.45; } }
 .mi-act { position: absolute; left: 50%; bottom: 124px; transform: translateX(-50%); z-index: 3; max-width: calc(100% - 28px); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; touch-action: none;
   background: rgba(251,191,36,0.18); border-color: rgba(251,191,36,0.7); color: #fff7d6; box-shadow: 0 0 18px rgba(251,191,36,0.25); }
@@ -467,8 +467,8 @@ export function create(engine) {
     c.fillStyle = "rgba(167,139,250,0.08)";
     const xv = (T) => x0 + (x1 - x0) * (T / TOTAL);
     c.fillRect(xv(PH[I.pro].start), y1, xv(PH[I.cyto].end) - xv(PH[I.pro].start), y0 - y1);
-    c.strokeStyle = "rgba(255,255,255,0.12)"; c.beginPath(); c.moveTo(x0, y0); c.lineTo(x1, y0); c.stroke();
-    c.fillStyle = "#6a7f9c"; c.font = "600 9px Inter, system-ui, sans-serif"; c.textAlign = "center";
+    c.strokeStyle = K.cssVar("--grid-line", "rgba(255,255,255,0.12)"); c.beginPath(); c.moveTo(x0, y0); c.lineTo(x1, y0); c.stroke();
+    c.fillStyle = K.cssVar("--ink-faint", "#6a7f9c"); c.font = "600 9px Inter, system-ui, sans-serif"; c.textAlign = "center";
     for (const [k, t] of [[I.G1, "G1"], [I.S, "S"], [I.G2, "G2"], [I.prometa, "M"], [I.done, "G1"]]) c.fillText(t, xv(PH[k].start + PH[k].dur / 2), y0 + 10);
     return xv;
   }
@@ -488,8 +488,8 @@ export function create(engine) {
     const x0 = 28, x1 = w - 8, y0 = h - 14, y1 = 8;
     const xv = axes(g, x0, x1, y0, y1);
     const yv = (val) => y0 - ((y0 - y1) * val) / 5;
-    c.fillStyle = "#6a7f9c"; c.textAlign = "right";
-    for (const val of [2, 4]) { c.fillText(`${val}C`, x0 - 4, yv(val) + 3); c.strokeStyle = "rgba(255,255,255,0.06)"; c.beginPath(); c.moveTo(x0, yv(val)); c.lineTo(x1, yv(val)); c.stroke(); }
+    c.fillStyle = K.cssVar("--ink-faint", "#6a7f9c"); c.textAlign = "right";
+    for (const val of [2, 4]) { c.fillText(`${val}C`, x0 - 4, yv(val) + 3); c.strokeStyle = K.cssVar("--grid-line", "rgba(255,255,255,0.06)"); c.beginPath(); c.moveTo(x0, yv(val)); c.lineTo(x1, yv(val)); c.stroke(); }
     const split = PH[I.done].start, T = M.T;
     const pre = (TT) => M.dnaC(Math.min(TT, split - 1e-6));
     curve(g, xv, yv, pre, 0, split - 1e-6, "#4fd1c5", 0.25, true);

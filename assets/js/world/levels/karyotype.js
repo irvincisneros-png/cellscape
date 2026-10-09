@@ -32,21 +32,21 @@ const CSS = `
 .kary .klbl { font-size: 0.76rem; color: var(--ink-faint); margin: 10px 0 4px; }
 .kary .segmented button { padding: 6px 4px; font-size: 0.78rem; }
 .kary .tiles { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; margin: 8px 0; }
-.kary .tile { text-align: center; padding: 6px 2px; border-radius: 9px; border: 1px solid var(--panel-border); background: rgba(255,255,255,0.03); font-size: 0.7rem; color: var(--ink-faint); }
+.kary .tile { text-align: center; padding: 6px 2px; border-radius: 9px; border: 1px solid var(--panel-border); background: var(--tint-1); font-size: 0.7rem; color: var(--ink-faint); }
 .kary .tile b { display: block; font-family: var(--font-display); font-size: 1.15rem; color: var(--ink); font-variant-numeric: tabular-nums; }
 .kary .ideo-wrap { display: flex; gap: 10px; align-items: flex-start; margin: 8px 0; }
-.kary .ideo-wrap canvas { flex: none; width: 150px; height: 300px; border-radius: 10px; background: rgba(255,255,255,0.025); border: 1px solid var(--panel-border); }
+.kary .ideo-wrap canvas { flex: none; width: 150px; height: 300px; border-radius: 10px; background: var(--tint-1); border: 1px solid var(--panel-border); }
 .kary .facts { font-size: 0.82rem; color: var(--ink-dim); display: flex; flex-direction: column; gap: 5px; min-width: 0; }
 .kary .facts b { color: var(--ink); }
 .kary .genes { display: flex; flex-wrap: wrap; gap: 6px; margin: 6px 0; }
-.kary .gchip { display: inline-flex; align-items: center; gap: 6px; padding: 5px 9px; border-radius: 999px; border: 1px solid var(--panel-border); background: rgba(255,255,255,0.03); color: var(--ink); font-size: 0.78rem; cursor: pointer; font-family: inherit; }
+.kary .gchip { display: inline-flex; align-items: center; gap: 6px; padding: 5px 9px; border-radius: 999px; border: 1px solid var(--panel-border); background: var(--tint-1); color: var(--ink); font-size: 0.78rem; cursor: pointer; font-family: inherit; }
 .kary .gchip i { width: 9px; height: 9px; border-radius: 50%; box-shadow: 0 0 8px currentColor; }
 .kary .gchip small { color: var(--ink-faint); font-size: 0.68rem; }
 .kary .gchip:hover, .kary .gchip[aria-pressed="true"] { border-color: var(--accent); background: rgba(79,209,197,0.14); }
-.kary .gdetail { margin-top: 8px; padding: 10px; border-radius: 10px; border: 1px solid var(--panel-border); background: rgba(255,255,255,0.03); font-size: 0.84rem; color: var(--ink-dim); }
+.kary .gdetail { margin-top: 8px; padding: 10px; border-radius: 10px; border: 1px solid var(--panel-border); background: var(--tint-1); font-size: 0.84rem; color: var(--ink-dim); }
 .kary .gdetail h3 { margin: 0 0 4px; font-size: 0.95rem; color: var(--ink); font-family: var(--font-display); }
 .kary .gdetail p { margin: 0 0 6px; }
-.kary .gdetail .pat { display: inline-block; padding: 2px 8px; border-radius: 999px; background: rgba(167,139,250,0.18); border: 1px solid rgba(167,139,250,0.45); color: #ddd6fe; font-size: 0.74rem; }
+.kary .gdetail .pat { display: inline-block; padding: 2px 8px; border-radius: 999px; background: rgba(167,139,250,0.18); border: 1px solid rgba(167,139,250,0.45); color: var(--t-violet); font-size: 0.74rem; }
 .kary .age { width: 100%; border-collapse: collapse; font-size: 0.8rem; color: var(--ink-dim); margin: 6px 0; }
 .kary .age td, .kary .age th { padding: 4px; border-bottom: 1px solid var(--panel-border); text-align: left; }
 .kary .pnote { border-left: 3px solid var(--accent-3); padding-left: 9px; }

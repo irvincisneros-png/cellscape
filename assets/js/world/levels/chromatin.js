@@ -29,11 +29,11 @@ const CSS = `
 .chr-ladder { display: flex; gap: 2px; padding: 3px; }
 .chr-ladder button { background: none; border: 0; color: var(--ink-faint); font: inherit; font-size: 0.74rem; padding: 3px 7px; border-radius: 999px; cursor: pointer; }
 .chr-ladder button[aria-current="true"] { background: rgba(79,209,197,0.18); color: var(--ink); }
-.chr .seq { font-family: ui-monospace, Menlo, monospace; font-size: 0.78rem; line-height: 1.6; word-break: break-all; color: var(--ink); background: rgba(255,255,255,0.03); border: 1px solid var(--panel-border); border-radius: 8px; padding: 6px 8px; margin: 6px 0; }
-.chr .seq .me { color: #e879f9; text-shadow: 0 0 6px #e879f9; }
+.chr .seq { font-family: ui-monospace, Menlo, monospace; font-size: 0.78rem; line-height: 1.6; word-break: break-all; color: var(--ink); background: var(--tint-1); border: 1px solid var(--panel-border); border-radius: 8px; padding: 6px 8px; margin: 6px 0; }
+.chr .seq .me { color: var(--t-pink); text-shadow: 0 0 6px var(--t-pink); }
 .chr .seq small { display: block; color: var(--ink-faint); font-family: var(--font-body, inherit); font-size: 0.72rem; }
 .chr .ko small { display: block; color: var(--ink-faint); font-size: 0.74rem; margin: -2px 0 6px 24px; }
-.chr .ok { color: #4ade80; font-weight: 600; }
+.chr .ok { color: var(--good); font-weight: 600; }
 `;
 
 const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
@@ -712,7 +712,7 @@ export function create(engine) {
     const c = chartCtx;
     c.setTransform(dpr, 0, 0, dpr, 0, 0);
     c.clearRect(0, 0, w, h);
-    c.strokeStyle = "rgba(255,255,255,0.08)";
+    c.strokeStyle = K.cssVar("--grid-line", "rgba(255,255,255,0.08)");
     for (let i = 0; i <= 4; i++) { c.beginPath(); c.moveTo(0, (h * i) / 4); c.lineTo(w, (h * i) / 4); c.stroke(); }
     chart.setAttribute("aria-label", `Transcription ${M.smoothTx.toFixed(2)} per second, chromatin ${Math.round(M.open * 100)} percent open, acetylation ${Math.round(M.ac * 100)} percent, methylation ${Math.round(M.me * 100)} percent.`);
     const H = M.history;

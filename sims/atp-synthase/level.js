@@ -20,7 +20,7 @@ const CSS = `
 .atp3d .now { border-top: 1px solid var(--panel-border); padding-top: 8px; margin-top: 8px; font-size: 0.86rem; }
 .atp3d-chart canvas { width: 100%; height: 110px; display: block; }
 .atp3d .flow { list-style: none; padding: 0; margin: 0 0 10px; display: flex; flex-direction: column; gap: 12px; }
-.atp3d .flow li { position: relative; display: grid; grid-template-columns: 1fr auto; gap: 1px 8px; padding: 7px 9px; border-radius: 9px; font-size: 0.84rem; background: rgba(255,255,255,0.03); border: 1px solid var(--panel-border); }
+.atp3d .flow li { position: relative; display: grid; grid-template-columns: 1fr auto; gap: 1px 8px; padding: 7px 9px; border-radius: 9px; font-size: 0.84rem; background: var(--tint-1); border: 1px solid var(--panel-border); }
 .atp3d .flow li b { color: var(--ink); font-weight: 600; }
 .atp3d .flow li span { grid-column: 1; color: var(--ink-faint); font-size: 0.76rem; }
 .atp3d .flow li em { grid-column: 2; grid-row: 1 / span 2; align-self: center; text-align: right; font-style: normal; color: var(--accent-3); font-size: 0.78rem; }
@@ -154,7 +154,7 @@ export function create(engine) {
     let maxV = 2.5, minV = 0;
     for (const v of hist) { if (v > maxV) maxV = v; if (v < minV) minV = v; }
     const Y = (v) => h - 4 - ((v - minV) / (maxV - minV)) * (h - 10);
-    c.strokeStyle = "rgba(255,255,255,0.1)";
+    c.strokeStyle = K.cssVar("--grid-line", "rgba(255,255,255,0.1)");
     c.beginPath(); c.moveTo(0, Y(0)); c.lineTo(w, Y(0)); c.stroke();
     c.setLineDash([2, 4]); c.beginPath(); c.moveTo(0, Y(2)); c.lineTo(w, Y(2)); c.stroke(); c.setLineDash([]);
     if (hist.length > 1) {

@@ -3,6 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <script>(function(){var t="auto";try{t=localStorage.getItem("cellscape.theme")||"auto"}catch(e){}if(t!=="light"&&t!=="dark"){try{t=matchMedia("(prefers-color-scheme: light)").matches?"light":"dark"}catch(e){t="dark"}}document.documentElement.dataset.theme=t;document.documentElement.style.colorScheme=t})()</script>
   <title>Cellular Respiration: The ATP Factory · CellScape</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Space+Grotesk:wght@500;600&display=swap" rel="stylesheet" />
@@ -15,7 +16,7 @@
     .flow li {
       position: relative; display: grid; grid-template-columns: 1fr auto; gap: 1px 8px;
       padding: 7px 9px; border-radius: 9px; font-size: 0.84rem;
-      background: rgba(255, 255, 255, 0.03); border: 1px solid var(--panel-border);
+      background: var(--tint-1); border: 1px solid var(--panel-border);
     }
     .flow li b { color: var(--ink); font-weight: 600; }
     .flow li span { grid-column: 1; color: var(--ink-faint); font-size: 0.76rem; }
@@ -35,6 +36,7 @@
       <a class="back" href="../../index.html">← CellScape</a>
       <h1>Cellular Respiration: The ATP Factory</h1>
       <span class="tag">Biology Y11 · Module 1 · Cellular respiration</span>
+      <span class="cs-theme-slot"></span>
     </header>
     <main class="stage" id="stage">
       <canvas id="canvas" aria-label="Cellular Respiration: The ATP Factory simulation. A patch of the inner mitochondrial membrane (a crista) with electron transport chain complexes I to IV pumping hydrogen ions into the intermembrane space, and ATP synthase spinning as hydrogen ions flow back to make ATP. Drag in a circle around ATP synthase to crank it by hand. The What's happening panel describes the current state."></canvas>
@@ -53,5 +55,6 @@
       .then((m) => m.boot({ start: "cristae", root: "../../" }))
       .catch((e) => { console.error(e); try { sessionStorage.setItem("cs2d", "1"); } catch {} location.reload(); });
   </script>
+  <script type="module">import("../../assets/js/world/theme.js").then((m) => { const s = document.querySelector(".cs-theme-slot"); if (s) m.mountThemeToggle(s); });</script>
 </body>
 </html>

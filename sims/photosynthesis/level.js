@@ -22,7 +22,7 @@ const CSS = `
 .lbl3d.cal b { display: block; font: 600 1.05rem "Space Grotesk", Inter, sans-serif; letter-spacing: 0; color: var(--ink); }
 .lbl3d.drag { color: #fbbf24; font-size: 0.7rem; font-weight: 600; text-shadow: 0 1px 6px #000; }
 .ps-chip.lim { border-color: currentColor; } .ps-chip.lim b { color: inherit; }
-.graph-canvas { width: 100%; height: 200px; display: block; margin-top: 8px; border-radius: 10px; background: rgba(5, 11, 22, 0.55); }
+.graph-canvas { width: 100%; height: 200px; display: block; margin-top: 8px; border-radius: 10px; background: var(--well-bg); }
 .graph-key { display: flex; flex-wrap: wrap; gap: 4px 12px; font-size: 0.78rem; color: var(--ink-dim); margin-top: 6px; }
 .graph-key i { display: inline-block; width: 14px; height: 3px; border-radius: 2px; vertical-align: middle; margin-right: 5px; }
 .ps-small { font-size: 0.8rem; color: var(--ink-faint) !important; }
@@ -394,22 +394,23 @@ export function create(engine) {
     const Xf = (x) => pl + ((x - ax.min) / (ax.max - ax.min)) * (w - pl - pr);
     const Yf = (y) => h - pb - (clamp(y, 0, YM) / YM) * (h - pt - pb);
     g.font = "10px Inter, system-ui, sans-serif";
-    g.strokeStyle = "rgba(160,190,230,0.12)"; g.lineWidth = 1; g.fillStyle = C.inkFaint;
+    const _ink = K.cssVar("--ink", C.ink), _dim = K.cssVar("--ink-dim", C.inkDim), _faint = K.cssVar("--ink-faint", C.inkFaint);
+    g.strokeStyle = K.cssVar("--grid-line", "rgba(160,190,230,0.12)"); g.lineWidth = 1; g.fillStyle = _faint;
     g.textAlign = "right"; g.textBaseline = "middle";
     for (let y = 0; y <= YM; y += 25) { g.beginPath(); g.moveTo(pl, Yf(y)); g.lineTo(w - pr, Yf(y)); g.stroke(); g.fillText(y, pl - 5, Yf(y)); }
     g.textAlign = "center"; g.textBaseline = "top";
     for (let i = 0; i <= 4; i++) { const x = lerp(ax.min, ax.max, i / 4); g.fillText(ax.fmt(x), Xf(x), h - pb + 4); }
     if (graph.vary === "colour") for (let l = 400; l < 700; l += 5) { g.fillStyle = PM.waveColour(l); g.fillRect(Xf(l), h - pb + 1, Xf(l + 5) - Xf(l) + 0.5, 3); }
-    g.fillStyle = C.inkDim; g.fillText(ax.label, (pl + w - pr) / 2, h - 13);
+    g.fillStyle = _dim; g.fillText(ax.label, (pl + w - pr) / 2, h - 13);
     g.save(); g.translate(9, (pt + h - pb) / 2); g.rotate(-Math.PI / 2); g.textBaseline = "middle"; g.fillText("O₂ bubbles/min", 0, 0); g.restore();
-    g.strokeStyle = C.inkFaint; g.beginPath(); g.moveTo(pl, pt); g.lineTo(pl, h - pb); g.lineTo(w - pr, h - pb); g.stroke();
+    g.strokeStyle = _faint; g.beginPath(); g.moveTo(pl, pt); g.lineTo(pl, h - pb); g.lineTo(w - pr, h - pb); g.stroke();
     const curve = (pts, upto, alpha, label, idx) => {
       g.save(); g.globalAlpha = alpha; g.lineWidth = 2.4; g.lineCap = "round";
       const n = Math.min(pts.length - 1, upto);
       for (let i = 0; i < n; i++) { g.strokeStyle = LIMCOL[pts[i].lim]; g.beginPath(); g.moveTo(Xf(pts[i].x), Yf(pts[i].y)); g.lineTo(Xf(pts[i + 1].x), Yf(pts[i + 1].y)); g.stroke(); }
       if (label && n === pts.length - 1) {
         const pk = pts.reduce((a, b) => (b.y > a.y ? b : a));
-        g.font = "600 10px Inter, system-ui, sans-serif"; g.fillStyle = C.ink; g.textBaseline = "bottom"; g.textAlign = "center";
+        g.font = "600 10px Inter, system-ui, sans-serif"; g.fillStyle = _ink; g.textBaseline = "bottom"; g.textAlign = "center";
         g.fillText(`${idx}: ${label}`, clamp(Xf(pk.x), pl + 40, w - pr - 40), Yf(pk.y) - 3);
       }
       g.restore();

@@ -3,6 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <script>(function(){var t="auto";try{t=localStorage.getItem("cellscape.theme")||"auto"}catch(e){}if(t!=="light"&&t!=="dark"){try{t=matchMedia("(prefers-color-scheme: light)").matches?"light":"dark"}catch(e){t="dark"}}document.documentElement.dataset.theme=t;document.documentElement.style.colorScheme=t})()</script>
   <title>Membrane Transport · CellScape</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Space+Grotesk:wght@500;600&display=swap" rel="stylesheet" />
@@ -18,6 +19,7 @@
       <a class="back" href="../../index.html">← CellScape</a>
       <h1>Membrane Transport</h1>
       <span class="tag">Biology Y11 · Module 1 · Cell membrane transport</span>
+      <span class="cs-theme-slot"></span>
     </header>
     <main class="stage" id="stage">
       <canvas id="canvas" aria-label="Membrane transport simulation: a phospholipid bilayer separating extracellular fluid (top) from cytoplasm (bottom), with an aquaporin, a potassium channel, a GLUT glucose carrier, a sodium-potassium pump and a sodium channel. Oxygen, carbon dioxide, water, glucose, sodium, potassium and large protein molecules move between the two sides. The What's happening panel describes the current state."></canvas>
@@ -36,5 +38,6 @@
       .then((m) => m.boot({ start: "membrane", root: "../../" }))
       .catch((e) => { console.error(e); try { sessionStorage.setItem("cs2d", "1"); } catch {} location.reload(); });
   </script>
+  <script type="module">import("../../assets/js/world/theme.js").then((m) => { const s = document.querySelector(".cs-theme-slot"); if (s) m.mountThemeToggle(s); });</script>
 </body>
 </html>

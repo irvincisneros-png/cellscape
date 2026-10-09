@@ -52,18 +52,18 @@ const CSS = `
 .ps3d .row-lbl { color: var(--ink-faint); font-size: 0.74rem; text-transform: uppercase; letter-spacing: 0.06em; }
 .ps3d .prot { display: flex; flex-wrap: wrap; gap: 3px; }
 .ps3d .prot .aa { font-size: 0.72rem; padding: 1px 5px; border-radius: 6px; color: #04101f; font-weight: 600; }
-.ps3d .prot .aa.diff { outline: 2px solid #fff; outline-offset: 1px; }
+.ps3d .prot .aa.diff { outline: 2px solid var(--ink); outline-offset: 1px; }
 .ps3d .prot .none { color: var(--ink-faint); font-style: italic; }
 .ps3d .badge { display: inline-block; padding: 2px 8px; border-radius: 999px; font-weight: 600; font-size: 0.8rem; }
-.ps3d .badge.k-none, .ps3d .badge.k-noncoding, .ps3d .badge.k-silent { background: rgba(74,222,128,0.18); color: #b8f5cd; }
-.ps3d .badge.k-missense, .ps3d .badge.k-inframe, .ps3d .badge.k-stoplost { background: rgba(251,191,36,0.18); color: #fde68a; }
-.ps3d .badge.k-nonsense, .ps3d .badge.k-frameshift, .ps3d .badge.k-startlost { background: rgba(248,113,113,0.2); color: #fecaca; }
+.ps3d .badge.k-none, .ps3d .badge.k-noncoding, .ps3d .badge.k-silent { background: rgba(74,222,128,0.18); color: var(--t-good); }
+.ps3d .badge.k-missense, .ps3d .badge.k-inframe, .ps3d .badge.k-stoplost { background: rgba(251,191,36,0.18); color: var(--t-warn); }
+.ps3d .badge.k-nonsense, .ps3d .badge.k-frameshift, .ps3d .badge.k-startlost { background: rgba(248,113,113,0.2); color: var(--t-bad); }
 .ps3d .status { font-size: 0.78rem; color: var(--ink-faint); }
 .ps3d .status.ok { color: var(--good); }
 .ps3d .dna-diff { font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 0.78rem; word-break: break-all; color: var(--ink-dim); }
-.ps3d .dna-diff mark { background: rgba(248,113,113,0.35); color: #fff; border-radius: 3px; padding: 0 1px; }
+.ps3d .dna-diff mark { background: rgba(248,113,113,0.35); color: var(--ink); border-radius: 3px; padding: 0 1px; }
 .ps3d .speed-label { font-size: 0.85rem; margin: 10px 0 6px; }
-dialog.ps3-gc { background: #0b1930; color: var(--ink); border: 1px solid var(--panel-border); border-radius: 16px; width: min(680px, calc(100% - 20px)); max-height: 92vh; padding: 14px; overflow: auto; }
+dialog.ps3-gc { background: var(--dialog-bg); color: var(--ink); border: 1px solid var(--panel-border); border-radius: 16px; width: min(680px, calc(100% - 20px)); max-height: 92vh; padding: 14px; overflow: auto; }
 dialog.ps3-gc::backdrop { background: rgba(2, 6, 14, 0.7); }
 dialog.ps3-gc h2 { font-family: var(--font-display); margin: 0 0 4px; font-size: 1.05rem; }
 dialog.ps3-gc p { margin: 0 0 10px; color: var(--ink-dim); font-size: 0.85rem; }
@@ -74,7 +74,7 @@ dialog.ps3-gc p { margin: 0 0 10px; color: var(--ink-dim); font-size: 0.85rem; }
 .ps3-gc td { border: 1px solid var(--panel-border); padding: 3px; vertical-align: top; }
 .ps3-gc .cd { display: flex; gap: 6px; padding: 2px 4px; border-radius: 5px; border-left: 4px solid transparent; margin: 1px 0; white-space: nowrap; }
 .ps3-gc .cd b { font-family: ui-monospace, Menlo, Consolas, monospace; letter-spacing: 0.05em; }
-.ps3-gc .cd.hl { background: rgba(255,255,255,0.18); box-shadow: 0 0 0 2px var(--accent-3); }
+.ps3-gc .cd.hl { background: var(--tint-3); box-shadow: 0 0 0 2px var(--accent-3); }
 .ps3-gc th.third { font-size: 0.72rem; line-height: 1.95; }
 .ps3-gc .gc-close { float: right; }
 .ps-chip .w { color: var(--ink-faint); }
