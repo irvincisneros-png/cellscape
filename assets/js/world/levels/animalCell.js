@@ -1337,6 +1337,9 @@ export function create(engine) {
     const spc = K.card(el, lens.pick({ "y7-8": "Cells with special jobs", "y9-10": "Specialised cells" }));
     spc.insertAdjacentHTML("beforeend", `<p class="hint" style="margin:0 0 8px">${lens.pick({ "y7-8": "Red blood cells, nerve cells, root hair cells and more: see how each cell's shape fits its job, and how cells build tissues and organs.", "y9-10": "Explore how structure fits function in specialised plant and animal cells, and how cells form tissues, organs and systems.", y11: "Structure–function relationships in differentiated cells (SA:V, organelle content, shape), and the cell → tissue → organ → system hierarchy." })}</p>`);
     K.button(K.buttonRow(spc), lens.pick({ "y7-8": "Meet the specialists ▸", "y9-10": "Specialised cells ▸" }), () => engine.dive(divePortal("specialised", "Specialised cells")));
+    const imm = K.card(el, lens.pick({ "y7-8": "Fighting germs", "y9-10": "Immune defence" }));
+    imm.insertAdjacentHTML("beforeend", `<p class="hint" style="margin:0 0 8px">${lens.pick({ "y7-8": "Watch white blood cells hunt and eat germs, and see how vaccines train your body.", "y9-10": "Barriers, phagocytes, antibodies and memory cells; vaccination and herd immunity.", y11: "Innate and adaptive immunity: phagocytosis, antigen presentation, helper and cytotoxic T cells, plasma cells, primary vs secondary response." })}</p>`);
+    K.button(K.buttonRow(imm), lens.pick({ "y7-8": "Fight an infection ▸", "y9-10": "Immune defence ▸" }), () => engine.dive(divePortal("immunity", "Immune defence")));
 
     ms.sec0 = M.secreted;
     mission = K.missions(el, lens.filter(MISSIONS).map((m) => ({ text: m.text, check: () => m.check(M, ms) })), (m) => engine.toast(`🎯 Mission complete: ${m.text.replace(/<[^>]+>/g, "")}`, 3400));
