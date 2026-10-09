@@ -20,6 +20,8 @@ export const LEVELS = {
   folding: { title: "Protein folding", load: () => import("./levels/folding.js") },
   mitosis: { title: "Cell division (mitosis)", load: () => import("../../../sims/mitosis/level.js") },
   meiosis: { title: "Meiosis & variation", load: () => import("../../../sims/meiosis/level.js") },
+  karyotype: { title: "Human karyotype", load: () => import("./levels/karyotype.js") },
+  inheritance: { title: "Inheritance lab", load: () => import("./levels/inheritance.js") },
 };
 
 /**

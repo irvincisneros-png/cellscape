@@ -769,6 +769,12 @@ export function create(engine) {
     bp.insertAdjacentHTML("beforeend", lens.pick(BIG_PICTURE));
     const r2 = K.buttonRow(bp);
     K.button(r2, lens.pick({ "y7-8": "Zoom into the DNA ▸", "y9-10": "Zoom into a chromosome ▸", y11: "Zoom into the chromatin ▸" }), () => engine.dive(portals[0]), { kind: "primary" });
+    const hg = K.card(el, lens.pick({ "y7-8": "Your genes", "y9-10": "Human genes and inheritance" }));
+    hg.insertAdjacentHTML("beforeend", `<p class="hint" style="margin:0 0 8px">${lens.pick({ "y7-8": "See all 46 human chromosomes, find genes on them, and work out how traits are passed from parents to children.", "y9-10": "Sort a human karyotype, find where genes sit on chromosomes, then predict inheritance with Punnett squares and pedigrees.", y11: "Karyotype (23 pairs, sex chromosomes, aneuploidy), gene loci, then monohybrid, dihybrid, sex-linked, codominant and polygenic inheritance." })}</p>`);
+    const r3 = K.buttonRow(hg);
+    const nucPortal = (to, label) => ({ to, label, radius: portals[0].radius, center: portals[0].center, object: portals[0].object });
+    K.button(r3, lens.pick({ "y7-8": "See the chromosomes ▸", "y9-10": "Karyotype ▸" }), () => engine.dive(nucPortal("karyotype", "Karyotype")));
+    K.button(r3, lens.pick({ "y7-8": "Inheritance lab ▸", "y9-10": "Inheritance lab ▸" }), () => engine.dive(nucPortal("inheritance", "Inheritance lab")));
 
     mission = K.missions(el, lens.filter(MISSIONS).map((m) => ({ text: lens.pick(m.text), check: () => m.check(M, state) })), (m) => engine.toast(`🎯 Mission complete: ${m.text}`, 3600));
     K.quiz(el, lens.filter(QUIZ));
