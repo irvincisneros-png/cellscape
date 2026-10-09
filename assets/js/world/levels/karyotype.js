@@ -627,9 +627,7 @@ export function create(engine) {
         return;
       }
       // dropped on empty space: stays where it is
-      c.spread = { ...c.cur, z: clamp(c.cur.z, -1, 1), flat: 0 };
-      c.spread.rot = c.cur.rot;
-      c.paired = false;
+      for (const o of d.offs) { o.o.spread = { x: o.o.cur.x, y: o.o.cur.y, z: clamp(o.x === undefined ? 0 : o.z, -1, 1), rot: o.o.cur.rot, flat: 0 }; o.o.cur.z = o.o.spread.z; }   // pairs stay paired and move together
       syncUi();
     },
   };
@@ -687,7 +685,7 @@ export function create(engine) {
     }
     for (let i = n; i < geneLbls.length; i++) geneLbls[i].style.display = "none";
     // "extra" tag
-    const ex = S.showDiff && S.cond !== "none" && (S.sorted || S.challengeDone) ? chroms.find((c) => c.want && c.extra) : null;
+    const ex = S.showDiff && S.cond !== "none" && S.sorted ? chroms.find((c) => c.want && c.extra) : null;
     if (ex) { _w.set(ex.cur.x, ex.cur.y - ex.ch.qLen - 2.7, 0); engine.place(extraLbl, _w); } else extraLbl.style.display = "none";
   }
 
@@ -734,7 +732,7 @@ export function create(engine) {
     if (lens.atLeast("y9-10")) nodes.chal = K.button(row, "Manual challenge", () => setChallenge(!S.challenge), { toggle: true });
     arr.insertAdjacentHTML("beforeend", `<div class="klbl">Stain</div>`);
     nodes.stain = K.segmented(arr, [{ value: "fluor", label: "Fluorescence (DAPI-like)" }, { value: "giemsa", label: "Giemsa (brightfield)" }], S.stain, (v) => { S.stain = v; applyStain(); syncUi(); });
-    arr.insertAdjacentHTML("beforeend", `<p class="hint">${L({ "y7-8": "Two ways of staining the same chromosomes.", "y9-10": "Both show the same bands. Giemsa-dark bands glow bright with DAPI.", y11: "G-banding: trypsin then Giemsa makes AT-rich, gene-poor, late-replicating regions stain dark. DAPI is also AT-selective, so the same bands appear bright." })}</p>`);
+    arr.insertAdjacentHTML("beforeend", `<p class="hint">${L({ "y7-8": "Two ways of staining the same chromosomes.", "y9-10": "Both show similar band patterns. Giemsa-dark bands tend to be bright with DAPI.", y11: "G-banding: trypsin then Giemsa makes AT-rich, gene-poor, late-replicating regions stain dark. DAPI also binds AT-rich DNA preferentially, so a similar (not identical) pattern of bands appears bright." })}</p>`);
 
     const who = K.card(node, L({ "y7-8": "Boy or girl?", "y9-10": "Whose chromosomes are these?" }));
     nodes.sexWrap = el("div"); who.appendChild(nodes.sexWrap);
@@ -767,7 +765,7 @@ export function create(engine) {
       nd.insertAdjacentHTML("beforeend", `<p>${L({ "y9-10": "Most aneuploidies start with <strong>nondisjunction</strong> in meiosis: a pair of homologues (or sister chromatids) fails to separate, so a gamete gets two copies or none. The fertilised egg then has 47 or 45 chromosomes.", y11: "Most aneuploidies arise from <strong>nondisjunction</strong> in meiosis I (homologues stay together) or meiosis II (sister chromatids stay together). The gamete is n+1 or n−1, so fertilisation gives a trisomic or monosomic zygote. Trisomy 21 is mostly maternal in origin." })}</p>
         <p>The risk of trisomy 21 rises with the mother's age, because her egg cells begin meiosis before she is born and wait, in prophase I, for decades:</p>
         <table class="age"><tr><th>Mother's age</th><th>20</th><th>30</th><th>35</th><th>40</th><th>45</th></tr><tr><td>Approx. chance</td><td>1 in 1,500</td><td>1 in 900</td><td>1 in 350</td><td>1 in 100</td><td>1 in 30</td></tr></table>
-        <p class="hint">Approximate values at birth (Hook, 1981). They vary between studies.</p>`);
+        <p class="hint">Approximate rates among live births (Hook 1981), not at conception. Figures vary between studies.</p>`);
       const r = K.buttonRow(nd);
       K.button(r, "See nondisjunction in meiosis ▸", () => engine.dive({ to: "meiosis", label: "Meiosis", radius: 10, center: () => new THREE.Vector3(0, 0, 0), object: root }), { kind: "primary" });
     }
@@ -882,7 +880,7 @@ export function create(engine) {
     const n = visibleChroms().length, gs = groupStats();
     const sexN = visibleChroms().filter((c) => c.key === "S").length;
     return {
-      sex: S.sex, cond: S.cond, total: n, autosomes: n - sexN, view: S.sorted || S.challengeDone ? "karyogram" : "spread",
+      sex: S.sex, cond: S.cond, total: n, autosomes: n - sexN, view: S.sorted ? "karyogram" : "spread",
       notation: notation(), pairsFound: gs.found, pairsExpected: gs.expected,
       sel: S.sel && { id: S.sel.id, revealed: S.sel.revealed, cls: S.sel.cls, mb: S.sel.mb, gene: S.gene ? GENE_BY_ID[S.gene] : null },
     };
@@ -954,7 +952,7 @@ export function create(engine) {
     if (c.flash > 0) { c.flash -= dt; col = c.flashCol; k = Math.min(1, c.flash * 1.6) * 0.6; }
     else if (selMatch) { col = _c.set("#ffd76a"); k = 0.22 + 0.06 * Math.sin(t * 3); }
     else if (hoverC === c) { col = _c.set("#a5f3fc"); k = 0.3; }
-    else if (S.showDiff && c.extra && S.cond !== "none" && c.revealed && (S.sorted || S.challengeDone || c.paired)) { col = _c.set("#fbbf24"); k = 0.22 + 0.1 * Math.sin(t * 3); }
+    else if (S.showDiff && c.extra && S.cond !== "none" && c.revealed && (S.sorted || c.placed || c.paired)) { col = _c.set("#fbbf24"); k = 0.22 + 0.1 * Math.sin(t * 3); }
     const u = c.mat.userData;
     if (col) u.hiCol.value.copy(col);
     u.hi.value = lerp(u.hi.value, k, Math.min(1, dt * 14 + 0.001));
@@ -1008,7 +1006,7 @@ export function create(engine) {
   };
   level.dispose = () => {
     hideLabels(); [...slotLbls, ...groupLbls, ...geneLbls, extraLbl].forEach((l) => l.remove());
-    clearMarkers();
+    clearMarkers(); markerGeo.dispose();
     for (const c of chroms) c.mat.dispose();
     atlas.fluor.dispose(); atlas.giemsa.dispose(); bump.dispose();
     engine.stageEl.classList.remove("kary-light");

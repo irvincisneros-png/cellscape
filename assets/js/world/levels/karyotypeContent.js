@@ -1,9 +1,11 @@
 // Data and lens-aware text for the human karyotype level.
 // Chromosome lengths are GRCh38 assembly sizes (Mb). Centromeric indices (p / total) are the standard
 // textbook / ISCN-style values used to classify centromere position at metaphase.
-// Band tables are a STYLISED ideogram: the named G-bands follow the ISCN pattern at roughly the 300-band level
-// (stain codes: n = gneg/light, 1-4 = gpos25/50/75/100, v = gvar heterochromatin, s = stalk), widths are relative
-// and are normalised within each arm. The major landmarks (e.g. 1q12 heterochromatin, 9q12, Xq28, Yq12) are kept.
+// Band tables are SCHEMATIC ideograms: band pattern approximate, pending verification against reference data.
+// Internal stain codes: n = gneg, 1-4 = gpos25/50/75/100, v = gvar, s = stalk, a = acen. Widths are relative and are
+// normalised within each arm, so a real UCSC cytoBand table (chrom, start, end, name, gieStain) can replace them:
+// tools/cytoband-to-karyotype.mjs rewrites the CYTOBAND block below (rows are [name, gieStain, start, end]); when a
+// chromosome has rows there they are used instead of the hand-entered RAW table.
 
 const T = (s) => s.trim().split(/\s+/).map((t) => { const [name, stain, w] = t.split(":"); return { name, stain, w: +w }; });
 
@@ -16,7 +18,7 @@ const RAW = {
     "p25.3:n:6 p25.2:1:3 p25.1:n:4 p24.3:3:6 p24.2:n:3 p24.1:2:3 p23.3:n:3 p23.2:1:2 p23.1:n:3 p22.3:3:5 p22.2:n:3 p22.1:2:3 p21:n:7 p16.3:3:5 p16.2:n:3 p16.1:2:3 p15:n:3 p14:2:3 p13.3:n:3 p13.2:1:3 p13.1:n:3 p12:3:6 p11.2:n:3",
     "q11.1:n:1 q11.2:2:3 q12.1:n:3 q12.2:1:2 q12.3:n:2 q13:2:4 q14.1:3:4 q14.2:n:3 q14.3:1:3 q21.1:2:5 q21.2:n:2 q21.3:1:3 q22.1:3:5 q22.2:n:2 q22.3:2:4 q23.1:n:3 q23.2:3:3 q23.3:n:3 q24.1:2:5 q24.2:n:3 q24.3:3:4 q31.1:n:5 q31.2:2:3 q31.3:n:3 q32.1:3:5 q32.2:n:4 q32.3:3:6 q33.1:n:4 q33.2:3:3 q33.3:n:3 q34:2:6 q35:3:6 q36.1:n:3 q36.2:2:4 q36.3:n:4 q37.1:3:3 q37.2:n:3 q37.3:2:3"],
   3: [198.3, 0.47, "metacentric",
-    "p26.3:n:5 p26.2:2:3 p26.1:n:4 p25.3:3:5 p25.2:n:3 p25.1:2:4 p24.3:n:4 p24.2:3:5 p24.1:n:3 p23:2:4 p22.3:n:3 p22.2:3:3 p22.1:n:3 p21.33:2:3 p21.32:n:3 p21.31:2:4 p21.2:n:2 p21.1:2:3 p14.3:n:3 p14.2:3:3 p14.1:n:3 p13:2:3 p12.3:n:3 p12.2:4:4 p12.1:n:3 p11.2:2:3",
+    "p26.3:2:5 p26.2:n:3 p26.1:2:4 p25.3:n:5 p25.2:3:3 p25.1:n:4 p24.3:4:4 p24.2:n:5 p24.1:3:3 p23:n:4 p22.3:n:3 p22.2:3:3 p22.1:n:3 p21.33:2:3 p21.32:n:3 p21.31:2:4 p21.2:n:2 p21.1:2:3 p14.3:n:3 p14.2:3:3 p14.1:n:3 p13:2:3 p12.3:n:3 p12.2:4:4 p12.1:n:3 p11.2:2:3",
     "q11.2:n:3 q12.1:2:3 q12.2:n:2 q12.3:3:3 q13.11:n:3 q13.12:1:2 q13.13:n:2 q13.2:2:3 q13.31:n:3 q13.32:2:3 q13.33:n:3 q21.1:3:3 q21.2:n:2 q21.3:3:3 q22.1:n:3 q22.2:2:3 q22.3:n:3 q23:3:4 q24:n:5 q25.1:2:4 q25.2:n:3 q25.31:3:3 q25.32:n:2 q25.33:3:3 q26.1:n:5 q26.2:3:3 q26.31:n:3 q26.32:2:3 q26.33:n:3 q27.1:3:3 q27.2:n:3 q27.3:3:3 q28:n:5 q29:2:3"],
   4: [190.21, 0.27, "submetacentric",
     "p16.3:n:4 p16.2:3:3 p16.1:n:5 p15.33:2:3 p15.32:n:3 p15.31:3:4 p15.2:n:3 p15.1:3:6 p14:n:4 p13:2:3 p12:3:6 p11:n:2",
@@ -56,7 +58,7 @@ const RAW = {
     "q11.1:n:2 q11.2:3:2 q12:n:3 q13.1:2:3 q13.2:n:2 q13.3:2:2 q14:n:3 q15.1:3:3 q15.2:n:2 q15.3:2:3 q21.1:n:3 q21.2:3:3 q21.3:n:3 q22.1:2:3 q22.2:n:2 q22.31:3:3 q22.32:n:2 q22.33:2:3 q23:n:3 q24.1:3:3 q24.2:n:2 q24.3:2:3 q25.1:n:3 q25.2:3:3 q25.3:n:3 q26.1:2:4 q26.2:n:3 q26.3:3:3"],
   16: [90.34, 0.4, "metacentric",
     "p13.3:n:5 p13.2:1:2 p13.13:n:2 p13.12:1:2 p13.11:n:3 p12.3:3:3 p12.2:n:2 p12.1:3:3 p11.2:n:4 p11.1:n:1",
-    "q11.1:n:1 q11.2:v:4 q12.1:3:3 q12.2:n:2 q13:n:3 q21:2:3 q22.1:n:3 q22.2:2:2 q22.3:n:2 q23.1:3:3 q23.2:n:2 q23.3:2:3 q24.1:n:3 q24.2:2:2 q24.3:n:4"],
+    "q11.1:n:1 q11.2:v:4 q12.1:n:3 q12.2:2:2 q13:n:3 q21:2:3 q22.1:n:3 q22.2:2:2 q22.3:n:2 q23.1:3:3 q23.2:n:2 q23.3:2:3 q24.1:n:3 q24.2:2:2 q24.3:n:4"],
   17: [83.26, 0.33, "submetacentric",
     "p13.3:n:5 p13.2:2:2 p13.1:n:3 p12:3:4 p11.2:n:4 p11.1:n:1",
     "q11.1:n:1 q11.2:3:3 q12:n:3 q21.1:2:3 q21.2:n:2 q21.31:3:3 q21.32:n:2 q21.33:3:3 q22:n:3 q23.1:3:3 q23.2:n:2 q23.3:3:3 q24.1:n:3 q24.2:2:3 q24.3:n:2 q25.1:3:3 q25.2:n:2 q25.3:3:3"],
@@ -71,13 +73,13 @@ const RAW = {
     "q11.1:n:1 q11.21:3:2 q11.22:n:2 q11.23:3:2 q12:n:3 q13.11:2:2 q13.12:n:2 q13.13:2:2 q13.2:n:3 q13.31:3:2 q13.32:n:2 q13.33:3:3"],
   21: [46.71, 0.23, "acrocentric",
     "p13:n:35 p12:s:25 p11.2:n:40",
-    "q11.1:n:1 q11.2:2:3 q21.1:n:4 q21.2:3:3 q21.3:n:3 q22.11:4:3 q22.12:n:2 q22.13:3:3 q22.2:n:3 q22.3:2:4"],
+    "q11.1:n:1 q11.2:n:3 q21.1:3:4 q21.2:n:3 q21.3:3:3 q22.11:n:3 q22.12:3:2 q22.13:n:3 q22.2:2:3 q22.3:n:4"],
   22: [50.82, 0.27, "acrocentric",
     "p13:n:35 p12:s:25 p11.2:n:40",
     "q11.1:n:1 q11.21:3:3 q11.22:n:2 q11.23:3:3 q12.1:n:2 q12.2:2:2 q12.3:n:3 q13.1:3:3 q13.2:n:2 q13.31:3:3 q13.32:n:2 q13.33:2:3"],
   X: [156.04, 0.4, "submetacentric",
     "p22.33:n:3 p22.32:2:3 p22.31:n:2 p22.2:3:3 p22.13:n:2 p22.12:2:2 p22.11:n:2 p21.3:3:3 p21.2:n:2 p21.1:3:3 p11.4:n:3 p11.3:4:2 p11.23:n:2 p11.22:3:2 p11.21:n:2 p11.1:n:1",
-    "q11.1:n:1 q12:n:2 q13.1:3:2 q13.2:n:2 q13.3:2:2 q21.1:3:3 q21.2:n:2 q21.31:3:3 q21.32:n:2 q21.33:3:3 q22.1:n:3 q22.2:2:2 q22.3:n:3 q23:3:3 q24:n:3 q25:4:4 q26.1:n:3 q26.2:2:2 q26.3:n:2 q27.1:3:3 q27.2:n:2 q27.3:3:3 q28:n:8"],
+    "q11.1:n:1 q12:2:2 q13.1:n:2 q13.2:3:2 q13.3:n:2 q21.1:3:3 q21.2:n:2 q21.31:3:3 q21.32:n:2 q21.33:3:3 q22.1:n:3 q22.2:2:2 q22.3:n:3 q23:3:3 q24:n:3 q25:4:4 q26.1:n:3 q26.2:2:2 q26.3:n:2 q27.1:3:3 q27.2:n:2 q27.3:3:3 q28:n:8"],
   Y: [57.23, 0.3, "acrocentric",
     "p11.32:n:2 p11.31:1:2 p11.2:n:4",
     "q11.1:n:1 q11.21:n:2 q11.221:3:2 q11.222:n:2 q11.223:2:2 q11.23:n:3 q12:v:30"],
@@ -89,15 +91,24 @@ export const UM_PER_MB = 10 / 248.956;           // chromosome 1 is drawn about 
 
 /** Parsed chromosome table: { id, mb, ci, cls, lenUm, pLen, qLen, bands:[{name, stain, u0, u1}] (u: 0 = p tip → 1 = q tip) }. */
 export const CHROMS = {};
+// <CYTOBAND:begin>
+export const CYTOBAND = {};   // { "1": [["p36.33", "gneg", 0, 2300000], ...], ... } (generated; empty = use RAW)
+// <CYTOBAND:end>
+const GIE = { gneg: "n", gpos25: "1", gpos50: "2", gpos75: "3", gpos100: "4", gvar: "v", stalk: "s", acen: "a" };
+function armTokens(id, armLetter, fallback) {
+  const rows = CYTOBAND[id];
+  if (!rows) return T(fallback);
+  return rows.filter((r) => r[0][0] === armLetter && r[1] !== "acen").map((r) => ({ name: r[0], stain: GIE[r[1]] ?? "n", w: Math.max(1, r[3] - r[2]) }));
+}
 for (const id of IDS) {
   const [mb, ci, cls, ps, qs] = RAW[id];
-  const arm = (list, u0, u1) => {
-    const b = T(list), tot = b.reduce((a, x) => a + x.w, 0);
+  const arm = (list, u0, u1, letter) => {
+    const b = armTokens(id, letter, list), tot = b.reduce((a, x) => a + x.w, 0);
     let u = u0;
     return b.map((x) => { const s = { name: x.name, stain: x.stain, u0: u, u1: (u += ((u1 - u0) * x.w) / tot) }; return s; });
   };
   const half = 0.012;                              // the centromere gets a narrow band of its own
-  const bands = [...arm(ps, 0, ci - half), { name: "cen", stain: "a", u0: ci - half, u1: ci + half }, ...arm(qs, ci + half, 1)];
+  const bands = [...arm(ps, 0, ci - half, "p"), { name: "cen", stain: "a", u0: ci - half, u1: ci + half }, ...arm(qs, ci + half, 1, "q")];
   const lenUm = mb * UM_PER_MB;
   CHROMS[id] = { id, mb, ci, cls, lenUm, pLen: lenUm * ci, qLen: lenUm * (1 - ci), bands };
 }
@@ -126,8 +137,8 @@ export const GENES = [
   {
     id: "hbb", sym: "HBB", chr: 11, loc: "11p15.4", bands: ["p15.4"], preset: "sickle", pattern: "autosomal recessive", color: "#fb7185",
     codes: "the β-globin chain of haemoglobin, the oxygen-carrying protein in red blood cells",
-    trait: { "y7-8": "A change in this gene makes red blood cells bend into a sickle shape (sickle cell disease).", "y9-10": "Sickle cell disease: the mutation GAG → GTG swaps glutamic acid for valine at position 6, so haemoglobin clumps and red cells sickle.", y11: "Sickle cell disease (HbS, Glu6Val). HbS/HbS people are affected; heterozygotes (sickle-cell trait) are usually healthy and have some protection against severe malaria, which is why the allele persists where malaria is common." },
-    inherit: { "y7-8": "You need two copies of the changed gene to have the disease (recessive).", "y9-10": "Autosomal recessive: both alleles must be HbS. Two carrier parents have a 1 in 4 chance of an affected child each pregnancy.", y11: "Autosomal recessive. Carrier × carrier gives 25% HbS/HbS, 50% carriers, 25% HbA/HbA, a new independent chance in every pregnancy." },
+    trait: { "y7-8": "A change in this gene makes red blood cells bend into a sickle shape (sickle cell disease).", "y9-10": "Sickle cell disease: the mutation GAG → GTG swaps glutamic acid for valine at position 6 (the HbS allele), so haemoglobin clumps and red cells sickle.", y11: "HbS is Glu6Val. HbS/HbS (sickle-cell anaemia) is the most common form of sickle cell disease; HbS combined with another variant (HbSC, or HbS/β-thalassaemia) also causes it. Heterozygotes (sickle-cell trait) are usually healthy and have some protection against severe malaria, which is why the allele persists where malaria is common." },
+    inherit: { "y7-8": "You need two copies of the changed gene to have the disease (recessive).", "y9-10": "In this HbA/HbS model: autosomal recessive, so both alleles must be HbS (HbS/HbS, sickle-cell anaemia). Two carrier parents have a 1 in 4 chance of an affected child each pregnancy.", y11: "In this HbA/HbS model: autosomal recessive. Carrier × carrier gives 25% HbS/HbS, 50% carriers, 25% HbA/HbA, a new independent chance in every pregnancy. (Real sickle cell disease also includes compound heterozygotes such as HbSC.)" },
     note: "This is the same β-globin gene you saw in the nucleus, chromatin and DNA levels.",
   },
   {
@@ -148,22 +159,22 @@ export const GENES = [
     id: "f8", sym: "F8", chr: "X", loc: "Xq28", bands: ["q28"], preset: "haemophilia", color: "#f87171", pattern: "X-linked recessive",
     codes: "clotting factor VIII, a protein needed for blood to clot",
     trait: { "y7-8": "Without it, blood clots slowly (haemophilia A).", "y9-10": "Haemophilia A: a faulty factor VIII means clotting is slow, so bleeding is prolonged and joints bleed easily.", y11: "Haemophilia A: reduced factor VIII activity impairs the intrinsic clotting pathway. Severity depends on residual activity; treatment is factor VIII replacement." },
-    inherit: { "y7-8": "The gene is on the X chromosome. Boys have only one X, so one faulty copy is enough; girls usually have a healthy second copy.", "y9-10": "X-linked recessive: males (XY) with the allele are affected; females (XX) are usually carriers. A carrier mother has a 1 in 2 chance of passing it to each child; fathers never pass an X-linked allele to sons.", y11: "X-linked recessive. Affected males cannot pass it to sons (they give the Y) but all their daughters are carriers. Females can be affected if homozygous, or occasionally through skewed X-inactivation." },
+    inherit: { "y7-8": "The gene is on the X chromosome. Boys have only one X, so one faulty copy is enough; girls usually have a healthy second copy.", "y9-10": "X-linked recessive: males (XY) with the allele are affected; females (XX) are usually carriers, and some carriers have mild symptoms. A carrier mother has a 1 in 2 chance of passing the allele to each child. Fathers never pass an X-linked allele to sons; all his daughters inherit his X allele, and with an unaffected non-carrier mother they are carriers.", y11: "X-linked recessive. An affected father cannot pass it to sons (he gives the Y); all his daughters inherit his X allele, so with an unaffected non-carrier mother they are carriers. Heterozygous females can have symptoms (for example through skewed X-inactivation), and females can be affected if homozygous." },
     note: "",
   },
   {
     id: "dmd", sym: "DMD", chr: "X", loc: "Xp21.2", bands: ["p21.2"], preset: "dmd", color: "#fb923c", pattern: "X-linked recessive",
     codes: "dystrophin, a protein that anchors muscle fibres to the structures around them",
     trait: { "y7-8": "A faulty gene means muscles gradually weaken (Duchenne muscular dystrophy).", "y9-10": "Duchenne muscular dystrophy: without dystrophin, muscle fibres tear during contraction and are slowly lost.", y11: "Duchenne muscular dystrophy. DMD is one of the largest human genes (about 2.2 million base pairs), which makes deletions and other changes relatively common; about one third of cases are new mutations." },
-    inherit: { "y7-8": "It sits on the X chromosome, so it mostly affects boys.", "y9-10": "X-linked recessive: mostly affects males; carrier mothers usually have no or mild symptoms.", y11: "X-linked recessive. Carrier females can show mild effects (X-inactivation mosaicism) and, in a third of cases, the mutation is new (not inherited)." },
+    inherit: { "y7-8": "It sits on the X chromosome, so it mostly affects boys.", "y9-10": "X-linked recessive: mostly affects males; carrier females usually have no or mild symptoms, and some have more.", y11: "X-linked recessive. Carrier females can show mild effects (X-inactivation mosaicism) and, in a third of cases, the mutation is new (not inherited)." },
     note: "",
   },
   {
     id: "sry", sym: "SRY", chr: "Y", loc: "Yp11.2", bands: ["p11.2"], preset: null, color: "#4ade80", pattern: "Y-linked",
-    codes: "a protein that switches on genes that make an embryo's gonads develop as testes",
-    trait: { "y7-8": "This small gene on the Y chromosome is the switch that makes a baby develop as a boy.", "y9-10": "SRY triggers the embryo's gonads to become testes. Testes then make the hormones that guide male development.", y11: "SRY (sex-determining region Y) encodes a transcription factor that starts testis determination (via SOX9). It sits near the pseudoautosomal boundary, which is why a crossing-over mistake between X and Y can move it onto an X (46,XX males) or leave a Y without it (46,XY females)." },
+    codes: "a protein that usually switches on the genes that make an embryo's gonads develop as testes",
+    trait: { "y7-8": "This small gene on the Y chromosome is usually the switch that makes a baby develop as a boy.", "y9-10": "SRY usually triggers the embryo's gonads to become testes. Testes then make the hormones that guide male development.", y11: "SRY (sex-determining region Y) encodes a transcription factor that usually starts testis determination (via SOX9). It sits near the pseudoautosomal boundary, so rare crossing-over mistakes between X and Y can move it onto an X (46,XX males) or leave a Y without it (46,XY females)." },
     inherit: { "y7-8": "Only people with a Y chromosome have it, and it is passed from father to son.", "y9-10": "Y-linked: passed from father to son only.", y11: "Y-linked inheritance: transmitted from father to son. It is a single copy per cell (hemizygous)." },
-    note: "There is no Inheritance lab preset for SRY because it is not inherited in a Punnett-square pattern.",
+    note: "SRY is not included in the Inheritance lab here.",
   },
   {
     id: "abo", sym: "ABO", chr: 9, loc: "9q34.2", bands: ["q34.2"], preset: "abo", color: "#facc15", pattern: "codominant (multiple alleles)",
@@ -226,16 +237,16 @@ export const CONDITIONS = {
 
 export const NOTE = {
   "y7-8": "A karyotype is a photograph of every chromosome from one cell, arranged in pairs. Real karyotypes are made from white blood cells caught in the middle of dividing.",
-  "y9-10": "This is a stylised human metaphase spread: 46 chromosomes, each already copied into two sister chromatids. Band patterns and lengths are simplified from standard ideograms.",
-  y11: "Stylised metaphase spread (not a micrograph). Lengths are scaled to the genome (chromosome 1 about 10 µm) and band patterns follow the ISCN G-banding at roughly the 300-band level, simplified. Real chromosome length at metaphase varies with how condensed the cell is.",
+  "y9-10": "This is a stylised human metaphase spread: 46 chromosomes, each already copied into two sister chromatids. Band patterns and lengths are simplified (schematic).",
+  y11: "Stylised metaphase spread (not a micrograph). Lengths are scaled to the genome (chromosome 1 about 10 µm) and the band patterns are schematic ideograms: approximate, pending verification against reference data. Real chromosome length at metaphase varies with how condensed the cell is.",
 };
 
 export const PLANT_NOTE = "These are human chromosomes. Plants have their own sets: a tomato has 12 pairs, a wheat plant 21 (bread wheat is hexaploid, 2n = 42), and the research plant <em>Arabidopsis</em> just 5 pairs.";
 
 export const CLASS_TEXT = {
-  metacentric: { "y7-8": "centromere near the middle", "y9-10": "metacentric: centromere near the middle, arms about equal", y11: "metacentric: centromere index about 0.375 to 0.5, p and q arms nearly equal" },
-  submetacentric: { "y7-8": "centromere a bit off-centre", "y9-10": "submetacentric: centromere off-centre, one arm clearly shorter", y11: "submetacentric: centromere index about 0.25 to 0.375, short p arm clearly shorter than q" },
-  acrocentric: { "y7-8": "centromere near one end, with a little knob (satellite)", "y9-10": "acrocentric: centromere near one end, a tiny short arm", y11: "acrocentric: centromere index below about 0.25; chromosomes 13, 14, 15, 21 and 22 carry satellites on stalks (nucleolar organiser regions) on their short arms" },
+  metacentric: { "y7-8": "centromere near the middle", "y9-10": "metacentric: centromere near the middle, arms about equal", y11: "metacentric: centromere near the middle, p and q arms similar in length" },
+  submetacentric: { "y7-8": "centromere a bit off-centre", "y9-10": "submetacentric: centromere off-centre, one arm clearly shorter", y11: "submetacentric: centromere off-centre, short p arm clearly shorter than q (conventional classes: this includes 2, 7 and X)" },
+  acrocentric: { "y7-8": "centromere near one end, with a very short top arm (13, 14, 15, 21 and 22 also have a small knob, a satellite)", "y9-10": "acrocentric: centromere near one end, a very short p arm (13, 14, 15, 21 and 22 carry satellites; Y does not)", y11: "acrocentric: centromere near one end. Chromosomes 13, 14, 15, 21 and 22 carry satellites on stalks (nucleolar organiser regions) on their short arms; the Y chromosome is acrocentric-like but has none" },
 };
 
 // ---------- missions and quiz ----------
