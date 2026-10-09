@@ -638,10 +638,10 @@ class Scope {
     this.updateUI();
   }
 
-  /** weight of the out-of-focus glow behind the sharp section */
+  /** weight of the out-of-focus glow behind the sharp section (light microscope only) */
   wF() {
     const S = this.S;
-    return S.mode === "lm" ? 0.9 : 0.85;
+    return S.mode === "lm" ? 0.9 : 0;   // TEM: only the clipped thin section, nothing from outside it
   }
 
   fillPost(u) {
