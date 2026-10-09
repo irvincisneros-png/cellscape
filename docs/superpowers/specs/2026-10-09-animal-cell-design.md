@@ -41,6 +41,15 @@ These are teaching-scale simplifications. Each one is stated on the page where i
   - The membrane level hides its "animal proteins in a plant cell" note when the parent is animal.
 - Picking and the info panel work for every new part.
 
+## Visual quality bar (owner priority)
+The animal cell must look real, in the style of molecular animation, and at least as polished as the plant cell. Concretely:
+- **Organic geometry:** the membrane is a noise-displaced, gently undulating blob with no sphere silhouette. Lysosomes, vesicles and mitochondria are irregular and vary in size. The smooth ER is a branching tubular network, not straight tubes. Glycogen shows as rosette clusters.
+- **Materials:** use the existing `materials.js` glass/fresnel helpers. Lysosomes are dense and translucent with a darker granular core. Vesicles are thin and glassy. The membrane rim has a fresnel glow. Nothing is flat-shaded or a plain colour.
+- **Crowding and motion:** a dense cytosol with drifting specks and the cytoskeleton (microtubules radiating from the centrosome; actin cortex under the membrane, Y9+ only). Vesicles travel along the microtubules. Organelles jitter slightly (Brownian motion). Everything is subtle and continuous.
+- **Lighting and post-processing:** use the engine's existing env, fog, bloom and bokeh pipeline. Tune a per-species env for the animal cell (warmer, more reddish-pink tissue tone than the plant cell's green).
+- **Performance:** instanced meshes for repeated parts. The `low` and `medium` quality settings drop the cytoskeleton density, specks and bokeh. The target is 60 fps on `high` on a mid laptop and smooth `medium` on a school Chromebook.
+- **Review gate:** I compare high-quality screenshots of the plant cell and the animal cell before committing. If anything looks primitive or toy-like, I fix it before moving on.
+
 ## Syllabus
 New parts and behaviours are tagged to existing dot points in `content/syllabus.json`: Y7 plant vs animal cells, Y9–10 osmosis and respiration, Biology Y11 Module 1 (cell structure, membrane transport). If no fitting dot point exists, nothing is invented: the gap goes into `SYLLABUS_NOTES.md`.
 
