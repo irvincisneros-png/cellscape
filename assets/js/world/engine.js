@@ -509,12 +509,12 @@ export class Engine {
 
   /** Run fn(k) every frame for k = 0 → 1 (eased) over `dur` seconds of real time. */
   tween(dur, fn) {
-    if (this.reducedMotion || dur <= 0) { fn(1); return Promise.resolve(); }
-    return new Promise((res) => {
+    if (this.reducedMotion || dur <= 0) { try { fn(1); return Promise.resolve(); } catch (err) { return Promise.reject(err); } }
+    return new Promise((res, rej) => {
       const t0 = performance.now();
       const tick = () => {
         const x = Math.min(1, (performance.now() - t0) / (dur * 1000));
-        safe(() => fn(x < 0.5 ? 2 * x * x : 1 - Math.pow(-2 * x + 2, 2) / 2));
+        try { fn(x < 0.5 ? 2 * x * x : 1 - Math.pow(-2 * x + 2, 2) / 2); } catch (err) { rej(err); return; }
         x < 1 ? requestAnimationFrame(tick) : res();
       };
       requestAnimationFrame(tick);
@@ -530,32 +530,44 @@ export class Engine {
     if (this.busy || this.stack.length !== 1 || this.stack[0].id === id) return;
     this.busy = true;
     const old = this.stack[0];
+    let committed = false, inst = null;
     try {
       const loading = this.load(id);
       loading.catch(() => {});
       if (old.inst.morphOut) await this.tween(0.7, (k) => old.inst.morphOut(k));
-      const inst = await loading;
+      inst = await loading;
       inst.morphIn?.(0);
       const cam = { target: this.controls.target.clone(), pos: this.camera.position.clone() };
-      try {
-        this.unmount(old.inst);
-        this.stack[0] = { id, inst };
-        this.mount(inst);
-      } catch (err) {
-        safe(() => this.unmount(inst));
-        this.stack[0] = old;
-        old.inst.morphOut?.(0);
-        this.mount(old.inst);
-        throw err;
-      }
+      this.unmount(old.inst);
+      this.stack[0] = { id, inst };
+      this.mount(inst);
+      committed = true;
       this.controls.target.copy(cam.target);
       this.camera.position.copy(cam.pos);
       this.controls.update();
       safe(() => old.inst.dispose?.());
       safe(() => disposeTree(old.inst.root));
+      // reframe for the new cell while it grows in, keeping the current viewing direction
+      const v = inst.view, dir = cam.pos.clone().sub(cam.target).normalize();
+      const flight = this.fly(v.target, v.target.clone().addScaledVector(dir, v.distance), 1.0);
+      this.userMoved = false;
       if (inst.morphIn) await this.tween(0.9, (k) => inst.morphIn(k));
+      await flight;
+      this.userMoved = false;
     } catch (err) {
       console.error(err);
+      if (committed) safe(() => inst.morphIn?.(1));   // new cell is in; just finish its morph
+      else {
+        // roll back: the old cell comes back whole, the half-made new one is freed
+        if (inst) {
+          if (this.stack[0].inst === inst) safe(() => this.unmount(inst));
+          safe(() => inst.dispose?.());
+          safe(() => disposeTree(inst.root));
+        }
+        this.stack[0] = old;
+        if (!this.scene.children.includes(old.inst.root)) safe(() => this.mount(old.inst));
+        safe(() => old.inst.morphOut?.(0));
+      }
       this.toast?.("Couldn't switch cells. Try again.");
     } finally {
       this.busy = false;

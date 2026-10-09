@@ -437,7 +437,7 @@ export function create(engine) {
     vacuole.scale.set(vs * keep, (0.6 + 0.4 * vs) * keep, (0.6 + 0.4 * vs) * keep);
     vacuole.visible = keep > 0.001;
     const ms = M.turgor < 35 ? 1 - ((35 - M.turgor) / 35) * 0.07 : 1;
-    membrane.scale.setScalar(ms);
+    membrane.scale.setScalar(ms + (1 - ms) * gone);   // hand over at the reference box during the morph
     marker.rotation.z = still ? 0 : t * 0.4;
     cytoMarker.rotation.y = still ? 0 : t * 0.6;
     marker.material.emissiveIntensity = 0.9 + Math.sin(t * 2.5) * 0.4;
@@ -750,6 +750,7 @@ export function create(engine) {
     },
     unmountPanel() { for (const el of Object.values(labels)) el.style.display = "none"; diveLbl.style.display = "none"; cytoLbl.style.display = "none"; cap.style.display = "none"; engine.overlay.innerHTML = ""; },
     onResume() { makeLabels(); },
+    dispose() { for (const el of [...Object.values(labels), diveLbl, cytoLbl, cap]) el.remove(); },
     onLens() { showLabels = lens.band === "y7-8" || lens.band === "y9-10"; progress = null; buildPanel(panelEl); },
     update(dt, t, rdt = dt) {
       M.step(dt);
