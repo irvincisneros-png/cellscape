@@ -28,28 +28,71 @@ const ZAXIS = new THREE.Vector3(0, 0, 1);
 
 // ---------- shaders ----------
 const VERT = `
-  varying vec3 vN; varying vec3 vV;
+  varying vec3 vN; varying vec3 vV; varying vec3 vL; varying vec3 vP;
   #include <clipping_planes_pars_vertex>
   void main() {
     #include <beginnormal_vertex>
     #include <defaultnormal_vertex>
     #include <begin_vertex>
     #include <project_vertex>
+    vL = position;
+    vec4 wp = vec4(transformed, 1.0);
+    #ifdef USE_INSTANCING
+      wp = instanceMatrix * wp;
+    #endif
+    vP = (modelMatrix * wp).xyz;
     vN = normalize(transformedNormal);
     vV = -mvPosition.xyz;
     #include <clipping_planes_vertex>
   }`;
 const FRAG = `
-  uniform vec3 uC0, uC1; uniform float uPow, uA0, uA1, uGain, uFocusZ, uSig; uniform vec3 uObj;   // uObj: view depth of the object's middle, its half-depth, 1 if it has a size
-  varying vec3 vN; varying vec3 vV;
+  uniform vec3 uC0, uC1; uniform float uPow, uA0, uA1, uGain, uFocusZ, uSig, uTex, uDbl, uPxU, uLine; uniform vec3 uObj;   // uObj: view depth of the object's middle, its half-depth, 1 if it has a size
+  varying vec3 vN; varying vec3 vV; varying vec3 vL; varying vec3 vP;
   #include <clipping_planes_pars_fragment>
+  float h3(vec3 p) { return fract(sin(dot(p, vec3(127.1, 311.7, 74.7))) * 43758.5453); }
+  float vn3(vec3 p) {
+    vec3 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 * f);
+    return mix(mix(mix(h3(i), h3(i + vec3(1, 0, 0)), f.x), mix(h3(i + vec3(0, 1, 0)), h3(i + vec3(1, 1, 0)), f.x), f.y),
+               mix(mix(h3(i + vec3(0, 0, 1)), h3(i + vec3(1, 0, 1)), f.x), mix(h3(i + vec3(0, 1, 1)), h3(i + vec3(1, 1, 1)), f.x), f.y), f.z);
+  }
   void main() {
     #include <clipping_planes_fragment>
-    float f = pow(1.0 - clamp(abs(dot(normalize(vN), normalize(vV))), 0.0, 1.0), uPow);
+    float cs = clamp(abs(dot(normalize(vN), normalize(vV))), 0.0, 1.0);
+    float f = pow(1.0 - cs, uPow);
+    vec3 c = mix(uC0, uC1, f);
+    if (uTex > 0.5) {                                    // electron microscope: internal texture and thin membranes
+      float gs = uPxU * 2.2;
+      float lum = 1.0 + (vn3(vP / gs) - 0.5) * 0.62 + (vn3(vP / (gs * 5.0)) - 0.5) * 0.4;   // fine granular cytoplasm
+      float edge = 1.0 - cs, mask = smoothstep(0.1, 0.5, cs);
+      float t = uTex;
+      if (t > 0.5 && t < 1.5) {                          // nucleus: dense heterochromatin clumped under the envelope
+        float cl = vn3(vL * 0.8) + 0.5 * vn3(vL * 2.3);
+        lum *= 1.0 - 0.5 * smoothstep(0.3, 0.85, edge) * smoothstep(0.35, 0.95, cl);
+      } else if (t < 2.5) {                              // mitochondrion: cristae folds
+        float fade = clamp((0.29 / uPxU - 2.0) / 4.0, 0.0, 1.0);
+        float st = pow(0.5 + 0.5 * sin(vL.x * 21.0 + 2.5 * vn3(vL * 2.0)), 5.0);
+        lum *= 1.0 - 0.62 * st * fade * mask;
+      } else if (t < 3.5) {                              // chloroplast: stacked thylakoid lamellae in grana patches
+        float fade = clamp((0.17 / uPxU - 2.0) / 4.0, 0.0, 1.0);
+        float st = pow(0.5 + 0.5 * sin(vL.z * 55.0 + 3.0 * vn3(vL * 2.5)), 10.0);
+        float gm = smoothstep(0.42, 0.58, vn3(vL * 2.0 + 7.0));
+        lum *= 1.0 - 0.7 * st * gm * fade * mask;
+      } else if (t > 4.5 && t < 5.5) {                   // cell wall: fibrous
+        lum *= 0.8 + 0.4 * 0.5 * (vn3(vec3(vP.x / (gs * 7.0), vP.y / (gs * 0.8), vP.z / gs)) + vn3(vec3(vP.x / (gs * 0.8), vP.y / (gs * 7.0), vP.z / gs)));
+      }
+      c *= lum;
+      if (uDbl > 0.5) {                                  // membranes: two thin dark lines a little apart, a fixed few pixels wide
+        float d = (cs * cs) / max(fwidth(cs * cs), 1e-5);
+        float L = uLine;
+        float ln = max(1.0 - smoothstep(0.7 * L, 1.7 * L, d), smoothstep(2.6 * L, 3.2 * L, d) * (1.0 - smoothstep(3.7 * L, 4.5 * L, d)));
+        if (t > 3.5 && t < 4.5) ln *= 0.5 + 0.5 * step(0.5, vn3(vP / (gs * 3.2)));   // rough ER: ribosome-studded, so dotted
+        c = mix(c, uC1, ln * 0.92);
+      }
+    }
     float zo = uObj.z > 0.5 ? uObj.x : vV.z;
     float dz = max(0.0, abs(zo - uFocusZ) - uObj.y) / uSig;   // 0 while the focal plane is inside the structure
     float w = exp(-0.5 * dz * dz);                       // soft focus: parts far from the focal plane fade
-    vec3 c = mix(mix(uC0, uC1, f), vec3(1.0), 1.0 - uGain * w);
+    c = mix(c, vec3(1.0), 1.0 - uGain * w);
     gl_FragColor = vec4(c, mix(uA0, uA1, f) * w);
   }`;
 const PVERT = `
@@ -72,25 +115,33 @@ const PFRAG = `
 // the neighbouring tissue: walls, a pale cytoplasm and a nucleus in every cell, except the middle cell (the 3D model)
 const LVERT = `varying vec2 vW; void main() { vW = (modelMatrix * vec4(position, 1.0)).xy; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }`;
 const LFRAG = `
-  uniform vec3 uCyto, uWall, uNuc; uniform vec2 uPitch; uniform float uMode, uFade, uPx, uWallW;
+  uniform vec3 uCyto, uWall, uNuc, uChl; uniform vec2 uPitch; uniform float uMode, uFade, uPx, uWallW;
   varying vec2 vW;
   float h21(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
   vec2 h22(vec2 p) { return vec2(h21(p), h21(p + 19.19)); }
   float vn(vec2 p) { vec2 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 * f); return mix(mix(h21(i), h21(i + vec2(1.0, 0.0)), f.x), mix(h21(i + vec2(0.0, 1.0)), h21(i + vec2(1.0, 1.0)), f.x), f.y); }
   void main() {
-    float wallD = 1e3, nucD = 1e3; bool hole = false; vec2 cid = vec2(0.0);
+    float wallD = 1e3, nucD = 1e3; bool hole = false; vec2 cid = vec2(0.0); float chl = 0.0;
     float aa = uPx * 1.2;
     if (uMode < 0.5) {                                   // plant: rows of brick-shaped cells
-      float row = floor(vW.y / uPitch.y + 0.5);
-      float off = row == 0.0 ? 0.0 : h21(vec2(row, 3.1)) * uPitch.x;
-      vec2 q = vec2(vW.x - off, vW.y - row * uPitch.y);
-      float col = floor(q.x / uPitch.x + 0.5);
-      vec2 c = vec2(q.x - col * uPitch.x, q.y);
-      wallD = min(uPitch.x * 0.5 - abs(c.x), uPitch.y * 0.5 - abs(c.y));
+      vec2 wv = vW + uPitch.x * 0.05 * (vec2(vn(vW * 0.045), vn(vW * 0.045 + 17.0)) - 0.5) * 2.0 * smoothstep(30.0, 90.0, length(vW));   // slightly wavy walls
+      float row = floor(wv.y / uPitch.y + 0.5);
+      float pxr = row == 0.0 ? uPitch.x : uPitch.x * (0.8 + 0.4 * h21(vec2(row, 5.5)));   // cells differ in length
+      float off = row == 0.0 ? 0.0 : h21(vec2(row, 3.1)) * pxr;
+      vec2 q = vec2(wv.x - off, wv.y - row * uPitch.y);
+      float col = floor(q.x / pxr + 0.5);
+      vec2 c = vec2(q.x - col * pxr, q.y);
+      wallD = min(pxr * 0.5 - abs(c.x), uPitch.y * 0.5 - abs(c.y));
       hole = row == 0.0 && col == 0.0;
       vec2 id = vec2(col, row); cid = id;
       vec2 nc = vec2(-0.22 * uPitch.x + (h21(id) - 0.5) * 0.12 * uPitch.x, (h21(id + 3.0) - 0.5) * 0.3 * uPitch.y);
-      nucD = length((c - nc) / vec2(0.07 * uPitch.x, 0.15 * uPitch.y));
+      nucD = length((c - nc) / vec2(0.07 * uPitch.x * (0.75 + 0.5 * h21(id + 11.0)), 0.15 * uPitch.y * (0.75 + 0.5 * h21(id + 13.0))));
+      hole = hole;
+      if (!hole) for (int k = 0; k < 5; k++) {          // chloroplasts lining the cell
+        vec2 hk = h22(id + float(k) * 7.3 + 1.0);
+        vec2 pc = vec2((hk.x - 0.5) * (pxr - 9.0), (hk.y > 0.5 ? 1.0 : -1.0) * (uPitch.y * 0.5 - 3.8));
+        chl = max(chl, 1.0 - smoothstep(0.7, 1.0, length((c - pc) / vec2(2.7, 1.5))));
+      }
     } else {                                             // animal: cells packed like a mosaic (Voronoi)
       vec2 g = vW / uPitch.x, ip = floor(g), fp = fract(g);
       float md = 8.0; vec2 bc = vec2(0.0), bid = vec2(0.0), bo = vec2(0.0);
@@ -116,7 +167,7 @@ const LFRAG = `
     float nuc = hole ? 0.0 : 1.0 - smoothstep(0.82, 1.0, nucD);   // the middle cell is the 3D model: it brings its own nucleus
     float tint = 1.0 - 0.07 * h21(cid + 7.0) - 0.05 * vn(vW * 0.22);              // each cell is a little different
     float mott = 0.82 + 0.36 * vn(vW * 0.9 + cid * 3.0);                             // a mottled nucleus
-    vec3 T = uCyto * tint * mix(vec3(1.0), uWall, line * (0.82 + 0.3 * h21(floor(vW / 14.0)))) * mix(vec3(1.0), pow(uNuc, vec3(mott)), nuc);
+    vec3 T = uCyto * tint * mix(vec3(1.0), uWall, line * (0.82 + 0.3 * h21(floor(vW / 14.0)))) * mix(vec3(1.0), pow(uNuc, vec3(mott)), nuc) * mix(vec3(1.0), uChl, chl * 0.9);
     gl_FragColor = vec4(mix(vec3(1.0), T, uFade), 1.0);
   }`;
 const PFS = `
@@ -125,6 +176,7 @@ const PFS = `
   uniform vec3 uField;
   varying vec2 vUv;
   float hash(vec2 p) { return fract(sin(dot(p, vec2(12.9898, 78.233))) * 43758.5453); }
+  float vnz(vec2 p) { vec2 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 * f); return mix(mix(hash(i), hash(i + vec2(1.0, 0.0)), f.x), mix(hash(i + vec2(0.0, 1.0)), hash(i + vec2(1.0, 1.0)), f.x), f.y); }
   vec3 blur(sampler2D t, float r) {
     vec3 acc = texture2D(t, vUv).rgb;
     if (r < 0.45) return acc;
@@ -153,6 +205,8 @@ const PFS = `
       col = mix(vec3(0.004, 0.005, 0.007) * (1.0 - 0.6 * smoothstep(0.9, 2.2, rn)), col, 1.0 - smoothstep(0.985, 1.0, rn));
       col += vec3(0.5, 0.45, 0.35) * 0.06 * smoothstep(0.97, 0.995, rn) * (1.0 - smoothstep(0.995, 1.0, rn));
     } else {
+      vec2 gp = vUv * uRes;
+      col *= 0.9 + 0.1 * hash(floor(gp / 1.5) + 5.0) + 0.12 * (vnz(gp / 3.0) - 0.5) + 0.14 * (vnz(gp / 14.0) - 0.5);   // emulsion grain and mottle
       col = clamp((col - 0.5) * 1.18 + 0.5, 0.0, 1.0);
       col *= 1.0 - uVig * smoothstep(0.7, 1.6, rn);
       col += (hash(vUv * uRes + uTime) - 0.5) * uGrain;
@@ -210,6 +264,7 @@ class Scope {
     this.kcache = new WeakMap(); this.matCache = new Map(); this.ptsCache = new Map();
     this._draw = []; this._hide = []; this._sceneHide = [];
     this.planes = [new THREE.Plane(), new THREE.Plane()];
+    this.pxU = { value: 1 }; this.lineU = { value: 1 };   // world units per device pixel, and the membrane line width scale (electron view)
     this.focusU = { value: 0 }; this.sigU = { value: 1e6 };   // shared by every structure material: where the focal plane is (view depth) and how soft the focus is
     this.noPlanes = [];
     this.dir = new THREE.Vector3(0, 0, 1); this.f = new THREE.Vector3(); this.tmp = new THREE.Vector3();
@@ -335,7 +390,7 @@ class Scope {
     const pitch = h.pitch || [h.cellUm, h.cellUm];
     this.lattice = new THREE.Mesh(new THREE.PlaneGeometry(7000, 7000), new THREE.ShaderMaterial({
       vertexShader: LVERT, fragmentShader: LFRAG, transparent: true, depthWrite: false, depthTest: false, blending: THREE.MultiplyBlending, premultipliedAlpha: true,
-      uniforms: { uCyto: { value: new THREE.Color() }, uWall: { value: new THREE.Color() }, uNuc: { value: new THREE.Color() }, uPitch: { value: new THREE.Vector2(pitch[0], pitch[1]) }, uMode: { value: h.tissue === "animal" ? 1 : 0 }, uFade: { value: 1 }, uPx: { value: 1 }, uWallW: { value: h.tissue === "animal" ? 0.35 : 0.75 } },
+      uniforms: { uCyto: { value: new THREE.Color() }, uChl: { value: new THREE.Color() }, uWall: { value: new THREE.Color() }, uNuc: { value: new THREE.Color() }, uPitch: { value: new THREE.Vector2(pitch[0], pitch[1]) }, uMode: { value: h.tissue === "animal" ? 1 : 0 }, uFade: { value: 1 }, uPx: { value: 1 }, uWallW: { value: h.tissue === "animal" ? 0.35 : 0.75 } },
     }));
     this.lattice.position.copy(h.home || new THREE.Vector3());
     this.lattice.frustumCulled = false; this.lattice.renderOrder = -5;
@@ -378,7 +433,7 @@ class Scope {
     if (!m) {
       m = new THREE.ShaderMaterial({
         vertexShader: VERT, fragmentShader: FRAG, clipping: true, side: THREE.DoubleSide, transparent: true, depthWrite: false, depthTest: false,
-        uniforms: { uC0: { value: new THREE.Color(spec.fill) }, uC1: { value: new THREE.Color(spec.edge) }, uPow: { value: spec.pow }, uA0: { value: spec.a0 }, uA1: { value: spec.a1 }, uGain: { value: spec.gain }, uFocusZ: this.focusU, uSig: this.sigU, uObj: { value: new THREE.Vector3() } },
+        uniforms: { uC0: { value: new THREE.Color(spec.fill) }, uC1: { value: new THREE.Color(spec.edge) }, uPow: { value: spec.pow }, uA0: { value: spec.a0 }, uA1: { value: spec.a1 }, uGain: { value: spec.gain }, uFocusZ: this.focusU, uSig: this.sigU, uObj: { value: new THREE.Vector3() }, uTex: { value: spec.tex || 0 }, uDbl: { value: spec.dbl ? 1 : 0 }, uPxU: this.pxU, uLine: this.lineU },
       });
       if (spec.blend === "paint") m.blending = THREE.NormalBlending;
       else { m.blending = THREE.MultiplyBlending; m.premultipliedAlpha = true; }
@@ -439,6 +494,8 @@ class Scope {
     px.cx = w / 2; px.cy = hgt / 2;
     // the optical section: a slab perpendicular to the view direction
     this.f.copy(this.dir).negate();
+    this.pxU.value = px.unitsPerPx / dpr;
+    this.lineU.value = (S.mode === "em" ? clamp(S.temMag / 20000, 0.5, 1.3) : 1) * dpr;
     const depth = h?.depthUm || 34;
     let half, centre;
     if (S.mode === "lm") { const o = C.objectiveOf(S.obj); half = o.dof / 2; centre = S.focus; if (S.obj < 10) { half = 1e4; centre = 0; } }
@@ -488,6 +545,8 @@ class Scope {
     // lattice: the neighbouring tissue (light microscope only)
     const lat = this.lattice, lu = lat.material.uniforms, st = S.stain;
     const KM = C.KINDS.membrane.lm, KW = C.KINDS.wall.lm, KN = C.KINDS.nucleus.lm;
+    const KC = C.KINDS.chloroplast.lm;
+    lu.uChl.value.set((KC[st] || KC.none).fill);
     lu.uCyto.value.set((KM[st] || KM.none).fill); lu.uNuc.value.set((KN[st] || KN.none).fill);
     lu.uWall.value.set((this.hint.tissue === "animal" ? KM : KW)[st]?.edge || (this.hint.tissue === "animal" ? KM : KW).none.edge);
     lu.uPx.value = this.px.unitsPerPx;
@@ -552,7 +611,7 @@ class Scope {
     } else {
       u.uHaze.value = 0.8 * dpr;
       u.uInt.value = S.light;
-      u.uVig.value = 0.22; u.uGrain.value = 0.03;
+      u.uVig.value = 0.25; u.uGrain.value = 0.045;
       u.uField.value.setRGB(0.78, 0.78, 0.78);
     }
   }
@@ -788,7 +847,7 @@ class Scope {
     const lens = this.engine.lens, S = this.S, h = this.hint || {};
     const pick = (v, ...a) => { const x = lens.pick(v); return typeof x === "function" ? x(...a) : x; };
     const o = C.objectiveOf(S.obj), band = lens.band;
-    let html = `<p>${esc(pick(C.TEXT.intro))}</p>`;
+    let html = `<p>${esc(pick(S.mode === "lm" ? C.TEXT.intro : C.TEXT.introEm))}</p>`;
     if (S.mode === "lm") {
       html += `<p>${pick(C.TEXT.mag, o)}</p><p>${pick(C.TEXT.limit, o)}</p><p><b>${esc(C.STAINS[S.stain].label)}.</b> ${esc(pick(C.STAIN_NOTE[S.stain]))}</p>`;
       if (S.stain === "iodine" && h.tissue === "animal") html += `<p class="hint">Iodine is usually used on plant tissue. Animal cells have almost no starch, so try methylene blue.</p>`;
@@ -812,8 +871,8 @@ class Scope {
       const shown = this.specFor(k) != null;
       const faint = lm && shown && K_.lmFrom >= 40;
       const tag = shown ? (faint ? "just visible (a speck)" : "visible") : lm ? (K_.um < lim * 1.5 || K_.lmFrom === Infinity ? "too small to see" : "too small at this power") : "—";
-      const size = lens.atLeast("y9-10") ? ` <span class="sm">≈ ${esc(C.fmtLen(K_.um))}</span>` : "";
-      return `<li class="${shown ? "yes" : "no"}"><span>${shown ? "✔" : "✖"}</span> ${esc(K_.name)}${size}<em>${tag}</em></li>`;
+      const size = lens.atLeast("y9-10") ? ` <span class="sm">≈&nbsp;${esc(C.fmtLen(K_.um).replace(" ", "\u00a0"))}</span>` : "";
+      return `<li class="${shown ? "yes" : "no"}"><span>${shown ? "✔" : "✖"}</span><b class="nm">${esc(K_.name)}${size}</b><em>${tag}</em></li>`;
     }).join("");
     const key = rows + lm + S.obj + S.stain;
     if (ui._seenKey === key) return;
@@ -910,9 +969,11 @@ function injectCss() {
   .scope-fig figcaption { font-size: 0.72rem; color: var(--ink-faint); margin-top: 5px; line-height: 1.35; } .scope-fig a { color: var(--accent); }
   .scope-list { margin: 0; padding-left: 18px; font-size: 0.84rem; color: var(--ink-dim); display: flex; flex-direction: column; gap: 4px; }
   .scope-seen { list-style: none; margin: 0 0 6px; padding: 0; display: flex; flex-direction: column; gap: 3px; font-size: 0.84rem; }
-  .scope-seen li { display: flex; gap: 6px; align-items: baseline; color: var(--ink-dim); }
+  .scope-seen li { display: flex; flex-wrap: wrap; gap: 0 6px; align-items: baseline; color: var(--ink-dim); }
+  .scope-seen .nm { font-weight: 400; flex: 1 1 11em; min-width: 0; }
   .scope-seen li.yes { color: var(--ink); } .scope-seen li span { width: 1.1em; color: var(--good, #4ade80); } .scope-seen li.no span { color: var(--danger, #f87171); }
-  .scope-seen em { margin-left: auto; font-style: normal; font-size: 0.74rem; color: var(--ink-faint); text-align: right; }
+  .scope-seen em { margin-left: auto; font-style: normal; font-size: 0.74rem; color: var(--ink-faint); text-align: right; white-space: nowrap; }
+  @media (max-width: 520px) { .scope-seen em { flex-basis: 100%; text-align: left; padding-left: 1.4em; } }
   .scope-seen .sm { font-size: 0.74rem; color: var(--ink-faint); }
   .scope-explain p { margin: 0 0 8px; } .scope-honest { border-left: 3px solid var(--accent); padding-left: 8px; }
   .calc { display: flex; gap: 8px; align-items: flex-end; flex-wrap: wrap; margin-top: 6px; }
