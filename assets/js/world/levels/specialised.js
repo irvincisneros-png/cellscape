@@ -1407,7 +1407,7 @@ function buildXylem(X) {
     const bY = 32;
     for (let i = 0; i < NW; i++) {
       const w = wd[i];
-      if (S.bubble) { if (w.y < bY - 24) w.y = Math.min(w.y + dt * 3, bY - 24 - (i % 5) * 1.8); }
+      if (S.bubble) { if (w.y < bY - 24 && S.tension > 0) w.y = Math.min(w.y + dt * 3, bY - 24 - (i % 5) * 1.8); }   // water below the bubble only creeps up to it while there is pull
       else w.y += v * dt;
       if (w.y > 100) w.y = -100;
       const hidden = S.bubble && Math.abs(w.y - bY) < 23;

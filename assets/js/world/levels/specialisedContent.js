@@ -193,7 +193,8 @@ export function palisadeState(light, co2 = 1, avoidance = true) {
   // limiting factor from the model's own sensitivity: how much +10 % of full light or CO2 would add
   const at = (l, c) => { const a = l * (1 - 0.3 * (avoidance ? smooth(l, 0.7, 1.0) : 0)); return clamp(100 * (a * (1 + K) / (a + K)) * (c * (1 + Kc) / (c + Kc)), 0, 100); };
   const gainLight = at(Math.min(1, light + 0.1), co2) - rate, gainCo2 = at(light, Math.min(1, co2 + 0.1)) - rate;
-  const limiting = gainLight > 1.6 * gainCo2 ? "light" : gainCo2 > 1.6 * gainLight ? "co2" : "both";
+  // "none": neither more light nor more CO2 adds anything here (both already at their maximum, or another factor limits)
+  const limiting = Math.max(gainLight, gainCo2) < 0.5 ? "none" : gainLight > 1.6 * gainCo2 ? "light" : gainCo2 > 1.6 * gainLight ? "co2" : "both";
   return { light, co2, avoid, absorbed, rate, limiting, gainLight, gainCo2, o2: rate, glucose: rate };
 }
 
@@ -601,8 +602,8 @@ export function narrative(id, S, band) {
     const p = palisadeState(S.light, S.co2, S.avoid), gl = p.gainLight, gc = p.gainCo2;
     const lim = p.limiting;
     out.push(y7
-      ? `Photosynthesis is running at <b>${f0(p.rate)} %</b> of its maximum. ${lim === "light" ? "More light would help most." : lim === "co2" ? "More carbon dioxide would help more than more light." : "More of either would help a little: it is close to its limit."}`
-      : `Rate: <b>${f0(p.rate)} %</b> of maximum. Raising light by 10 % of full would change it by <b>${gl >= 0 ? "+" : ""}${f1(gl)} %</b>; raising CO₂ by 10 % of full would give <b>${gc >= 0 ? "+" : ""}${f1(gc)} %</b>. So the limiting factor is ${lim === "light" ? "<b>light</b>" : lim === "co2" ? "<b>CO₂</b>" : "<b>both light and CO₂ about equally</b>"}.`);
+      ? `Photosynthesis is running at <b>${f0(p.rate)} %</b> of its maximum. ${lim === "light" ? "More light would help most." : lim === "co2" ? "More carbon dioxide would help more than more light." : lim === "none" ? "More light or carbon dioxide would not help now: something else, like temperature, is holding it back." : "More of either would help a little: it is close to its limit."}`
+      : `Rate: <b>${f0(p.rate)} %</b> of maximum. Raising light by 10 % of full would change it by <b>${gl >= 0 ? "+" : ""}${f1(gl)} %</b>; raising CO₂ by 10 % of full would give <b>${gc >= 0 ? "+" : ""}${f1(gc)} %</b>. ${lim === "none" ? "Neither increase helps at these settings, so in this model the rate is at its ceiling (in a real leaf another factor, such as temperature or enzyme capacity, would now be limiting)." : `So the limiting factor is ${lim === "light" ? "<b>light</b>" : lim === "co2" ? "<b>CO₂</b>" : "<b>both light and CO₂ about equally</b>"}.`}`);
     if (S.avoid && p.avoid > 0.15) out.push(adv ? `In bright light about ${f0(100 * p.avoid)} % of the chloroplasts have moved to the side walls (<b>chloroplast avoidance</b>), which reduces light absorbed to ${f0(100 * p.absorbed / Math.max(p.light, 0.01))} % of the incident light and protects the photosystems.` : "In very bright light the chloroplasts slide to the sides of the cell, away from the light, so they do not get damaged.");
     out.push(`Oxygen made and glucose made rise and fall with the rate (here ${f0(p.o2)} % of max).`);
     return out;
