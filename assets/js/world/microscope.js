@@ -28,12 +28,14 @@ const ZAXIS = new THREE.Vector3(0, 0, 1);
 
 // ---------- shaders ----------
 const VERT = `
+  uniform float uK;   // 1, or a shrink factor that draws a structure at its true size (ribosomes in the electron view)
   varying vec3 vN; varying vec3 vV; varying vec3 vL; varying vec3 vP;
   #include <clipping_planes_pars_vertex>
   void main() {
     #include <beginnormal_vertex>
     #include <defaultnormal_vertex>
     #include <begin_vertex>
+    transformed *= uK;
     #include <project_vertex>
     vL = position;
     vec4 wp = vec4(transformed, 1.0);
@@ -96,20 +98,22 @@ const FRAG = `
     gl_FragColor = vec4(c, mix(uA0, uA1, f) * w);
   }`;
 const PVERT = `
-  uniform float uSize, uScale;
+  uniform float uSize, uScale; varying float vD;
   #include <clipping_planes_pars_vertex>
   void main() {
     vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
     gl_Position = projectionMatrix * mvPosition;
     gl_PointSize = max(uSize * uScale / -mvPosition.z, 1.6);
+    vD = -mvPosition.z;
     #include <clipping_planes_vertex>
   }`;
 const PFRAG = `
-  uniform vec3 uC0; uniform float uGain;
+  uniform vec3 uC0; uniform float uGain, uFocusZ, uSig; varying float vD;
   #include <clipping_planes_pars_fragment>
   void main() {
     #include <clipping_planes_fragment>
-    float a = smoothstep(1.0, 0.45, length(gl_PointCoord - 0.5) * 2.0) * uGain;
+    float dz = (vD - uFocusZ) / uSig;
+    float a = smoothstep(1.0, 0.45, length(gl_PointCoord - 0.5) * 2.0) * uGain * exp(-0.5 * dz * dz);   // only points near the focal plane / in the section
     gl_FragColor = vec4(mix(vec3(1.0), uC0, a), 1.0);
   }`;
 // the neighbouring tissue: walls, a pale cytoplasm and a nucleus in every cell, except the middle cell (the 3D model)
@@ -262,7 +266,7 @@ class Scope {
       focusTravel: 0, rulerReads: [], temMaxMag: 0, calcOk: false, compareOpened: false,
     };
     this.kcache = new WeakMap(); this.matCache = new Map(); this.ptsCache = new Map();
-    this._draw = []; this._hide = []; this._sceneHide = [];
+    this._draw = []; this._hide = []; this._sceneHide = []; this.drawn = new Set();
     this.planes = [new THREE.Plane(), new THREE.Plane()];
     this.pxU = { value: 1 }; this.lineU = { value: 1 };   // world units per device pixel, and the membrane line width scale (electron view)
     this.focusU = { value: 0 }; this.sigU = { value: 1e6 };   // shared by every structure material: where the focal plane is (view depth) and how soft the focus is
@@ -278,6 +282,13 @@ class Scope {
     this.obr = function (renderer, scene, camera, geometry, material) {
       const u = material.uniforms?.uObj;
       if (!u) return;
+      let kk = 1;
+      if (material.userData.trueUm && geometry.attributes?.position) {   // draw at true size: shrink the enlarged model geometry about its own centre
+        if (!geometry.boundingBox) geometry.computeBoundingBox();
+        const b = geometry.boundingBox, md = Math.max(b.max.x - b.min.x, b.max.y - b.min.y, b.max.z - b.min.z);
+        if (md > 0) kk = Math.min(1, material.userData.trueUm / md);
+      }
+      material.uniforms.uK.value = kk;
       if (this.isInstancedMesh || !geometry.attributes?.position) u.value.set(0, 0, 0);
       else {
         if (!geometry.boundingBox) geometry.computeBoundingBox();
@@ -292,13 +303,18 @@ class Scope {
 
   // ---------- on / off ----------
   activate() {
-    const e = this.engine, r = e.renderer;
+    const e = this.engine, r = e.renderer, c = e.controls, proto = Object.getPrototypeOf(e);
     this.active = true;   // so a failed start can still be undone with deactivate()
+    // snapshot everything we are about to change, so deactivate() can put it back exactly
     this.snap = {
       pos: e.camera.position.clone(), target: e.controls.target.clone(), userMoved: e.userMoved, inst: e.current,
-      overlay: e.overlay ? e.overlay.style.visibility : "",
+      overlay: e.overlay ? e.overlay.style.visibility : "", tm: r.toneMapping, clip: r.clippingPlanes, clay: !!e.style.clay,
+      ctl: this.captureControls(),
     };
-    const c = e.controls;
+    this.wantStyle = this.snap.clay ? "clay" : "real";
+    // the clay look moves and half-cuts organelles: show the real layout while the microscope is on (the look comes back on exit)
+    if (this.snap.clay) { proto.setStyle.call(e, "real"); this.cancelFlight(); }
+    this.replace(e, "setStyle", (name) => { this.wantStyle = name === "clay" ? "clay" : "real"; e.toast?.("The art style can't change while the microscope is on. It will switch when you turn the microscope off."); e.onStyle?.(e.styleName); });
     this.rp = e.composer.passes.find((p) => p instanceof RenderPass);
     this.rpWas = this.rp ? this.rp.enabled : true;
     this.renderPass = new ScopeRenderPass(this);
@@ -317,7 +333,7 @@ class Scope {
     c.touches.ONE = THREE.TOUCH.PAN;
     e.userMoved = true;
     this.replace(e, "pick", () => null);
-    this.replace(e, "dive", (p) => { this.deactivate("This level is a magnified model, below what a light microscope can resolve. Microscope switched off. Try the electron microscope on the whole cell."); return Object.getPrototypeOf(e).dive.call(e, p); });
+    this.replace(e, "dive", (p) => { this.deactivate("Microscope switched off: this simulator only models the microscope on whole cells. (Real light microscopes can't resolve molecules; try the electron microscope on the whole cell.)"); return Object.getPrototypeOf(e).dive.call(e, p); });
     e.setHover?.(null);
     if (e.overlay) e.overlay.style.visibility = "hidden";
     e.stageEl.classList.add("scope-on");
@@ -333,6 +349,16 @@ class Scope {
     this.logD = Math.log(Math.max(1e-3, e.camera.position.distanceTo(c.target)));
   }
 
+  captureControls() {
+    const e = this.engine, c = e.controls, cam = e.camera;
+    return { rot: c.enableRotate, zoom: c.enableZoom, L: c.mouseButtons.LEFT, R: c.mouseButtons.RIGHT, t1: c.touches.ONE, min: c.minDistance, max: c.maxDistance, near: cam.near, far: cam.far, damp: c.enableDamping };
+  }
+
+  cancelFlight() {
+    const e = this.engine;
+    if (e.flight) { const f = e.flight; e.flight = null; try { f.res?.(); } catch (err) { console.error(err); } }
+  }
+
   replace(obj, key, fn) {
     this.own.push([obj, key, Object.prototype.hasOwnProperty.call(obj, key), obj[key]]);
     obj[key] = fn;
@@ -342,7 +368,7 @@ class Scope {
   deactivate(message) {
     if (!this.active) return;
     this.active = false;
-    const e = this.engine, c = e.controls, r = e.renderer;
+    const e = this.engine, c = e.controls, r = e.renderer, proto = Object.getPrototypeOf(e), sn = this.snap;
     for (const [obj, key, had, val] of this.own.reverse()) { if (had) obj[key] = val; else delete obj[key]; }
     this.own = [];
     if (this.renderPass) { e.composer.removePass(this.renderPass); this.renderPass.dispose(); }
@@ -350,19 +376,25 @@ class Scope {
     if (this.rp) this.rp.enabled = this.rpWas;
     e.scopeActive = false;
     e.refreshPost();
-    r.toneMapping = e.style.clay ? THREE.NeutralToneMapping : THREE.ACESFilmicToneMapping;
-    r.clippingPlanes = [];
+    this.cancelFlight();
     const L = e.current;
-    c.enableRotate = true; c.enableZoom = true;
-    c.mouseButtons.LEFT = L?.leftDragRotate === false ? null : THREE.MOUSE.ROTATE; c.mouseButtons.RIGHT = THREE.MOUSE.ROTATE;
-    c.touches.ONE = THREE.TOUCH.ROTATE;
-    // the camera limits are the level's own (what Engine.mount sets)
-    c.minDistance = L?.minDistance ?? 0.1; c.maxDistance = L?.maxDistance ?? 100;
-    e.camera.near = L?.near ?? c.minDistance * 0.05; e.camera.far = L?.far ?? c.maxDistance * 20;
-    e.camera.updateProjectionMatrix();
-    if (!this.snap) { /* never got going */ }
-    else if (L === this.snap.inst) { e.camera.position.copy(this.snap.pos); c.target.copy(this.snap.target); e.userMoved = this.snap.userMoved; c.update(); }
-    else if (L) { e.frame(L.view); e.userMoved = false; }   // switched cells (plant <-> animal) meanwhile: frame the new one
+    // the art style the student wants (the clay look is restored here if it was on)
+    if (sn && this.wantStyle === "clay" && !e.style.clay) { proto.setStyle.call(e, "clay"); this.cancelFlight(); }
+    else if (sn && this.wantStyle === "real" && e.style.clay) { proto.setStyle.call(e, "real"); this.cancelFlight(); }
+    const sameStyle = !sn || !!e.style.clay === sn.clay;
+    if (sn) {
+      r.clippingPlanes = sn.clip;
+      if (sameStyle) r.toneMapping = sn.tm;
+      const k = sameStyle && L === sn.inst ? sn.ctl : this.ctlNow || sn.ctl;   // after a plant <-> animal swap, the new level's own settings
+      c.enableRotate = k.rot; c.enableZoom = k.zoom; c.mouseButtons.LEFT = k.L; c.mouseButtons.RIGHT = k.R; c.touches.ONE = k.t1;
+      c.minDistance = k.min; c.maxDistance = k.max; e.camera.near = k.near; e.camera.far = k.far; e.camera.updateProjectionMatrix();
+      c.enableDamping = false; c.update();   // flush any pending pan velocity before putting the camera back
+      if (L === sn.inst && sameStyle) { e.camera.position.copy(sn.pos); c.target.copy(sn.target); e.userMoved = sn.userMoved; }
+      else if (L) { e.frame(L.view); e.userMoved = false; }   // different cell or look: frame the level itself
+      c.update();
+      c.enableDamping = k.damp;
+    } else r.clippingPlanes = [];
+    this.fly = null;
     if (e.overlay && this.snap) e.overlay.style.visibility = this.snap.overlay;
     e.stageEl.classList.remove("scope-on");
     if (this.group) { e.scene.remove(this.group); this.group.traverse((o) => { o.geometry?.dispose?.(); o.material?.dispose?.(); }); }
@@ -379,11 +411,15 @@ class Scope {
 
   // ---------- the level the microscope is looking at ----------
   attachLevel(L) {
+    if (this.inst && this.inst !== L && this.snap) {   // Engine.mount has just set the new level's own limits and left-button binding; the rest we changed ourselves
+      const n = this.captureControls();
+      this.ctlNow = { ...this.snap.ctl, L: n.L, min: n.min, max: n.max, near: n.near, far: n.far };
+    }
     this.inst = L;
     this.hint = L?.microscope || null;
     this.kcache = new WeakMap();
     const e = this.engine;
-    if (!this.hint) { setTimeout(() => this.deactivate("The microscope works on the whole cell. Go back up to the cell, then switch it on."), 0); return; }
+    if (!this.hint) { setTimeout(() => this.deactivate("The microscope only works on the whole cell in this simulator. Go back up to the cell, then switch it on."), 0); return; }
     const h = this.hint;
     // tissue lattice for the light microscope
     if (this.lattice) { this.group.remove(this.lattice); this.lattice.geometry.dispose(); this.lattice.material.dispose(); }
@@ -433,8 +469,9 @@ class Scope {
     if (!m) {
       m = new THREE.ShaderMaterial({
         vertexShader: VERT, fragmentShader: FRAG, clipping: true, side: THREE.DoubleSide, transparent: true, depthWrite: false, depthTest: false,
-        uniforms: { uC0: { value: new THREE.Color(spec.fill) }, uC1: { value: new THREE.Color(spec.edge) }, uPow: { value: spec.pow }, uA0: { value: spec.a0 }, uA1: { value: spec.a1 }, uGain: { value: spec.gain }, uFocusZ: this.focusU, uSig: this.sigU, uObj: { value: new THREE.Vector3() }, uTex: { value: spec.tex || 0 }, uDbl: { value: spec.dbl ? 1 : 0 }, uPxU: this.pxU, uLine: this.lineU },
+        uniforms: { uC0: { value: new THREE.Color(spec.fill) }, uC1: { value: new THREE.Color(spec.edge) }, uPow: { value: spec.pow }, uA0: { value: spec.a0 }, uA1: { value: spec.a1 }, uGain: { value: spec.gain }, uFocusZ: this.focusU, uSig: this.sigU, uObj: { value: new THREE.Vector3() }, uTex: { value: spec.tex || 0 }, uDbl: { value: spec.dbl ? 1 : 0 }, uPxU: this.pxU, uLine: this.lineU, uK: { value: 1 } },
       });
+      m.userData.trueUm = this.S.mode === "em" ? C.KINDS[kind].trueUm || 0 : 0;
       if (spec.blend === "paint") m.blending = THREE.NormalBlending;
       else { m.blending = THREE.MultiplyBlending; m.premultipliedAlpha = true; }
       this.matCache.set(key, m);
@@ -449,7 +486,7 @@ class Scope {
       m = new THREE.ShaderMaterial({
         vertexShader: PVERT, fragmentShader: PFRAG, clipping: true, transparent: true, depthWrite: false, depthTest: false,
         blending: THREE.MultiplyBlending, premultipliedAlpha: true,
-        uniforms: { uC0: { value: new THREE.Color(spec.fill) }, uGain: { value: spec.gain }, uSize: { value: size }, uScale: { value: 500 } },
+        uniforms: { uC0: { value: new THREE.Color(spec.fill) }, uGain: { value: spec.gain }, uSize: { value: size }, uScale: { value: 500 }, uFocusZ: this.focusU, uSig: this.sigU },
       });
       this.ptsCache.set(key, m);
     }
@@ -463,13 +500,16 @@ class Scope {
     this.lastT = now;
     const w = e.w, hgt = e.h, dpr = (this.renderPass?.rtS.width || w) / w;   // render pixels per CSS pixel
     const dref = Math.min(w, Math.max(120, hgt - DOCK_PAD)) * FIELD;
-    const fovUm = S.mode === "lm" ? C.lmFovUm(S.obj) : C.temFovUm(S.temMag);
+    const fovUm = S.mode === "lm" ? C.lmFovUm(S.obj) : C.temFovUm(S.temMag);   // where the objective / magnification is heading
     const mpu = e.metersPerUnit() || 1e-6, fovUnits = (fovUm * 1e-6) / mpu;
     const tanH = Math.tan(THREE.MathUtils.degToRad(cam.fov / 2));
     const dWant = fovUnits / (2 * tanH * (dref / hgt));
     const k = e.reducedMotion ? 1 : 1 - Math.exp(-9 * dt);
     this.logD += (Math.log(dWant) - this.logD) * k;
     const d = Math.exp(this.logD);
+    // the field of view the camera really has this frame (it eases towards the target, so this can differ from fovUm)
+    const fovUnitsNow = 2 * tanH * d * (dref / hgt), fovNow = fovUnitsNow * mpu * 1e6;
+    const settling = Math.abs(Math.log(dWant) - this.logD) > 0.004 || (1 - this.dir.dot(ZAXIS)) > 1e-5 || !!this.fly;
     // look straight down the cell's z axis (ease the direction round so the change is smooth)
     this.dir.lerp(ZAXIS, e.reducedMotion ? 1 : 1 - Math.exp(-6 * dt)).normalize();
     // pan: the stage can move, within the slide (LM) or the cell (TEM)
@@ -484,13 +524,16 @@ class Scope {
     cam.position.copy(t).addScaledVector(this.dir, d);
     cam.lookAt(t);
     c.minDistance = 1e-3; c.maxDistance = 1e9;
+    c.enableRotate = false; c.enableZoom = false;   // (Engine.mount resets these when plant <-> animal swaps)
+    c.mouseButtons.LEFT = THREE.MOUSE.PAN; c.mouseButtons.RIGHT = THREE.MOUSE.PAN; c.touches.ONE = THREE.TOUCH.PAN;
     const near = Math.max(0.005, d - 90), far = d + 90;
     if (Math.abs(cam.near - near) > 1e-6 || Math.abs(cam.far - far) > 1e-6) { cam.near = near; cam.far = far; cam.updateProjectionMatrix(); }
     cam.updateMatrixWorld();
     e.renderer.toneMapping = THREE.NoToneMapping;
     // optics in screen terms
     const px = this.px;
-    px.dref = dref; px.dpr = dpr; px.fovUm = fovUm; px.pxPerUm = dref / fovUm; px.unitsPerPx = fovUnits / dref; px.dt = dt;
+    px.dref = dref; px.dpr = dpr; px.fovUm = fovNow; px.fovNominal = fovUm; px.settling = settling; px.pxPerUm = dref / fovNow; px.unitsPerPx = fovUnitsNow / dref; px.dt = dt;
+    px.visibleW = fovNow * w / dref; px.visibleWNominal = fovUm * w / dref;
     px.cx = w / 2; px.cy = hgt / 2;
     // the optical section: a slab perpendicular to the view direction
     this.f.copy(this.dir).negate();
@@ -508,7 +551,7 @@ class Scope {
     this.coverage = clamp((hi - lo) / depth, 0, 1);
     this.half = half;
     this.focusU.value = d + centre;                // view depth of the focal plane
-    this.softSigma = S.mode === "lm" ? clamp(C.objectiveOf(S.obj).dof * 0.9, 3, 1e4) : 2.2;
+    this.softSigma = S.mode === "lm" ? clamp(C.objectiveOf(S.obj).dof * 0.9, 3, 1e4) : 0.3;   // TEM: only what the thin section cuts through
     // scale: point sprites (ribosomes) need pixels per unit at the target distance
     this.pointScale = (hgt * dpr) / (2 * tanH);
   }
@@ -528,62 +571,70 @@ class Scope {
       if (!spec || (om && om.visible === false)) { hide.push(o); return; }
       draw.push(o, k, spec);
     });
-    for (const ch of scene.children) if (ch !== L.root && ch !== this.group && ch.visible) { ch.visible = false; sh.push(ch); }
-    // swap in the absorbance materials (restored below, inside this frame)
-    for (let i = 0; i < draw.length; i += 3) {
-      const o = draw[i], k = draw[i + 1], spec = draw[i + 2];
-      o.userData._scopeMat = o.material; o.userData._scopeRO = o.renderOrder;
-      if (o.isPoints) {
-        const m = this.ptsMat(k, spec, (o.userData.realMat || o.material)?.size || 0.2);
-        m.uniforms.uScale.value = this.pointScale;
-        o.material = m;
-      } else o.material = this.matFor(k, spec);
-      o.renderOrder = C.KINDS[k].order;
-      o.userData._scopeObr = o.onBeforeRender; o.onBeforeRender = this.obr;
-    }
-    for (const o of hide) o.userData._scopeVis = o.visible, o.visible = false;
-    // lattice: the neighbouring tissue (light microscope only)
-    const lat = this.lattice, lu = lat.material.uniforms, st = S.stain;
-    const KM = C.KINDS.membrane.lm, KW = C.KINDS.wall.lm, KN = C.KINDS.nucleus.lm;
-    const KC = C.KINDS.chloroplast.lm;
-    lu.uChl.value.set((KC[st] || KC.none).fill);
-    lu.uCyto.value.set((KM[st] || KM.none).fill); lu.uNuc.value.set((KN[st] || KN.none).fill);
-    lu.uWall.value.set((this.hint.tissue === "animal" ? KM : KW)[st]?.edge || (this.hint.tissue === "animal" ? KM : KW).none.edge);
-    lu.uPx.value = this.px.unitsPerPx;
-    const depth = this.hint.depthUm || 34, dist = Math.max(0, Math.abs(S.focus) - depth / 2 - this.half);
-    lu.uFade.value = S.mode === "lm" ? clamp(1 - dist / 6, 0.15, 1) : 0;
-    lat.visible = S.mode === "lm";
-    const prevColor = renderer.getClearColor(this._cc || (this._cc = new THREE.Color())), prevAlpha = renderer.getClearAlpha();
-    const prevAuto = renderer.autoClear;
-    renderer.autoClear = true;
-    renderer.setClearColor(0xffffff, 1);
-    // S: the sharp slice
-    renderer.clippingPlanes = this.planes;
-    renderer.setRenderTarget(rtS);
-    renderer.render(scene, cam);
-    // F: the whole cell with a soft focus (stained fill and out-of-focus glow). The LM leaves out the tiny, faint structures here.
-    const needF = this.wF() > 0.001, lmode = S.mode === "lm";
-    if (needF) {
-      const skip = (k) => lmode && !C.KINDS[k].hz;
-      for (let i = 0; i < draw.length; i += 3) if (skip(draw[i + 1])) { draw[i].userData._scopeVis = draw[i].visible; draw[i].visible = false; }
-      lat.visible = false;
-      this.sigU.value = this.softSigma;
-      renderer.clippingPlanes = this.noPlanes;
-      renderer.setRenderTarget(rtF);
+    const drawn = this.drawn, lat = this.lattice, prevAuto = renderer.autoClear, prevColor = renderer.getClearColor(this._cc || (this._cc = new THREE.Color())), prevAlpha = renderer.getClearAlpha();
+    drawn.clear();
+    try {
+      for (const ch of scene.children) if (ch !== L.root && ch !== this.group && ch.visible) { ch.visible = false; sh.push(ch); }
+      // swap in the absorbance materials (restored below, inside this frame)
+      for (let i = 0; i < draw.length; i += 3) {
+        const o = draw[i], k = draw[i + 1], spec = draw[i + 2];
+        o.userData._scopeMat = o.material; o.userData._scopeRO = o.renderOrder;
+        drawn.add(k);
+        if (o.isPoints) {
+          const m = this.ptsMat(k, spec, (S.mode === "em" && C.KINDS[k].trueUm) || (o.userData.realMat || o.material)?.size || 0.2);   // electron view: ribosome dots at their true 25 nm
+          m.uniforms.uScale.value = this.pointScale;
+          o.material = m;
+        } else o.material = this.matFor(k, spec);
+        o.renderOrder = C.KINDS[k].order;
+        o.userData._scopeObr = o.onBeforeRender; o.onBeforeRender = this.obr;
+      }
+      for (const o of hide) o.userData._scopeVis = o.visible, o.visible = false;
+      // lattice: the neighbouring tissue (light microscope only)
+      const lu = lat.material.uniforms, st = S.stain;
+      const KM = C.KINDS.membrane.lm, KW = C.KINDS.wall.lm, KN = C.KINDS.nucleus.lm;
+      const KC = C.KINDS.chloroplast.lm;
+      lu.uChl.value.set((KC[st] || KC.none).fill);
+      lu.uCyto.value.set((KM[st] || KM.none).fill); lu.uNuc.value.set((KN[st] || KN.none).fill);
+      lu.uWall.value.set((this.hint.tissue === "animal" ? KM : KW)[st]?.edge || (this.hint.tissue === "animal" ? KM : KW).none.edge);
+      lu.uPx.value = this.px.unitsPerPx;
+      const depth = this.hint.depthUm || 34, dist = Math.max(0, Math.abs(S.focus) - depth / 2 - this.half);
+      lu.uFade.value = S.mode === "lm" ? clamp(1 - dist / 6, 0.15, 1) : 0;
+      lat.visible = S.mode === "lm";
+      renderer.autoClear = true;
+      renderer.setClearColor(0xffffff, 1);
+      // S: the sharp slice
+      renderer.clippingPlanes = this.planes;
+      renderer.setRenderTarget(rtS);
       renderer.render(scene, cam);
-      this.sigU.value = 1e6;
-      for (let i = 0; i < draw.length; i += 3) if (skip(draw[i + 1])) draw[i].visible = draw[i].userData._scopeVis;
+      // F: the whole cell with a soft focus (stained fill and out-of-focus glow). The LM leaves out the tiny, faint structures here.
+      const needF = this.wF() > 0.001, lmode = S.mode === "lm";
+      if (needF) {
+        const skip = (k) => lmode && !C.KINDS[k].hz;
+        for (let i = 0; i < draw.length; i += 3) if (skip(draw[i + 1])) { draw[i].userData._scopeVis = draw[i].visible; draw[i].visible = false; }
+        lat.visible = false;
+        this.sigU.value = this.softSigma;
+        renderer.clippingPlanes = this.noPlanes;
+        renderer.setRenderTarget(rtF);
+        renderer.render(scene, cam);
+        this.sigU.value = 1e6;
+        for (let i = 0; i < draw.length; i += 3) if (skip(draw[i + 1])) draw[i].visible = draw[i].userData._scopeVis;
+      }
+    } finally {
+      // put everything back, whatever happened above
+      for (let i = 0; i < draw.length; i += 3) {
+        const o = draw[i], u = o.userData;
+        if (u._scopeMat !== undefined) { o.material = u._scopeMat; o.renderOrder = u._scopeRO; o.onBeforeRender = u._scopeObr; }
+        if (u._scopeVis !== undefined) o.visible = u._scopeVis;
+        delete u._scopeMat; delete u._scopeRO; delete u._scopeObr; delete u._scopeVis;
+      }
+      for (const o of hide) { if (o.userData._scopeVis !== undefined) o.visible = o.userData._scopeVis; delete o.userData._scopeVis; }
+      for (const ch of sh) ch.visible = true;
+      lat.visible = true;
+      renderer.clippingPlanes = this.noPlanes;
+      renderer.setClearColor(prevColor, prevAlpha);
+      renderer.autoClear = prevAuto;
+      renderer.setRenderTarget(null);
     }
-    // put everything back
-    for (let i = 0; i < draw.length; i += 3) { const o = draw[i]; o.material = o.userData._scopeMat; o.renderOrder = o.userData._scopeRO; o.onBeforeRender = o.userData._scopeObr; delete o.userData._scopeMat; delete o.userData._scopeRO; delete o.userData._scopeObr; }
-    for (const o of hide) { o.visible = o.userData._scopeVis; delete o.userData._scopeVis; }
-    for (const ch of sh) ch.visible = true;
-    for (let i = 0; i < draw.length; i += 3) delete draw[i].userData._scopeVis;
-    lat.visible = true;
-    renderer.clippingPlanes = this.noPlanes;
-    renderer.setClearColor(prevColor, prevAlpha);
-    renderer.autoClear = prevAuto;
-    renderer.setRenderTarget(null);
     this.updateUI();
   }
 
@@ -758,15 +809,17 @@ class Scope {
       ln.setAttribute("x1", a.x); ln.setAttribute("y1", a.y); ln.setAttribute("x2", b.x); ln.setAttribute("y2", b.y);
       [[ticks[0], a], [ticks[1], b]].forEach(([t, p]) => { t.setAttribute("x1", p.x - nx); t.setAttribute("y1", p.y - ny); t.setAttribute("x2", p.x + nx); t.setAttribute("y2", p.y + ny); });
       const um = L / this.px.pxPerUm;
-      val.textContent = C.fmtLen(um);
+      val.textContent = this.px.settling ? "…" : C.fmtLen(um) + (this.S.mode === "em" ? " (model)" : "");
       val.style.transform = `translate(${(a.x + b.x) / 2}px, ${(a.y + b.y) / 2}px) translate(-50%, -140%)`;
       return um;
     };
     this.redrawRuler = () => { if (a && b && box.classList.contains("has")) draw(); };
     const pos = (ev) => { const r = box.getBoundingClientRect(); return { x: ev.clientX - r.left, y: ev.clientY - r.top }; };
-    box.addEventListener("pointerdown", (ev) => { if (!this.S.ruler) return; box.setPointerCapture(ev.pointerId); drag = true; a = pos(ev); b = a; box.classList.add("has"); draw(); ev.preventDefault(); });
+    box.addEventListener("pointerdown", (ev) => { if (!this.S.ruler) return;
+      if (this.px.settling) { this.engine.toast?.("Wait for the view to stop zooming, then measure."); return; }
+      box.setPointerCapture(ev.pointerId); drag = true; a = pos(ev); b = a; box.classList.add("has"); draw(); ev.preventDefault(); });
     box.addEventListener("pointermove", (ev) => { if (!drag) return; b = pos(ev); draw(); });
-    const end = () => { if (!drag) return; drag = false; const um = draw(); if (um && Math.hypot(b.x - a.x, b.y - a.y) > 8) this.S.rulerReads.push(um); };
+    const end = () => { if (!drag) return; drag = false; const um = draw(); if (um && !this.px.settling && Math.hypot(b.x - a.x, b.y - a.y) > 5) this.S.rulerReads.push(um); };
     box.addEventListener("pointerup", end); box.addEventListener("pointercancel", end);
   }
 
@@ -775,24 +828,25 @@ class Scope {
     const ui = this.ui, S = this.S, px = this.px, lens = this.engine.lens, band = lens.band;
     if (!ui.hud) return;
     const lm = S.mode === "lm", o = C.objectiveOf(S.obj);
-    const mag = lm ? C.lmMag(S.obj) : S.temMag, fov = px.fovUm;
+    const mag = lm ? C.lmMag(S.obj) : S.temMag, fov = px.fovNominal ?? px.fovUm;
     const limit = lm ? C.lmLimitUm(S.obj) : C.temLimitUm();
     let html;
     if (lm) {
       html = `<div class="big">×${mag.toLocaleString("en-AU")}</div><div class="sm">${band === "y7-8" ? `10× eyepiece × ${o.x}× objective` : `10× eyepiece × ${o.x}× objective (NA ${o.na})`}</div>`
-        + `<div>Field of view <b>${C.fmtLen(fov)}</b></div><div>Smallest detail ≈ <b>${C.fmtLen(limit)}</b>${o.x < 100 ? ` <span class="sm">(best light microscope ≈ 0.2 µm)</span>` : ""}</div>`;
+        + `<div>Field of view <b>${C.fmtLen(fov)}</b></div><div>Smallest detail ≈ <b>${C.fmtLen(limit)}</b>${o.x < 100 ? ` <span class="sm">(conventional best ≈ 0.2 µm)</span>` : ""}</div>`;
     } else {
       html = `<div class="big">×${mag.toLocaleString("en-AU")}</div><div class="sm">Transmission electron microscope (model)</div>`
-        + `<div>Image width <b>${C.fmtLen(fov)}</b></div><div>Smallest detail ≈ <b>1 nm</b></div>`;
+        + `<div>Width of view <b>${C.fmtLen(px.visibleWNominal ?? fov)}</b></div><div>Smallest detail ≈ <b>1 nm</b> <span class="sm">(real TEM; magnification is for a 100 mm tall print)</span></div>`;
     }
     if (html !== ui._hud) { ui._hud = html; ui.hud.innerHTML = html; }
     // scale bar
-    const nice = C.niceLen(fov * 0.2), wpx = nice * px.pxPerUm;
+    const nice = C.niceLen(px.fovUm * 0.2), wpx = nice * px.pxPerUm;   // (the scale bar follows the camera as it really is)
     const txt = C.fmtLen(nice), key = `${txt}|${Math.round(wpx)}|${S.mode}`;
     if (key !== ui._bar) { ui._bar = key; ui.bar.firstChild.style.width = `${wpx.toFixed(1)}px`; ui.bar.lastChild.textContent = txt; }
     const R = px.dref / 2, bx = lm ? px.cx - R * 0.58 : px.cx - R + 4, by = lm ? px.cy + R * 0.64 : px.cy + R - 8;
     ui.bar.style.transform = `translate(${bx.toFixed(0)}px, ${by.toFixed(0)}px)`;
     ui.bar.classList.toggle("em", !lm);
+    if (this.drawn.size !== this._dk) { this._dk = this.drawn.size; this._cardsDirty = true; }
     this.redrawRuler?.();
     this.missionsCard?.update();
     if (this._cardsDirty) { this._cardsDirty = false; this.fillSeen(); }
@@ -868,13 +922,13 @@ class Scope {
     const lm = S.mode === "lm", lim = lm ? C.lmLimitUm(S.obj) : C.temLimitUm();
     const rows = (h.parts || []).map((k) => {
       const K_ = C.KINDS[k]; if (!K_) return "";
-      const shown = this.specFor(k) != null;
+      const spec = this.specFor(k), shown = spec != null && this.drawn.has(k), notDrawn = spec != null && !shown;
       const faint = lm && shown && K_.lmFrom >= 40;
-      const tag = shown ? (faint ? "just visible (a speck)" : "visible") : lm ? (K_.um < lim * 1.5 || K_.lmFrom === Infinity ? "too small to see" : "too small at this power") : "—";
+      const tag = notDrawn ? "not drawn at this graphics quality" : shown ? (faint ? "just visible (a speck)" : K_.exag && !lm ? "visible (enlarged in the model)" : "visible") : lm ? (K_.um < lim * 1.5 || K_.lmFrom === Infinity ? "too small to see" : "too small at this power") : "—";
       const size = lens.atLeast("y9-10") ? ` <span class="sm">≈&nbsp;${esc(C.fmtLen(K_.um).replace(" ", "\u00a0"))}</span>` : "";
       return `<li class="${shown ? "yes" : "no"}"><span>${shown ? "✔" : "✖"}</span><b class="nm">${esc(K_.name)}${size}</b><em>${tag}</em></li>`;
     }).join("");
-    const key = rows + lm + S.obj + S.stain;
+    const key = rows + lm + S.obj + S.stain + [...this.drawn].sort().join();
     if (ui._seenKey === key) return;
     ui._seenKey = key;
     ui.seen.innerHTML = `<h2>What can you see right now?</h2><ul class="scope-seen">${rows}</ul><p class="hint">${esc(lm ? C.TEXT.smallDetail : "In an electron microscope the limit is about 1 nm, so membranes, ribosomes, cristae and the Golgi cisternae can all be resolved.")}</p>`;
@@ -883,12 +937,12 @@ class Scope {
   fillCompareCard() {
     const ui = this.ui, lens = this.engine.lens, S = this.S, h = this.hint;
     const sp = S.mode === "em" ? C.SPECIMENS.ecoli : C.SPECIMENS[h?.specimen || "onion"];
-    const qs = lens.pick(C.TEXT.compareQ);
-    const key = sp.file + lens.band;
+    const qs = S.mode === "em" ? lens.pick(C.TEXT.compareQEm) : lens.pick(C.TEXT.compareQ[h?.tissue === "animal" ? "animal" : "plant"]);
+    const key = sp.file + lens.band + (h?.tissue || "");
     if (ui._cmpKey === key) return;
     ui._cmpKey = key;
     ui.cmpCard.innerHTML = `<h2>Compare with a real micrograph</h2>${this.figureHtml(sp)}`
-      + (S.mode === "em" ? `<p class="hint">This is a scanning electron micrograph (SEM): it shows the surface of bacteria in 3D, not the inside of a cell. No scale is given for this image.</p>` : `<p class="hint">This is a real photo, not our model. It has no scale bar, so don't measure it.</p>`)
+      + (S.mode === "em" ? `<p class="hint">This is a scanning electron micrograph (SEM): it shows the surface of E. coli bacteria in 3D, not the inside of a cell. The photo has its own 5 µm scale bar. CDC states 4890×, but that is the magnification of the original, not of the size it appears on your screen.</p>` : `<p class="hint">This is a real photo of ${h?.tissue === "animal" ? "human cheek (epithelial) cells" : "onion bulb epidermis"}, not our ${h?.tissue === "animal" ? "liver-cell" : "leaf-cell"} model. It has no scale bar, so don't measure it.</p>`)
       + `<p><b>Think about it</b></p><ul class="scope-list">${qs.map((q) => `<li>${esc(q)}</li>`).join("")}</ul>`;
     const btn = $el("button", "btn"); btn.type = "button"; btn.textContent = "Show beside the model";
     btn.addEventListener("click", () => this.setCompare(true));
@@ -913,8 +967,8 @@ class Scope {
     const fov = C.lmFovUm(S.obj), size = fov / n, truth = (h.pitch || [h.cellUm])[0];
     const ok = Math.abs(size - truth) <= truth * 0.3;
     if (ok) S.calcOk = true;
-    const u = lens.atLeast("y11") ? ` (±${Math.round(100 / n)}% from counting ±1 cell)` : "";
-    out.innerHTML = `<b>Cell size = ${C.fmtLen(fov)} ÷ ${n} ≈ ${C.fmtLen(size)}</b>${u}.<br>${ok ? "That matches the cells in this tissue well." : (size > truth ? "That looks too big. Did you count every cell, including partial ones at the edge?" : "That looks too small. Check how many cells you counted across, in a straight line through the middle.")}`;
+    const u = lens.atLeast("y11") ? ` (about ±${Math.round(100 / n)}% from counting ±1 cell)` : "";
+    out.innerHTML = `<b>Mean cell length along the line ≈ ${C.fmtLen(fov)} ÷ ${n} ≈ ${C.fmtLen(size)}</b>${u}. This is an approximate mean.<br>${ok ? "That matches the cells along a horizontal line in this tissue well." : (size > truth ? "That looks too big. Did you count every cell the horizontal line crosses, including partial ones at the ends?" : "That looks too small. Count only along one horizontal line through the middle, not up and down.")}`;
   }
 }
 
@@ -994,7 +1048,7 @@ export function toggle(engine, btn) {
   if (engine.scope?.active) { engine.scope.deactivate(); return; }
   if (engine.busy) return;
   if (!engine.current?.microscope) {
-    engine.toast?.("The microscope works on the whole cell. Go back up to the cell, then switch it on. (Organelles and molecules are below what a light microscope can resolve; try the electron microscope.)");
+    engine.toast?.("The microscope works on the whole cell. Go back up to the cell, then switch it on. (This simulator does not model the microscope on organelle or molecule views; real light microscopes can't resolve molecules, so try the electron microscope on the whole cell.)");
     return;
   }
   const s = new Scope(engine, btn);
