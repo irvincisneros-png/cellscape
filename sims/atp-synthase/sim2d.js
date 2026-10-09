@@ -1,4 +1,4 @@
-// Cellular Respiration: The ATP Factory — electron transport chain + chemiosmosis + ATP synthase.
+// 2D fallback of the ATP Factory (used when WebGL2 is unavailable). Cellular Respiration: The ATP Factory — electron transport chain + chemiosmosis + ATP synthase.
 //
 // Model (simplified, see "Not to scale" note in the explain card):
 //  • NADH / FADH₂ arrive at rate  J = SUPPLY_MAX · NADH% · bp,  bp = 1 − 0.85·G³  (respiratory control:
@@ -23,15 +23,8 @@ const { ctx } = stage;
 const toast = K.toaster(stageEl);
 const reduceMotion = !!(window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches);
 
-// ---------- model constants ----------
-const PCAP = 120; // H⁺ in the intermembrane space at 100 % gradient
-const H_PER_TURN = 9, ATP_PER_TURN = 3;
-const STEP_H = TAU / H_PER_TURN, STEP_A = TAU / ATP_PER_TURN;
-const TURNS_MAX = 1.0; // rotor turns per (sim) second at full gradient — real enzyme ≈ 100+ per second
-const G_THRESH = 0.2; // minimum gradient needed to drive synthesis
-const SUPPLY_MAX = 1.2; // electron pairs per second at 100 % NADH supply
-const LEAK_BASE = 0.4, LEAK_DNP = 30;
-const DEF = { o2: 100, nadh: 50 };
+// ---------- model constants (shared with the 3D levels via model.js) ----------
+import { PCAP, STEP_H, STEP_A, TURNS_MAX, G_THRESH, SUPPLY_MAX, LEAK_BASE, LEAK_DNP, DEF, geff, backpressure as bpf, o2factor } from "./model.js";
 
 const st = { o2: DEF.o2, nadh: DEF.nadh, cyanide: false, dnp: false, olig: false };
 let L = { w: 0, h: 0, dpr: 0 };
@@ -42,9 +35,8 @@ let hover = null, grabbedOnce = false;
 const far = Array.from({ length: 36 }, () => ({ x: Math.random(), y: Math.random(), r: rand(0.6, 1.8), sp: rand(0.004, 0.015) }));
 
 const gradient = () => clamp(sim.pool / PCAP, 0, 1);
-const geff = (G) => clamp((G - G_THRESH) / (1 - G_THRESH), 0, 1);
-const backpressure = (G) => Math.max(0.1, 1 - 0.85 * G * G * G);
-const o2f = () => (st.cyanide ? 0 : (st.o2 / (st.o2 + 40)) * 1.4);
+const backpressure = bpf;
+const o2f = () => o2factor(st.o2, st.cyanide);
 const netATP = () => sim.made - sim.hydro;
 
 // ---------- layout ----------
