@@ -184,6 +184,13 @@ export async function boot(opts) {
     if (u.href !== location.href) history.replaceState(null, "", u);
   };
 
+  // Phase 6 add-ons. Each module owns its own cards and UI and installs itself here: revision quiz, teacher mode,
+  // keyboard/screen-reader access. onChange(fn) chains a listener for level changes (fn receives the stack).
+  const addonCtx = { engine, panelEl, stageEl, header, lens, qs, root, graphicsCard: qCard,
+    onChange: (fn) => { const p = engine.onChange; engine.onChange = (s) => { p(s); fn(s); }; } };
+  await Promise.all(["teacherMode", "revision", "a11y"].map((name) =>
+    import(`./${name}.js`).then((m) => m.install?.(addonCtx)).catch((e) => console.error(`add-on ${name}:`, e))));
+
   K.loop((dt, t) => engine.render(dt, t));
   await engine.start(start);
   return engine;
