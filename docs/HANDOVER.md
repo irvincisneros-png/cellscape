@@ -80,5 +80,5 @@ You're continuing **CellScape**, a multi-scale 3D cell-biology simulator for NSW
    - quiz banks from science-defender (shuffle and de-duplicate first);
    - teacher mode, accessibility and performance tiers;
    - GitHub Pages, **after asking me**.
-5. **Outside CellScape (ask before pushing):** fix the 8 wrong answer keys in my `equilibrium-lost` question bank and the TX/tx bug in my live Year-10 Punnett tool (both listed in the audit).
+5. **Outside CellScape (ask before pushing):** the Year-10-Science genetics fixes (TX/tx labels, codons, pedigree wording, eye colour) are committed on local branch `fix/genetics-science-errors`, not pushed. `equilibrium-lost` is excluded from the suite.
 6. I may want to play with it and give feedback first. If I do, prioritise my feedback over the plan.

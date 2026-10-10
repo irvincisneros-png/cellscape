@@ -9,7 +9,7 @@ None of the 16 science repos should be absorbed whole, but four contain parts Ce
 - the **Year 7 cells slice**, for microscopy specimens, specialised cells and quiz text;
 - the **cellarium "plant as a society of cells" game idea**, to be rebuilt as a plant-cell mission.
 
-Physics, earth and chemistry repos belong to sibling sites under `science-sim-hub`. `tectonic-earth` is the one asset ready for a shared Three.js engine. Two question banks are valuable hub-wide (science-defender 895 items, equilibrium-lost 2,107 items). equilibrium-lost has about 7 wrong answer keys to fix before students use it.
+Physics, earth and chemistry repos belong to sibling sites under `science-sim-hub`. `tectonic-earth` is the one asset ready for a shared Three.js engine. science-defender's 895-item question bank is valuable hub-wide. **equilibrium-lost is excluded from the suite (owner decision, 2026-10-10).**
 
 ## Summary table
 
@@ -25,11 +25,11 @@ Physics, earth and chemistry repos belong to sibling sites under `science-sim-hu
 | tectonic-earth | Plate tectonics globe (Three r128) | B: earth world; port to current Three | L | High |
 | mineral-detective-lab | Mineral ID lab (canvas 2D) | B: earth world | M | Med |
 | changelab-year-8-science | Heat transfer & energy stores (Next) | B: physics/energy; reuse engine only | M | Med |
-| equilibrium-lost | Y10 chemistry RPG (Phaser) | C: but extract and fix its 2,107-item bank | S fix / M extract | High (bank) |
+| equilibrium-lost | Y10 chemistry RPG (Phaser) | **Excluded** (owner decision 2026-10-10) | — | — |
 | science-defender | Y7–10 tower-defence revision game | C: but export its 895-item bank (shuffle and de-dup first) | S | Med-high (bank) |
 | scientific-naming-game | Y7 Latin-roots naming | C: fix italics and roots, then park | S | Low-med |
 | biolaunch | Y6 prosthetic-arm STEM | C | S | Low |
-| Year-10-Balancing-Equations | Chem Quest + orphaned balancing app | C: archive (superseded by equilibrium-lost bank) | S | Low |
+| Year-10-Balancing-Equations | Chem Quest + orphaned balancing app | C: archive | S | Low |
 | science-sim-hub | Suite control room | Keep as the hub | — | — |
 
 Verdict key: **A** = absorb into CellScape. **B** = sibling world under the hub. **C** = standalone or archive.
@@ -123,7 +123,7 @@ Outcome 3.1.7 (Aboriginal classification) is deliberately absent pending cultura
 
 ## Science errors found (fix in the source repos if they stay in use)
 
-**equilibrium-lost** (`src/content/data/`), before any student use:
+**equilibrium-lost** (`src/content/data/`). Excluded from the suite; fixes kept on the unpushed local branch `fix/answer-keys` for reference:
 
 | Item | Problem |
 |---|---|
