@@ -669,7 +669,7 @@ export function create(engine) {
     chart.setAttribute("aria-label", `Cell supplies now: ATP ${M.atp.toFixed(0)}, glucose ${M.glucose.toFixed(0)}, starch ${M.starch.toFixed(0)}, turgor ${M.turgor.toFixed(0)} percent.`);
     if (H.length < 2) return;
     for (const [k, col] of [["turgor", "#38bdf8"], ["starch", K.cssVar("--ink", "#f8fafc")], ["glucose", "#a3e635"], ["atp", "#fbbf24"]]) {
-      c.strokeStyle = col; c.lineWidth = 2; c.beginPath();
+      c.strokeStyle = K.chartCol(col); c.lineWidth = 2; c.beginPath();
       H.forEach((p, i) => { const x = (i / 239) * w, y = h - (p[k] / 100) * (h - 4) - 2; i ? c.lineTo(x, y) : c.moveTo(x, y); });
       c.stroke();
     }

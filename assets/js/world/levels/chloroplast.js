@@ -448,7 +448,7 @@ export function create(engine) {
     chart.setAttribute("aria-label", `Now: O₂ released ${M.flux.J.toFixed(1)} per minute, CO₂ fixed ${M.flux.V.toFixed(1)} per minute, carriers ${Math.round(M.e * 100)}% charged, starch ${M.starch.toFixed(0)}.`);
     if (H.length < 2) return;
     for (const [f, col] of [[(p) => p.starch, K.cssVar("--ink", "#f8fafc")], [(p) => p.e * 100, "#fbbf24"], [(p) => (p.V / 80) * 100, "#2dd4bf"], [(p) => (p.J / 80) * 100, "#f87171"]]) {
-      c.strokeStyle = col; c.lineWidth = 2; c.beginPath();
+      c.strokeStyle = K.chartCol(col); c.lineWidth = 2; c.beginPath();
       H.forEach((p, i) => { const x = (i / 239) * w, y = h - (clamp(f(p), 0, 100) / 100) * (h - 4) - 2; i ? c.lineTo(x, y) : c.moveTo(x, y); });
       c.stroke();
     }

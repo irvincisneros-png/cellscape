@@ -26,6 +26,23 @@ export function cssVar(name, fallback = "") {
   try { return getComputedStyle(document.documentElement).getPropertyValue(name).trim() || fallback; } catch { return fallback; }
 }
 
+/** Chart series colour for the current page theme: the pale dark-theme hues are darkened on the light panel so
+ *  lines and text keep contrast. Accepts "#rgb"/"#rrggbb" or "rgb(a)(r,g,b[,a])"; dark theme returns it unchanged. */
+export function chartCol(col) {
+  try {
+    if (document.documentElement.dataset.theme !== "light") return col;
+    let r, g, b, a = null, m;
+    if ((m = /^#([0-9a-f]{3}|[0-9a-f]{6})$/i.exec(col))) {
+      const h = m[1].length === 3 ? m[1].replace(/./g, "$&$&") : m[1];
+      r = parseInt(h.slice(0, 2), 16); g = parseInt(h.slice(2, 4), 16); b = parseInt(h.slice(4, 6), 16);
+    } else if ((m = /^rgba?\(\s*([\d.]+)[ ,]+([\d.]+)[ ,]+([\d.]+)(?:[ ,/]+([\d.]+))?\s*\)$/i.exec(col))) {
+      r = +m[1]; g = +m[2]; b = +m[3]; a = m[4] == null ? null : +m[4];
+    } else return col;
+    const k = 0.55, d = (v) => Math.round(v * k);
+    return a == null ? `rgb(${d(r)},${d(g)},${d(b)})` : `rgba(${d(r)},${d(g)},${d(b)},${Math.min(1, a + 0.2)})`;
+  } catch { return col; }
+}
+
 // ---------- stage ----------
 /** HiDPI canvas that tracks its container size. ctx is pre-scaled so you draw in CSS pixels. */
 export function createStage(canvas, onResize) {

@@ -1378,7 +1378,7 @@ export function create(engine) {
     const Y = (v) => h - (v / 100) * (h - 4) - 2;
     c.setLineDash([3, 4]); c.strokeStyle = "rgba(56,189,248,0.35)"; c.beginPath(); c.moveTo(0, Y(50)); c.lineTo(w, Y(50)); c.stroke(); c.setLineDash([]);
     for (const [k, col, sc] of [["vol", "#38bdf8", 50], ["gi", "#a3e635", 100 / 15], ["glycogen", "#f9a8d4", 1], ["atp", "#fbbf24", 1]]) {
-      c.strokeStyle = col; c.lineWidth = 2; c.beginPath();
+      c.strokeStyle = K.chartCol(col); c.lineWidth = 2; c.beginPath();
       H.forEach((p, i) => { const x = (i / 239) * w, y = Y(clamp(p[k] * sc, 0, 100)); i ? c.lineTo(x, y) : c.moveTo(x, y); });
       c.stroke();
     }

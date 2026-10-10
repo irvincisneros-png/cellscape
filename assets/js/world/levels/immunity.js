@@ -1190,12 +1190,12 @@ export function create(engine) {
     c.textAlign = "right"; c.fillText("days", w - 4, padT + ph - 4);
     c.beginPath(); c.moveTo(padL, padT + ph); c.lineTo(padL + pw, padT + ph); c.stroke();
     // protective level (dotted)
-    c.setLineDash([2, 4]); c.strokeStyle = "rgba(74,222,128,0.7)"; c.beginPath(); c.moveTo(padL, Y(PROT)); c.lineTo(padL + pw, Y(PROT)); c.stroke(); c.setLineDash([]);
-    c.fillStyle = "rgba(74,222,128,0.9)"; c.textAlign = "left"; c.fillText(lens.pick({ "y7-8": "enough to protect", "y9-10": "protective level" }), padL + 2, Y(PROT) - 3);
+    c.setLineDash([2, 4]); c.strokeStyle = K.chartCol("rgba(74,222,128,0.7)"); c.beginPath(); c.moveTo(padL, Y(PROT)); c.lineTo(padL + pw, Y(PROT)); c.stroke(); c.setLineDash([]);
+    c.fillStyle = K.chartCol("rgba(74,222,128,0.9)"); c.textAlign = "left"; c.fillText(lens.pick({ "y7-8": "enough to protect", "y9-10": "protective level" }), padL + 2, Y(PROT) - 3);
     // exposures
     for (const e of M.events) {
       if (e.day < w0 || e.day > w1) continue;
-      const col = e.kind === "vaccinate" ? "#4ade80" : e.id === "virus" ? "#f59e0b" : "#f87171";
+      const col = K.chartCol(e.kind === "vaccinate" ? "#4ade80" : e.id === "virus" ? "#f59e0b" : "#f87171");
       c.setLineDash([3, 3]); c.strokeStyle = col; c.globalAlpha = e.id === pathId ? 0.9 : 0.35; c.beginPath(); c.moveTo(X(e.day), padT); c.lineTo(X(e.day), padT + ph); c.stroke(); c.setLineDash([]);
       c.fillStyle = col; c.textAlign = "left"; c.fillText(e.kind === "vaccinate" ? "V" : e.id === "virus" ? "I" : "I", X(e.day) + 2, padT + 9); c.globalAlpha = 1;
     }
@@ -1205,10 +1205,10 @@ export function create(engine) {
       c.stroke(); c.setLineDash([]);
     };
     if (H.length > 1) {
-      if (M.events.some((e) => e.id === oth)) line((p) => p[oth].igm + p[oth].igg, "rgba(160,170,190,0.4)", 1.5);
-      if (lens.atLeast("y9-10")) line((p) => (pathId === "virus" ? p.v.i : p.b.p), "rgba(248,113,113,0.8)", 1.5, [4, 3], 1.1);
-      if (sen) { line((p) => p[key].igm, "#fbbf24", 2); line((p) => p[key].igg, "#2dd4bf", 2); }
-      else line((p) => p[key].igm + p[key].igg, "#e8f1ff", 2.2);
+      if (M.events.some((e) => e.id === oth)) line((p) => p[oth].igm + p[oth].igg, K.chartCol("rgba(160,170,190,0.4)"), 1.5);
+      if (lens.atLeast("y9-10")) line((p) => (pathId === "virus" ? p.v.i : p.b.p), K.chartCol("rgba(248,113,113,0.8)"), 1.5, [4, 3], 1.1);
+      if (sen) { line((p) => p[key].igm, K.chartCol("#fbbf24"), 2); line((p) => p[key].igg, K.chartCol("#2dd4bf"), 2); }
+      else line((p) => p[key].igm + p[key].igg, K.chartCol("#e8f1ff"), 2.2);
     }
     chart.setAttribute("aria-label", `Antibody level over time for the ${pathId}: now ${(M.total(pathId)).toFixed(2)} (relative units), day ${day.toFixed(0)}.`);
   }

@@ -543,7 +543,7 @@ export function create(engine) {
     const series = [["G", "#f472b6", 1], ["o2", "#f87171", 6], ["atp", "#fbbf24", MitoModel.ATP_SCALE]];
     if (lens.atLeast("y11")) series.unshift(["nadh", "#60a5fa", 1]);
     for (const [k, col, max] of series) {
-      c.strokeStyle = col; c.lineWidth = 2; c.beginPath();
+      c.strokeStyle = K.chartCol(col); c.lineWidth = 2; c.beginPath();
       H.forEach((p, i) => { const x = (i / 239) * w, y = h - Math.min(1, p[k] / max) * (h - 4) - 2; i ? c.lineTo(x, y) : c.moveTo(x, y); });
       c.stroke();
     }
