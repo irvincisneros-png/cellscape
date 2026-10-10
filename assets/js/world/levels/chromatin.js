@@ -654,6 +654,7 @@ export function create(engine) {
     }));
     const r2 = K.buttonRow(bp);
     K.button(r2, lens.pick({ "y7-8": "Zoom into the DNA ▸", "y9-10": "Zoom into the DNA double helix ▸" }), () => engine.dive(portals[0]), { kind: "primary" });
+    K.button(r2, lens.pick({ "y7-8": "How cells remember which genes are off ▸", "y9-10": "Epigenetics: marks, memory and environment ▸" }), () => engine.dive({ to: "epigenetics", label: "Epigenetics", radius: 6, center: () => FW.clone(), object: helixHit, start: { view: "marks" } }));
 
     mission = K.missions(el, lens.filter(MISSIONS).map((m) => ({ text: lens.pick(m.text), check: () => m.check(M, state) })), (m) => engine.toast(`🎯 Mission complete: ${m.text}`, 3600));
     K.quiz(el, lens.filter(QUIZ));

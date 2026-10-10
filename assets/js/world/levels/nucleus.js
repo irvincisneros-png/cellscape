@@ -775,6 +775,7 @@ export function create(engine) {
     const nucPortal = (to, label) => ({ to, label, radius: portals[0].radius, center: portals[0].center, object: portals[0].object });
     K.button(r3, lens.pick({ "y7-8": "See the chromosomes ▸", "y9-10": "Karyotype ▸" }), () => engine.dive(nucPortal("karyotype", "Karyotype")));
     K.button(r3, lens.pick({ "y7-8": "Inheritance lab ▸", "y9-10": "Inheritance lab ▸" }), () => engine.dive(nucPortal("inheritance", "Inheritance lab")));
+    K.button(r3, lens.pick({ "y7-8": "Switching genes on and off ▸", "y9-10": "Epigenetics ▸" }), () => engine.dive(nucPortal("epigenetics", "Epigenetics")));
 
     mission = K.missions(el, lens.filter(MISSIONS).map((m) => ({ text: lens.pick(m.text), check: () => m.check(M, state) })), (m) => engine.toast(`🎯 Mission complete: ${m.text}`, 3600));
     K.quiz(el, lens.filter(QUIZ));
@@ -827,7 +828,7 @@ export function create(engine) {
     chart.setAttribute("aria-label", `Transcription ${M.smooth.tx.toFixed(1)} per second, mRNA export ${M.smooth.exp.toFixed(1)} per second, ribosomal subunit export ${M.smooth.subExp.toFixed(1)} per second, import ${M.smooth.imp.toFixed(1)} per second.`);
     if (H.length < 2) return;
     for (const [k, col] of [["imp", "#fbbf24"], ["sub", "#a5b4fc"], ["exp", MRNA_COL], ["tx", K.cssVar("--ink", "#f8fafc")]]) {
-      c.strokeStyle = col; c.lineWidth = 2; c.beginPath();
+      c.strokeStyle = k === "tx" ? col : K.chartCol(col); c.lineWidth = 2; c.beginPath();
       H.forEach((p, i) => { const x = (i / 239) * w, y = h - Math.min(1, p[k] / 6) * (h - 4) - 2; i ? c.lineTo(x, y) : c.moveTo(x, y); });
       c.stroke();
     }

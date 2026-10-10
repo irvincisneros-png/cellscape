@@ -24,6 +24,7 @@ export const LEVELS = {
   inheritance: { title: "Inheritance lab", load: () => import("./levels/inheritance.js") },
   specialised: { title: "Specialised cells", load: () => import("./levels/specialised.js") },
   immunity: { title: "Immune defence", load: () => import("./levels/immunity.js") },
+  epigenetics: { title: "Epigenetics", load: () => import("./levels/epigenetics.js") },
 };
 
 /**

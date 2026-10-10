@@ -130,7 +130,7 @@ export class MuscleModel {
 // 4. Sperm: midpiece mitochondria -> ATP -> beat frequency -> swimming speed
 // =====================================================================================================================
 export class SpermModel {
-  constructor() { this.atp = 0.7; this.mito = 1; this.F = 0.9; this.speed = 0; this.moved = 0; this.peak = 0; this.timeFast = 0; }
+  constructor() { this.atp = 0.7; this.mito = 1; this.F = 0.9; this.speed = 0; this.hz = 0; this.moved = 0; this.peak = 0; this.timeFast = 0; this.step(0); }
   static P = 0.6; static G = 0.025; static U = 0.5; static K = 0.5; static VMAX = 110; static FMAX = 12;   // um/s, Hz (real beat ~10-20 Hz)
   step(dt) {
     const S = SpermModel;

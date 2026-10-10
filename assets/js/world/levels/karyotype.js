@@ -747,6 +747,13 @@ export function create(engine) {
       K.checkbox(who, "Mark the extra chromosome (after sorting)", true, (v) => { S.showDiff = v; });
     }
     const cp = el("p", "hint", ""); cp.style.marginTop = "8px"; who.appendChild(cp); nodes.condNote = cp;
+    if (lens.atLeast("y9-10")) {
+      const xr = K.buttonRow(who);
+      K.button(xr, "Why one X is switched off (Barr bodies) ▸", () => {
+        const kt = S.cond === "xxy" ? "XXY" : S.cond === "turner" ? "X0" : S.sex;
+        engine.dive({ to: "epigenetics", label: "Epigenetics", radius: 10, center: () => new THREE.Vector3(0, 0, 0), object: root, start: { view: "x", karyotype: kt } });
+      });
+    }
 
     nodes.selCard = K.card(node, "Selected chromosome"); nodes.selCard.style.display = "none";
 
