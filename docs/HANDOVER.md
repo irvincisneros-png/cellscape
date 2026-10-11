@@ -4,7 +4,7 @@ Paste everything below the line into a new Claude Code session opened in `~/Docu
 
 ---
 
-You're continuing **CellScape**, a multi-scale 3D cell-biology simulator for NSW high-school science (Years 7–12). I'm a science teacher. Work in `cellscape/`, branch `main`. It's on GitHub as the **private** repo `irvincisneros-png/cellscape` (remote `origin`). The `gh` CLI is signed in, and there's no GitHub MCP server. Commit and push to `origin/main` as work lands. **Ask me before anything public**: making the repo public, GitHub Pages, publishing, or pushing to my other repos.
+You're continuing **CellScape**, a multi-scale 3D cell-biology simulator for NSW high-school science (Years 7–12). I'm a science teacher. Work in `cellscape/`, branch `main`. It's on GitHub as the **public** repo `irvincisneros-png/cellscape` (remote `origin`), live on GitHub Pages at https://irvincisneros-png.github.io/cellscape/ (published 2026-10-11; every push to `main` redeploys). The `gh` CLI is signed in, and there's no GitHub MCP server. Commit and push to `origin/main` as work lands. **Ask me before** pushing to my other repos. Pushes to CellScape `main` go live, so verify before pushing.
 
 ## Read first (in this order)
 1. `cellscape/docs/PLAN.md`: phases, status table, known follow-ups.
@@ -80,6 +80,5 @@ You're continuing **CellScape**, a multi-scale 3D cell-biology simulator for NSW
    - a "Sun and shade leaf" mission (cellarium idea);
    - quiz banks from science-defender (shuffle and de-duplicate first);
    - teacher mode, accessibility and performance tiers;
-   - GitHub Pages, **after asking me**.
-4. **Outside CellScape (ask before pushing):** the Year-10-Science genetics fixes (TX/tx labels, codons, pedigree wording, eye colour) are committed on local branch `fix/genetics-science-errors`, not pushed. `equilibrium-lost` is excluded from the suite.
+4. **Outside CellScape (ask before pushing):** the Year-10-Science genetics fixes are live (pushed 2026-10-11). `equilibrium-lost` is excluded from the suite.
 5. I may want to play with it and give feedback first. If I do, prioritise my feedback over the plan.
