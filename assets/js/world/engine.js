@@ -12,6 +12,7 @@ import { UnrealBloomPass } from "three/addons/postprocessing/UnrealBloomPass.js"
 import { BokehPass } from "three/addons/postprocessing/BokehPass.js";
 import { OutputPass } from "three/addons/postprocessing/OutputPass.js";
 import { StyleManager } from "./style.js";
+import { applyTier, TIER_LOD } from "./materials.js";
 
 const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 const ease = (t) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
@@ -90,6 +91,8 @@ export class Engine {
     this.stack = [];            // [{ id, inst, portal, saved }]
     this.busy = false;
     this.frameTimes = [];
+    this.frameSpan = 0;
+    this.pixelScale = 1;       // below 1 only on very weak devices, and only in the Fast tier
     this.pointer = { x: 0, y: 0, inside: false };
     this.hoverObj = null;
     this.zoomOutPush = 0;
@@ -175,6 +178,22 @@ export class Engine {
     this.onStyle && this.onStyle(this.styleName);
   }
 
+  /** Performance tier: "high" | "medium" | "low" (same as .quality). Levels may read it to size their own detail. */
+  get tier() { return this.quality; }
+
+  /**
+   * Detail multiplier for the tier: 1 (high), 0.75 (medium), 0.5 (low). Levels can scale particle / instance counts by it.
+   * The engine also applies it for you: any InstancedMesh marked `userData.lod = true` gets
+   * count = ceil(full * lodScale), where full is `userData.lodCount` or the buffer capacity (instanceMatrix.count).
+   * Such meshes are engine-managed, so don't set .count on them yourself.
+   */
+  get lodScale() { return TIER_LOD[this.quality] ?? 1; }
+
+  /** Re-apply the tier's material downgrades and LOD counts to the mounted level (idempotent, cheap when nothing changed). */
+  refreshTier() {
+    if (this.current?.root) applyTier(this.current.root, this.quality, this.lodScale);
+  }
+
   refreshPost() {
     this.bokeh.enabled = this.quality === "high";
     this.bloom.enabled = this.quality !== "low" && !this.style.clay;
@@ -183,6 +202,8 @@ export class Engine {
 
   setQuality(q) {
     this.quality = q;
+    this.frameTimes.length = 0; this.frameSpan = 0;
+    this.refreshTier();
     this.refreshPost();
     this.style.refreshQuality();
     this.resize();
@@ -192,7 +213,7 @@ export class Engine {
   resize() {
     const r = this.stageEl.getBoundingClientRect();
     const w = (this.w = Math.max(1, r.width)), h = (this.h = Math.max(1, r.height));
-    const dpr = Math.min(window.devicePixelRatio || 1, this.quality === "low" ? 1 : this.quality === "medium" ? 1.5 : 2);
+    const dpr = Math.min(window.devicePixelRatio || 1, this.quality === "low" ? 1 : this.quality === "medium" ? 1.5 : 2) * (this.quality === "low" ? this.pixelScale : 1);
     this.renderer.setPixelRatio(dpr);
     this.renderer.setSize(w, h, false);
     this.composer.setPixelRatio(dpr);
@@ -389,6 +410,7 @@ export class Engine {
     this.applyEnv(inst.env, inst);
     this.style.applyTo(inst, this.styleName);
     this.style.attach(inst);
+    this.refreshTier();
     this.refreshPost();
     const c = this.controls;
     c.minDistance = inst.minDistance ?? 0.1;
@@ -689,20 +711,31 @@ export class Engine {
     } else this.tip.style.display = "none";
     this.checkAutoDive();
     this.style.tick(dt);
+    if (this.quality !== "high" && (this._tierT = (this._tierT || 0) - dt) <= 0) { this._tierT = 1; this.refreshTier(); }   // levels may spawn meshes mid-simulation
     this.updateScale();
     if (this.quality === "low" && !this.scopeActive) this.renderer.render(this.scene, this.camera);
     else this.composer.render();
-    this.autoQuality(dt);
+    const now = performance.now(), wall = this._wallT ? (now - this._wallT) / 1000 : 0;   // unclamped: K.loop clamps dt to 0.05, which hides < 20 fps
+    this._wallT = now;
+    this.autoQuality(wall);
   }
 
+  /**
+   * Adaptive quality. Averages frame time over ~3 s of real frames (ignoring pauses > 1 s such as a hidden tab or a
+   * shader compile), then steps down ONE tier if it is too slow. It never steps back up by itself, and does nothing once
+   * the user has picked a quality (lockQuality). In Fast, a still-struggling device drops the pixel ratio to 0.75 once.
+   */
   autoQuality(dt) {
-    if (!dt || this.lockQuality || this.busy) return;
+    if (!dt || this.lockQuality || this.busy || this.scopeActive || document.hidden) return;
+    if (dt > 1) return;                      // a one-off gap (tab resume, shader compile); sustained slow frames still count
     const f = this.frameTimes;
     f.push(dt);
-    if (f.length < 90) return;
-    const avg = f.reduce((a, b) => a + b, 0) / f.length;
-    f.length = 0;
+    this.frameSpan += dt;
+    if (this.frameSpan < 3 || f.length < 30) return;
+    const avg = this.frameSpan / f.length;
+    f.length = 0; this.frameSpan = 0;
     if (avg > 1 / 32 && this.quality === "high") this.setQuality("medium");
     else if (avg > 1 / 24 && this.quality === "medium") this.setQuality("low");
+    else if (avg > 1 / 20 && this.quality === "low" && this.pixelScale === 1) { this.pixelScale = 0.75; this.resize(); }
   }
 }

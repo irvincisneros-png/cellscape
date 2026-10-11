@@ -93,3 +93,57 @@ export function wobble(g, amp = 0.08, freq = 2.0, seed = 0) {
   g.computeVertexNormals();
   return g;
 }
+
+// ---------- performance tiers ----------
+// engine.tier is "high" | "medium" | "low" (the Quality control). applyTier(root, tier) walks a level's root and
+// downgrades the expensive MeshPhysicalMaterial features in place, remembering the originals on the material
+// (userData._tier) so going back up restores them exactly:
+//   high   everything as authored
+//   medium sheen and transmission off (transmission falls back to plain alpha)
+//   low    also clearcoat off
+// Only the "real" look's materials are touched. When the clay style is active the mesh carries a clay material
+// (userData.clayMat) and the original sits in userData.realMat: we downgrade realMat (so the real look is already
+// correct when the style is switched back, and nothing is restored to a stale value) and never touch clay materials.
+export const TIER_RANK = { high: 0, medium: 1, low: 2 };
+export const TIER_LOD = { high: 1, medium: 0.75, low: 0.5 };
+
+function setTierOn(m, tier) {
+  if (!m || !m.isMeshPhysicalMaterial || m.userData.clay) return false;   // clay materials are tiered by style.js (tierClay)
+  const u = m.userData, rank = TIER_RANK[tier] ?? 0;
+  if ((u._tierRank ?? 0) === rank && (rank === 0 || u._tier)) return false;
+  let o = u._tier;
+  if (!o) {
+    if (rank === 0) return false;
+    o = u._tier = { clearcoat: m.clearcoat, sheen: m.sheen, transmission: m.transmission, transparent: m.transparent, opacity: m.opacity, depthWrite: m.depthWrite };
+  }
+  m.clearcoat = rank >= 2 ? 0 : o.clearcoat;
+  m.sheen = rank >= 1 ? 0 : o.sheen;
+  if (o.transmission > 0) {
+    if (rank >= 1) { m.transmission = 0; m.transparent = true; m.opacity = Math.min(o.opacity, 0.4); m.depthWrite = false; }
+    else { m.transmission = o.transmission; m.transparent = o.transparent; m.opacity = o.opacity; m.depthWrite = o.depthWrite; }
+  }
+  u._tierRank = rank;
+  if (rank === 0) delete u._tier;
+  m.needsUpdate = true;   // clearcoat/sheen/transmission toggle shader defines
+  return true;
+}
+
+function eachMat(v, fn) { if (Array.isArray(v)) v.forEach((m) => eachMat(m, fn)); else if (v) fn(v); }
+
+/** Apply a performance tier to everything under root (materials, and InstancedMesh.count for userData.lod meshes). */
+export function applyTier(root, tier, lodScale = TIER_LOD[tier] ?? 1) {
+  if (!root) return;
+  root.traverse((o) => {
+    if (!(o.isMesh || o.isPoints || o.isLine)) return;
+    const u = o.userData;
+    if (o.isMesh) {
+      if (u.realMat) eachMat(u.realMat, (m) => setTierOn(m, tier));   // clay style active: the real material is stashed
+      else eachMat(o.material, (m) => setTierOn(m, tier));
+    }
+    if (o.isInstancedMesh && u.lod) {
+      const full = u.lodCount ?? o.instanceMatrix.count;
+      const n = Math.max(1, Math.ceil(full * lodScale));
+      if (o.count !== n) o.count = n;
+    }
+  });
+}

@@ -17,6 +17,7 @@
 //   mesh.userData.clayColor     explicit clay colour (hex) instead of the nearest-pastel mapping
 //   mesh.userData.clayHide      hide this object in clay
 //   mesh.userData.keepMaterial  leave this object alone (e.g. glowing dive markers)
+//   material.userData.clayPatch(shader, renderer) + clayPatchKey   an onBeforeCompile patch (hole cut-aways, glow bands) re-applied on top of the clay shader
 import * as THREE from "three";
 
 const CLAY_ENV = { bg: ["#f4efea", "#ddd6cf", "#e8e2dc"], fog: ["#d9d2cb", 0], exposure: 0.92, bloom: [0, 0.4, 1], aperture: 0.0016 };
@@ -36,6 +37,7 @@ const CREAM = new THREE.Color("#f1e9db"), GREYLILAC = new THREE.Color("#d2c9d9")
 export function pastelOf(color, out = new THREE.Color()) {
   color.getHSL(_hsl, THREE.SRGBColorSpace);
   const k = 0.8 + 0.2 * smoothstep(0.1, 0.5, _hsl.l);
+  if (_hsl.l > 0.86 && _hsl.s < 0.6) return out.copy(CREAM);                  // whites and near-whites (starch, glucose, plaque) read as cream clay
   if (_hsl.s < 0.12) return out.copy(_hsl.l > 0.6 ? CREAM : GREYLILAC).multiplyScalar(_hsl.l > 0.6 ? 1 : 0.92 * k + 0.08);
   const h = _hsl.h * 360;
   let best = PAL_COL[0], bd = 1e9;
@@ -162,7 +164,9 @@ export class StyleManager {
       .style-clay .cs-hint, .style-clay .lbl3d.dive, .style-clay .lbl3d.org, .style-clay .lbl3d.cs-tip {
         background: rgba(17, 26, 40, 0.94) !important; color: #eef5f6 !important; border-color: rgba(94, 234, 212, 0.55); text-shadow: none; }
       .style-clay .cs-hint { padding: 4px 9px; border-radius: 8px; }
-      .style-clay .lbl3d.org small, .style-clay .lbl3d.cs-tip small { color: #b9c7d4 !important; }`;
+      .style-clay .lbl3d.org small, .style-clay .lbl3d.cs-tip small { color: #b9c7d4 !important; }
+      .style-clay .lbl3d[data-csclay="light"] { color: #3b322c !important; text-shadow: 0 0 5px #fbf6ef, 0 0 9px #fbf6ef, 0 1px 2px rgba(251,246,239,0.9) !important; }
+      .style-clay .lbl3d[data-csclay="light"] small { color: #6a5d54 !important; }`;
     document.head.appendChild(s);
   }
 
@@ -174,6 +178,8 @@ export class StyleManager {
       side, vertexColors: vc,
       ...(opacity < 1 ? { transparent: true, opacity, depthWrite: false } : {}),
     });
+    m.userData.clay = true;                  // so other systems (quality tiers) can recognise a clay stand-in
+    this.tierClay(m);
     const U = this.U, pastel = pastelShader;
     m.onBeforeCompile = (sh) => {
       sh.uniforms.uClayTex = U.tex; sh.uniforms.uClayFreq = U.freq; sh.uniforms.uClayAmt = U.amt;
@@ -186,7 +192,10 @@ export class StyleManager {
           {
             vec3 bw = pow(abs(vClayN), vec3(4.0)); bw /= (bw.x + bw.y + bw.z + 1e-4);
             vec3 cp = vClayP * uClayFreq;
-            float h = texture2D(uClayTex, cp.yz).r * bw.x + texture2D(uClayTex, cp.xz + 0.37).r * bw.y + texture2D(uClayTex, cp.xy + 0.71).r * bw.z;
+            // two octaves (a soft lumpy one plus a finer one), sampled with a mip bias so the surface reads as smooth plasticine, not grain
+            vec3 cq = cp * 0.31;
+            float h = 0.62 * (texture2D(uClayTex, cq.yz, 0.6).r * bw.x + texture2D(uClayTex, cq.xz + 0.19, 0.6).r * bw.y + texture2D(uClayTex, cq.xy + 0.53, 0.6).r * bw.z)
+                    + 0.38 * (texture2D(uClayTex, cp.yz, 1.6).r * bw.x + texture2D(uClayTex, cp.xz + 0.37, 1.6).r * bw.y + texture2D(uClayTex, cp.xy + 0.71, 1.6).r * bw.z);
             vec2 dh = vec2(dFdx(h), dFdy(h));
             vec3 sx = dFdx(-vViewPosition), sy = dFdy(-vViewPosition);
             vec3 r1 = cross(sy, normal), r2 = cross(normal, sx);
@@ -195,27 +204,68 @@ export class StyleManager {
             normal = normalize(abs(det) * normal - uClayAmt * gr);
           }`);
       if (pastel) f = f.replace("#include <color_fragment>", `#include <color_fragment>
-          { float lm = dot(diffuseColor.rgb, vec3(0.299, 0.587, 0.114)); diffuseColor.rgb = mix(vec3(lm), diffuseColor.rgb, 0.8); diffuseColor.rgb = mix(diffuseColor.rgb, vec3(1.0), 0.34); }`);
+          {   // per-vertex / per-instance colours of any depth become pastels of the same hue: keep the hue, lift the value, cap the saturation
+            vec3 c0 = diffuseColor.rgb; float mx = max(max(c0.r, c0.g), c0.b), mn = min(min(c0.r, c0.g), c0.b);
+            float sat = mx > 1e-4 ? (mx - mn) / mx : 0.0;
+            vec3 hue = mx > 1e-4 ? c0 / mx : vec3(1.0);
+            vec3 pc = mix(vec3(1.0), hue, clamp(sat * 0.8, 0.0, 0.8)) * (0.5 + 0.5 * pow(mx, 0.5));
+            float lift = 1.0 - smoothstep(0.3, 0.85, mx);                         // only dark colours need pastelising; light ones are already pastel
+            vec3 res = mix(c0, pc, lift) * 0.94;
+            res = mix(res, vec3(0.64, 0.58, 0.82) * (0.62 + 0.38 * mx), (1.0 - smoothstep(0.04, 0.22, sat)) * 0.85);   // near-greys and whites (backbones, scaffolds) become soft periwinkle, not white-on-white
+            float rl = dot(res, vec3(0.299, 0.587, 0.114));
+            diffuseColor.rgb = max(vec3(0.0), mix(vec3(rl), res, 1.3));   // a touch more chroma so pastel never turns chalky
+          }`);
       sh.fragmentShader = f;
     };
-    m.customProgramCacheKey = () => `clay${pastel ? "p" : ""}`;
+    m.customProgramCacheKey = () => `clay2${pastel ? "p" : ""}`;
     return m;
+  }
+
+  /** Cheaper clay on slower tiers: Fast drops clearcoat and sheen (two extra lobes per pixel), Balanced drops sheen. Restores on Cinematic. */
+  tierClay(m, q = this.engine.quality) {
+    const cc = q === "low" ? 0 : 0.3, sh = q === "high" ? 0.4 : 0;
+    if (m.clearcoat !== cc || m.sheen !== sh) { m.clearcoat = cc; m.sheen = sh; m.needsUpdate = true; }
   }
 
   clayFor(orig, o) {
     if (Array.isArray(orig)) return orig.map((m) => this.clayFor(m, o));
     const vc = !!orig.vertexColors, perInst = !!(o.isInstancedMesh && o.instanceColor), tinted = vc || perInst;
     // enclosing glass shells (low alpha) and other see-through parts stay see-through so the action inside remains visible
-    const g = orig.userData?.glass, opacity = g ? (g.maxA.value <= 0.5 ? 0.2 : 1) : orig.transparent && orig.opacity < 0.9 ? Math.max(0.15, orig.opacity) : 1;
+    const g = orig.userData?.glass, gBase = g ? (g.maxA.value <= 0.5 ? Math.min(0.26, Math.max(0.12, g.maxA.value * 0.65)) : 1) : 1, lv0 = g ? orig.opacity : orig.transparent && orig.opacity < 0.9 ? Math.max(0.15, orig.opacity) : 1;
+    const opacity = gBase * lv0;
     const op = o.userData.clayOpacity ?? opacity, dbl = o.userData.claySide === "double" || orig.side === THREE.DoubleSide;
     const key = `${vc ? "v" : "p"}${perInst ? "i" : ""}${op}${dbl ? "d" : ""}${o.userData.clayColor || ""}`;
     let per = this.cache.get(orig);
     if (!per) this.cache.set(orig, (per = {}));
-    if (per[key]) return per[key];
+    if (per[key]) { per[key].userData.opReset?.(o.userData.clayOpacity !== undefined ? op : lv0); return per[key]; }   // reused: start from the real material's current fade
     const color = o.userData.clayColor ? new THREE.Color(o.userData.clayColor) : tinted ? (orig.color || new THREE.Color("#ffffff")).clone() : pastelOf(orig.color || new THREE.Color("#cccccc"));
     const m = (per[key] = this.makeClay(color, { vc, pastelShader: tinted, opacity: op, side: dbl ? THREE.DoubleSide : THREE.FrontSide }));
+    if (o.userData.clayOpacity !== undefined) this.linkOpacity(m, 1, op); else this.linkOpacity(m, gBase, lv0);
     this.syncClip(orig, m);
+    // a realistic material may carry a shader patch that still matters in clay (cut-away holes, glowing bands): re-apply it on top of the clay shader
+    const patch = orig.userData?.clayPatch;
+    if (patch) {
+      const base = m.onBeforeCompile, key = m.customProgramCacheKey;
+      m.onBeforeCompile = (sh, r) => { base(sh, r); patch(sh, r); };
+      m.customProgramCacheKey = () => `${key.call(m)}+${orig.userData.clayPatchKey || "patch"}`;
+    }
     return m;
+  }
+
+  /**
+   * Levels fade parts by writing material.opacity (nucleus fading in, a cell disappearing...) and don't know the clay
+   * material is standing in. Keep that working: the written value is multiplied by the clay see-through factor (so a
+   * glass shell that is 20 % in clay stays 20 % x fade) and the material flips transparent only while it is below 1.
+   */
+  linkOpacity(m, base, written) {
+    let lv = written;
+    const apply = () => { const t = lv * base < 0.999; if (m.transparent !== t) { m.transparent = t; m.depthWrite = !t; m.needsUpdate = true; } };
+    Object.defineProperty(m, "opacity", {
+      configurable: true, enumerable: true,
+      get: () => lv * base,
+      set: (v) => { lv = v; m.userData.opWritten = v; apply(); },
+    });
+    m.userData.opReset = (v) => { lv = v; delete m.userData.opWritten; apply(); };    // start again from the real material's fade (not a level's write)
   }
 
   /** Levels cut shells open with clipping planes (e.g. the nucleus "near side is cut away"): keep that in clay. */
@@ -226,6 +276,21 @@ export class StyleManager {
 
   isGlowOnly(m) {
     return m.blending === THREE.AdditiveBlending || (m.isMeshBasicMaterial && m.transparent && m.opacity < 0.35);
+  }
+
+  /**
+   * Labels are DOM text, mostly written for the dark backdrop (pale text, dark halo). On the light clay backdrop those
+   * vanish, so any label with pale text and no pill background of its own is tagged once and restyled by the CSS above.
+   */
+  fixLabels() {
+    const L = document.querySelectorAll(".lbl3d:not([data-csclay])");
+    for (let i = 0; i < L.length; i++) {
+      const el = L[i], cs = getComputedStyle(el);
+      const bg = cs.backgroundColor.match(/[\d.]+/g) || [0, 0, 0, 0], col = cs.color.match(/[\d.]+/g) || [0, 0, 0];
+      const hasPill = (bg.length > 3 ? +bg[3] : 1) > 0.3;
+      const lum = (0.299 * col[0] + 0.587 * col[1] + 0.114 * col[2]) / 255;
+      el.dataset.csclay = !hasPill && lum > 0.62 ? "light" : "ok";
+    }
   }
 
   // ---------- applying a style to a level ----------
@@ -239,9 +304,16 @@ export class StyleManager {
         return;
       }
       if (!(o.isMesh || o.isPoints || o.isLine || o.isSprite)) return;
+      if (clay && o.userData.styled === "clay" && o.userData.realMat !== undefined && !this.isStandIn(o)) delete o.userData.styled;   // the level put a material of its own back on: restyle it
       if (clay) { this.toClay(o); const u = o.userData; if (u.realMat && u.clayMat && !Array.isArray(u.realMat) && !Array.isArray(u.clayMat)) this.syncClip(u.realMat, u.clayMat); }
       else this.toReal(o);
     });
+  }
+
+  /** True while the mesh still carries the material this manager put on it (a clay or hidden stand-in). */
+  isStandIn(o) {
+    const m = o.material, u = o.userData;
+    return m === u.clayMat || m === this.hiddenMat || m === this.hiddenPts || m === this.hiddenLine || !!m?.userData?.clay || (Array.isArray(m) && m.every((x) => x.userData.clay));
   }
 
   toClay(o) {
@@ -272,7 +344,7 @@ export class StyleManager {
         if (g && g.attributes.position && !g.attributes.normal) g.computeVertexNormals();
         mat = this.clayFor(orig, o);
         u.clayMat = mat;
-        u.shadowFlags = [o.castShadow, o.receiveShadow];
+        if (!u.shadowFlags) u.shadowFlags = [o.castShadow, o.receiveShadow];
         const solid = !mat.transparent;
         o.castShadow = solid; o.receiveShadow = true;
       }
@@ -291,7 +363,12 @@ export class StyleManager {
       if (m?.userData._blend !== undefined) { m.blending = m.userData._blend; m.depthTest = m.userData._dt; delete m.userData._blend; delete m.userData._dt; m.needsUpdate = true; }
       return;
     }
-    if (u.realMat) { o.material = u.realMat; delete u.realMat; }
+    if (u.realMat) {
+      // a level may have faded this part while clay was on (it wrote to the clay material): hand the value back
+      const cm = u.clayMat, r = u.realMat;
+      if (cm?.userData.opWritten !== undefined && !Array.isArray(r)) { r.opacity = cm.userData.opWritten; delete cm.userData.opWritten; }
+      o.material = r; delete u.realMat;
+    }
     if (u.shadowFlags) { [o.castShadow, o.receiveShadow] = u.shadowFlags; delete u.shadowFlags; }
     delete u.clayHidden;
   }
@@ -377,7 +454,7 @@ export class StyleManager {
     }
     const f = inst?.clay?.freq ?? 0.14 * (60 / Math.max(20, inst?.view?.distance || 60)) * 0.6;
     this.U.freq.value = f;
-    this.U.amt.value = inst?.clay?.amount ?? 1.15 / Math.max(0.2, f * 6);
+    this.U.amt.value = inst?.clay?.amount ?? 0.7 / Math.max(0.2, f * 6);
     this.refreshQuality();
   }
 
@@ -386,6 +463,10 @@ export class StyleManager {
   }
 
   refreshQuality() {
+    this.engine.current?.root.traverse((o) => {
+      if (!o.isMesh) return;
+      for (const m of Array.isArray(o.material) ? o.material : [o.material]) if (m?.userData?.clay) this.tierClay(m);   // incl. kit materials and arrays
+    });
     if (!this.key) return;
     const q = this.engine.quality, on = this.clay && q !== "low";
     if (this.key.castShadow !== on) this.key.castShadow = on;
@@ -401,6 +482,7 @@ export class StyleManager {
     eng.applyEnv(inst.env, inst);
     this.applyTo(inst);
     this.attach(inst);
+    this.fixLabels();
     if ((inst._hookStyle || "real") !== this.name) { inst._hookStyle = this.name; inst.onStyle?.(this.name, true); }
     eng.refreshPost();
   }
@@ -408,8 +490,15 @@ export class StyleManager {
   /** Per-frame upkeep: restyle parts a level created after the swap (e.g. spawned mid-simulation). */
   tick(dt) {
     if (!this.clay) return;
+    // some levels scale the fog with the zoom every frame (tuned for a dark backdrop): on the light clay backdrop it only washes colours out
+    const fog = this.engine.scene.fog;
+    if (fog && fog.density > 0) {
+      const d = Math.max(0.5, this.engine.camera.position.distanceTo(this.engine.controls.target));
+      if (fog.density * d > 0.2) fog.density = 0.2 / d;
+    }
     if ((this.sweepT -= dt) > 0) return;
     this.sweepT = 0.6;
     this.applyTo(this.engine.current);
+    this.fixLabels();
   }
 }

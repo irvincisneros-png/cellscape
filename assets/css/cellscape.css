@@ -11,7 +11,7 @@
   --panel-border: rgba(120, 190, 255, 0.16);
   --ink: #e8f1ff;
   --ink-dim: #9fb3cf;
-  --ink-faint: #6a7f9c;
+  --ink-faint: #7a8fac;
   --accent: #4fd1c5;      /* teal: cytoplasm / water */
   --accent-2: #a78bfa;    /* violet: proteins */
   --accent-3: #fbbf24;    /* amber: energy / ATP */
@@ -57,10 +57,10 @@
   --panel-border: rgba(20, 32, 46, 0.2);
   --ink: #14202e;
   --ink-dim: #3b4b5f;
-  --ink-faint: #54657a;
-  --accent: #0a756d;
+  --ink-faint: #4b5c71;
+  --accent: #086660;
   --accent-2: #6d4ad6;
-  --accent-3: #8a5a06;
+  --accent-3: #7a4f05;
   --danger: #b3261e;
   --good: #17743a;
   --on-accent: #ffffff;
@@ -83,7 +83,7 @@
   --shadow: rgba(20, 32, 46, 0.18);
   --t-good: #17743a;
   --t-bad: #b3261e;
-  --t-warn: #8a5a06;
+  --t-warn: #7a4f05;
   --t-violet: #5b3fc0;
   --t-pink: #a21caf;
   --dialog-bg: #fbf8f1;

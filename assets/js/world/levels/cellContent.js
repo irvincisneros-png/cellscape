@@ -1,6 +1,8 @@
 // Lens-aware text for the plant-cell level. Each value may be a plain string or
 // { "y7-8": ..., "y9-10": ..., "y11": ..., "y12": ... } (lens.pick chooses the right one).
 
+import { LEAVES } from "./plantCellModel.js";
+
 export const ORGANELLES = {
   chloroplast: {
     name: "Chloroplast", color: "#4ade80", portal: "chloroplast", sim: "photosynthesis",
@@ -130,11 +132,48 @@ export const MISSIONS = [
   { band: "y9-10", text: "Put the cell in a <strong>salty solution</strong> until it goes flaccid, then rescue it.", check: (m, s) => s.wasFlaccid && m.turgor > 75 && m.outside < 20 },
   { band: "y9-10", text: "Block the <strong>nuclear pores</strong>. Where does the mRNA pile up, and which organelles go quiet?", check: (m) => !m.on.pores && m.mrna > 70 },
   { band: "y9-10", text: "Find a <strong>limiting factor</strong>: with bright light, cut CO₂ so photosynthesis slows.", check: (m) => m.light > 60 && m.co2Out < 8 && m.flux.photo < 2.5 },
+  // Sun and shade leaf missions: the checks read what a LeafLab (plantCellModel.js) recorded from the real fluxes.
+  { band: "y7-8", maxBand: "y7-8", text: "<strong>Sun leaf or shade leaf?</strong> Pick each leaf in turn and slide the light until the cell takes in and gives out the <em>same</em> amount of oxygen (20 s or so, hold it still). That light is its <strong>compensation point</strong>. Which leaf needs less light to break even?", check: (m, s) => s.lab.comp.sun !== null && s.lab.comp.shade !== null },
+  { band: "y9-10", text: "Find the <strong>light compensation point</strong> (net O₂ exchange = 0) for the sun leaf and for the shade leaf. Hold the light steady for 20 s or so at each try, with the day cycle off and CO₂ high.", check: (m, s) => s.lab.comp.sun !== null && s.lab.comp.shade !== null },
+  { band: "y7-8", maxBand: "y7-8", text: "Turn on the <strong>24 h day</strong>. Can you choose a brightness so the cell finishes the whole day with <em>at least as much sugar</em> as it started with? (It respires all night, so the store drops in the dark.)", check: (m, s) => !!s.lab.last?.ok },
+  { band: "y9-10", text: "Run the <strong>24 h day</strong> and choose a peak light so the sugar store ends the day <strong>no lower than it started</strong>, even though respiration continues all night. Leave all settings alone for the full 24 h.", check: (m, s) => !!s.lab.last?.ok },
+  { band: "y7-8", maxBand: "y7-8", text: "<strong>Who wins?</strong> Hold dim light (10–20 %) and then full sun (90 % or more) for each leaf. Which leaf gives out more oxygen in dim light, and which in full sun?", check: (m, s) => s.lab.compared },
+  { band: "y9-10", text: "Show that the <strong>shade leaf wins at low light</strong> (10–20 %) and the <strong>sun leaf wins in full sun</strong> (90 % or more): hold each light steady for 20 s or so on both leaf types.", check: (m, s) => s.lab.compared },
+  { band: "y9-10", text: "On a bright, <strong>hot, dry</strong> day (light 60 % or more, plenty of CO₂ outside) turn up the heat until the <strong>stomata close</strong> and CO₂ inside the leaf limits photosynthesis.", check: (m) => m.on.chloroplast && ["co2", "stomata"].includes(limiter(m)) && m.stomata < 0.3 && m.light >= 60 && m.co2Out >= 30 && m.co2 < 8 && m.flux.photo < 2 },
   { band: "y11", text: "Show <strong>demand control</strong>: in bright light, ATP stays high and the mitochondria slow down.", check: (m) => m.atp > 80 && m.flux.resp < 1.5 && m.light > 60 },
   { band: "y11", text: "At night, run the <strong>starch store</strong> down below 40.", check: (m) => m.light < 10 && m.starch < 40 },
   { band: "y11", text: "Switch off the <strong>aquaporins</strong>, then the pumps: compare how fast turgor falls with and without water channels.", check: (m) => !m.on.aquaporins && !m.on.pumps && m.turgor < 60 },
   { band: "y11", text: "Switch off <strong>transcription</strong> but leave the pores open: show that mRNA already made still reaches the ribosomes for a while.", check: (m) => !m.on.nucleus && m.on.pores && m.mrnaCyto > 5 && m.mrna < 3 },
 ];
+
+/** Sun-leaf / shade-leaf choice: text for the leaf card, by year band. */
+export const LEAF_CHOICES = [
+  { value: "generic", label: { "y7-8": "Ordinary leaf", "y9-10": "Typical leaf" },
+    about: { "y7-8": "A general leaf cell: the starting settings.", "y9-10": "The model's starting leaf cell, between a sun leaf and a shade leaf." } },
+  { value: "sun", label: "☀ Sun leaf",
+    about: {
+      "y7-8": "A leaf that grows in <strong>bright sun</strong>. It has a <strong>thick layer</strong> of tall cells packed with <strong>extra chloroplasts</strong> in each patch of leaf, so it makes lots of sugar in strong light. But it needs a lot of light just to break even, and it uses more energy to run.",
+      "y9-10": "Grows in full sun. A thicker <strong>palisade layer</strong> holds <strong>more chloroplasts per area of leaf</strong>, with more enzyme in each, so it keeps making more sugar as light rises (a <strong>higher light-saturation point</strong>). Its upkeep is higher too: a <strong>higher respiration rate</strong> and a <strong>higher compensation point</strong>.",
+      y11: "Sun leaf: a thicker palisade mesophyll with more chloroplasts per unit of leaf area and more Rubisco and electron-transport capacity per chloroplast. The ceiling for photosynthesis (and the light-saturation point) is high, but dark respiration is higher, so the <strong>light compensation point</strong> is higher too.",
+      y12: "Sun leaf: thick palisade mesophyll, more chloroplasts per unit leaf area, high Rubisco and electron-transport capacity per unit leaf area. The light-response curve rises more slowly but to a higher plateau; dark respiration (R) is greater, so the light compensation point (net CO₂ or O₂ exchange = 0) sits at a higher light level.",
+    } },
+  { value: "shade", label: "🌿 Shade leaf",
+    about: {
+      "y7-8": "A leaf that grows in the <strong>shade</strong>. It is thinner, with <strong>bigger stacks of membranes (grana) holding lots of chlorophyll</strong> in each chloroplast, so it catches dim light well. It tops out early in strong light, but it uses less energy to run.",
+      "y9-10": "Grows in shade. Fewer chloroplasts, but <strong>bigger grana</strong> and <strong>more chlorophyll per chloroplast</strong> catch dim light, so it saturates at <strong>low light</strong>. Its upkeep is cheaper, so its respiration is lower and its <strong>compensation point is lower</strong>.",
+      y11: "Shade leaf: thinner, with fewer chloroplasts per unit leaf area but larger grana and more chlorophyll (and light-harvesting antenna) per chloroplast. It is efficient in dim light and saturates early; low Rubisco and respiration costs give a <strong>lower light compensation point</strong>.",
+      y12: "Shade leaf: thin blade, fewer chloroplasts per unit leaf area but larger grana and more chlorophyll per chloroplast. A steeper initial slope on the light-response curve (more light captured per unit of light), an early plateau (lower Rubisco and electron-transport capacity), and low dark respiration, giving a low light compensation point.",
+    } },
+];
+
+/** Plain-language time of day, e.g. "14:30 · afternoon". Light is zero from 18:00 to 06:00 in this model. */
+export function clockText(hour) {
+  const h = Math.floor(hour) % 24, m = Math.floor((hour - Math.floor(hour)) * 60);
+  const part = hour < 6 || hour >= 18 ? "night" : hour < 11 ? "morning" : hour < 13 ? "midday" : "afternoon";
+  return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")} · ${part}`;
+}
+
+export const LEAF_NOTE = "These compensation points and light levels are <strong>teaching-scale numbers</strong>, chosen to show the pattern. Real values depend on the species, temperature and CO₂, and are measured in the lab.";
 
 export const QUIZ = [
   { band: "y7-8", maxBand: "y7-8", q: "Which organelle uses light to make glucose?", options: ["Mitochondrion", "Chloroplast", "Nucleus", "Vacuole"], answer: 1, why: "Chloroplasts contain chlorophyll, which captures light for photosynthesis." },
@@ -148,6 +187,25 @@ export const QUIZ = [
 ];
 
 /** Live "why is this happening" narrative, built from what the model is actually doing (fluxes), not just the switches. */
+/** Which term of the model's photosynthesis rate is actually smallest right now (same terms as plantCellModel.stepOnce), or null if none is clearly limiting. */
+function limiter(m) {
+  if (!m.on.chloroplast) return "off";
+  const lf = LEAVES[m.leaf] || LEAVES.generic, sat = (x, k) => (x <= 0 ? 0 : x / (x + k));
+  const L = sat(m.light, lf.K), C = sat(m.co2 + m.co2Out * 0.6 * m.stomata, 30), W = Math.max(0.2, Math.min(1, m.turgor / 60));
+  const low = Math.min(L, C, W);
+  if (low >= 0.6) return null;
+  if (low === L) return "light";
+  if (low === C) return m.stomata < 0.7 && m.co2Out >= 10 ? "stomata" : "co2";
+  return "water";
+}
+const LIMIT_TEXT = {
+  light: { y7: "there is not much light for it", adv: "light is the limiting factor" },
+  co2: { y7: "there is little carbon dioxide for it", adv: "CO₂ supply is the limiting factor" },
+  stomata: { y7: "the leaf's pores are mostly shut, so little carbon dioxide gets in", adv: "closed stomata restrict CO₂ entry, which is the limiting factor" },
+  water: { y7: "the cell is short of water", adv: "low turgor (water) is the limiting factor" },
+};
+
+const lens_y11 = (band) => band === "y11" || band === "y12";
 export function narrative(m, band) {
   const y7 = band === "y7-8";
   const on = m.on, F = m.flux, out = [];
@@ -161,7 +219,7 @@ export function narrative(m, band) {
     : lag ? (y7 ? `Oxygen is still ${o2 > 0 ? "leaving" : "coming in"} from before, but that is about to reverse.` : `Net O₂ is still ${o2 > 0 ? "leaving" : "entering"} (${Math.abs(o2).toFixed(1)}/s) as the cell catches up — but now ${balance}, so this will reverse.`)
     : o2 > 0 ? (y7 ? "Overall, the cell is <strong>giving out oxygen</strong>." : `Net O₂ is <strong>leaving</strong> the cell (${o2.toFixed(1)}/s): ${balance}.`)
     : (y7 ? "Overall, the cell is <strong>taking in oxygen</strong>." : `Net O₂ is <strong>entering</strong> the cell (${(-o2).toFixed(1)}/s): ${balance}.`);
-  const co2Limited = m.light > 30 && m.co2Out < 10 && m.co2 < 10;
+  const co2Limited = m.light > 30 && (m.co2Out < 10 || m.stomata < 0.4) && m.co2 < 10;
   if (!on.chloroplast) out.push(`Chloroplasts are <strong>off</strong>: no new glucose is being made.`);
   else if (co2Limited) out.push(`Plenty of light but very little <strong>CO₂</strong> — CO₂ is the <strong>limiting factor</strong>, so photosynthesis is ${photo < 0.15 ? "almost stopped" : "slow"}.`);
   else if (photo < 0.15) out.push(y7 ? `There's <strong>not enough light</strong>, so the chloroplasts have stopped making glucose.` : `<strong>Almost no photosynthesis</strong> right now — light (${m.light.toFixed(0)}%) is limiting.`);
@@ -181,6 +239,32 @@ export function narrative(m, band) {
   if (!on.nucleus) out.push(on.pores ? `<strong>Transcription off</strong>: no new mRNA. The mRNA already made still leaves the nucleus and is read until it breaks down.` : `<strong>Transcription off</strong> as well: no new mRNA is being made.`);
   if (!on.er) out.push(`<strong>Ribosomes/ER off</strong>: mRNA arrives but no secreted proteins are made.`);
   if (!on.golgi) out.push(`<strong>Golgi off</strong>: proteins pile up in the ER and nothing is shipped to the membrane.`);
+  // ---- sun / shade leaf, day cycle and stomata: all read from the live fluxes ----
+  const leafOn = m.leaf && m.leaf !== "generic";
+  if (m.auto) out.push(`It is <strong>${clockText(m.hour)}</strong> — light ${m.light.toFixed(0)}%.`);
+  if ((leafOn || m.auto) && on.chloroplast && on.mitochondrion) {
+    const net = F.net || 0, name = m.leaf === "sun" ? "sun leaf" : m.leaf === "shade" ? "shade leaf" : "leaf";
+    if (m.light < 1) out.push(y7
+      ? `It is dark, so there is <strong>no photosynthesis</strong>, but the cell keeps <strong>respiring</strong>: it uses up oxygen and sugar all night.`
+      : `Dark: photosynthesis is 0 but respiration continues (${resp.toFixed(1)}/s), so net O₂ exchange is −${resp.toFixed(1)}/s and the sugar store falls (${m.sugar.toFixed(0)}%).`);
+    else if (photo > 0.1 && Math.abs(net) <= 0.25 && !["light", null].includes(limiter(m))) out.push(y7
+      ? `The ${name} makes about as much oxygen as it uses, but that is because ${LIMIT_TEXT[limiter(m)]?.y7 || "something is switched off"}, not because the light is low.`
+      : `Net O₂ exchange ≈ 0 (photosynthesis ${photo.toFixed(1)}/s ≈ respiration ${resp.toFixed(1)}/s), but photosynthesis is held down because ${LIMIT_TEXT[limiter(m)]?.adv || "chloroplasts are off"} — this is not the light compensation point.`);
+    else if (photo > 0.3 && Math.abs(net) <= 0.25) out.push(y7
+      ? `The ${name} makes about as much oxygen as it uses: this light is its <strong>compensation point</strong>.`
+      : `At the <strong>light compensation point</strong> for this ${name}: photosynthesis (${photo.toFixed(1)}/s) ≈ respiration (${resp.toFixed(1)}/s), so net O₂ exchange ≈ 0.`);
+    else if (net < 0) {
+      const lim = limiter(m);
+      const why = lim === "off" ? (y7 ? " The chloroplasts are switched off." : " Chloroplasts are switched off.")
+        : lim ? (y7 ? ` Photosynthesis is held back because ${LIMIT_TEXT[lim].y7}.` : ` Photosynthesis is held back: ${LIMIT_TEXT[lim].adv}.`)
+        : (y7 ? "" : " No single input is clearly limiting photosynthesis; respiration is simply faster (check the organelle switches).");
+      out.push(y7
+        ? `This ${name} is using <strong>more oxygen than it makes</strong>, so it is living off stored sugar.${why}`
+        : `Net O₂ is negative for this ${name}: photosynthesis ${photo.toFixed(1)}/s < respiration ${resp.toFixed(1)}/s, so net O₂ is −${(-net).toFixed(1)}/s and the sugar store is being drawn on (light ${m.light.toFixed(0)}%).${why}`);
+    }
+    else if (!y7) out.push(`Above the compensation point for this ${name}: net O₂ production is +${net.toFixed(1)}/s (photosynthesis ${photo.toFixed(1)}/s − respiration ${resp.toFixed(1)}/s).`);
+  }
+  if (m.stomata < 0.7) out.push(`<strong>Stomata ${m.stomata < 0.15 ? "are nearly shut" : "are closing"}</strong> (${(m.stomata * 100).toFixed(0)}% open) in the hot, dry air. This saves water, but CO₂ can't get in fast enough: CO₂ inside the leaf is ${m.co2.toFixed(0)}%, so ${["co2", "stomata"].includes(limiter(m)) ? "<strong>CO₂ limits photosynthesis</strong>" : "photosynthesis is slowed"} (${photo.toFixed(1)}/s).${lens_y11(band) ? " The guard cells lose turgor and shut the pore: water is saved, but the CO₂ supply is cut." : ""}`);
   const w = F.water || 0;
   const wDir = w < -0.2 ? "out" : w > 0.2 ? "in" : "none";
   if (m.outside > 25) out.push(y7

@@ -1172,10 +1172,31 @@ export function create(engine) {
     for (const el of Object.values(labels)) el.remove();
     for (const k of Object.keys(labelTargets)) labels[k] = engine.label("", "org");
   }
+  // keep 3D labels below the HUD chip rows on narrow stages (portrait): clamp their screen y to under the overlay
+  const _lp = new THREE.Vector3(), _cx = new Float32Array(16), _cy = new Float32Array(16), _cw = new Float32Array(16), _ch = new Float32Array(16); let _cn = 0;
+  function chipFloor() { const ov = engine.overlay; return ov && ov.firstChild && engine.w < 700 ? ov.offsetTop + ov.offsetHeight + 14 : -1e9; }
+  function placeClamped(el, v, dx, dy, minY) {
+    const p = _lp.copy(v).project(engine.camera);
+    if (p.z > 1 || p.z < -1) { el.style.display = "none"; return false; }
+    el.style.display = "";
+    const x = (p.x * 0.5 + 0.5) * engine.w + dx;
+    let y = (-p.y * 0.5 + 0.5) * engine.h + dy;
+    const w = el.offsetWidth || 100, h = el.offsetHeight || 22;
+    if (y - h / 2 < minY) {   // clamped: keep the label's top edge below the chips, then stack below any earlier label it would overlap
+      y = minY + h / 2;
+      for (let pass = 0; pass < 3; pass++) for (let i = 0; i < _cn; i++) if (Math.abs(x - _cx[i]) < (w + _cw[i]) / 2 + 6 && Math.abs(y - _cy[i]) < (h + _ch[i]) / 2 + 3) y = _cy[i] + (h + _ch[i]) / 2 + 3;
+    } else if (minY > -1e8) {   // narrow stage: an unclamped label also moves clear of labels already pushed down onto it
+      for (let pass = 0; pass < 3; pass++) for (let i = 0; i < _cn; i++) if (Math.abs(x - _cx[i]) < (w + _cw[i]) / 2 + 6 && Math.abs(y - _cy[i]) < (h + _ch[i]) / 2 + 3) y = _cy[i] + (h + _ch[i]) / 2 + 3;
+    }
+    if (_cn < 16) { _cx[_cn] = x; _cy[_cn] = y; _cw[_cn] = w; _ch[_cn++] = h; }
+    el.style.transform = `translate(${x.toFixed(1)}px, ${y.toFixed(1)}px) translate(-50%, -50%)`;
+    return true;
+  }
   function updateLabels(rdt) {
     if ((stT -= rdt) <= 0) { stT = 0.3; stCache = M.status(); }
     const hide = morph.k < 1 || M.burst || engine.current !== level, narrow = engine.camera.aspect < 0.9;
     tC2.set(0, 0, 0).project(engine.camera);
+    const floorY = chipFloor(); _cn = 0;
     for (let li = 0; li < labelKeys.length; li++) {
       const k = labelKeys[li], el = labels[k];
       if (!el) continue;
@@ -1192,7 +1213,7 @@ export function create(engine) {
       const len = Math.hypot(dx, dy);
       if (len < 10) { dx = Math.cos(li * 1.1); dy = Math.sin(li * 1.1); } else { dx /= len; dy /= len; }
       const push = 34 + 24 * (li % 3);
-      engine.place(el, tLbl, dx * push, dy * push);
+      placeClamped(el, tLbl, dx * push, dy * push, floorY);
     }
     if (hide) { diveLbl.style.display = "none"; cytoLbl.style.display = "none"; return; }
     engine.place(diveLbl, tLbl.copy(MEM_SPOT).multiplyScalar(sCell).add(tmpV.set(0, -2.9, 0.8)));

@@ -691,7 +691,7 @@ function buildMuscle(X) {
   }
   const D = V3(0.1, 0.5, 1);
   const views = [
-    { label: "Whole fibre (shortened)", x: 0, y: 34, z: 0, w: 270, h: 150, dir: D },
+    { label: "Whole fibre (shortened)", x: 0, y: 34, z: 0, w: 270, nw: 175, h: 150, dir: D },
     { label: "Sarcomere (magnified)", x: 0, y: 86, z: 0, w: 52, h: 40 },
     { label: "Inside the fibre", x: -30, y: 4, z: 0, w: 90, h: 50, dir: V3(0.1, 0.7, 1) },
   ];
@@ -1991,7 +1991,8 @@ export function create(engine) {
   function viewWorld(sp, v) {
     const dir = (v.dir ? v.dir.clone() : V3(0.1, 0.28, 1)).normalize().applyAxisAngle(UP, sp.bay.rotation.y);
     const target = sp.bay.localToWorld(V3(v.x, v.y, v.z));
-    return { target, dir, distance: distFor(v.w, v.h) };
+    // portrait: a view may give a narrower width (nw) so a long cell fills the screen (its far ends run off-screen, labelled "truncated")
+    return { target, dir, distance: distFor(engine.camera.aspect < 0.9 && v.nw ? v.nw : v.w, v.h) };
   }
   function overviewWorld(group) {
     const a = xs[group[0]] - mid, b = xs[group.at(-1)] - mid, w = (b - a) + HALF_W[group[0]] + HALF_W[group.at(-1)] + 60;
@@ -2072,7 +2073,9 @@ export function create(engine) {
       const p = typeof a.p === "function" ? a.p() : a.p;
       hold(el, toWorld(p, vpool[vp++]));
     });
+    const ov = engine.overlay, floorY = ov && ov.firstChild && engine.w < 700 ? ov.offsetTop + ov.offsetHeight + 14 : -1e9;
     // nudge overlapping labels apart (greedy, top to bottom)
+    for (let i = 0; i < act.length; i++) { const q = act[i], h = (q.el._w || 120) / 2 + 6; q.x = Math.min(Math.max(q.x, h), Math.max(h, engine.w - h)); if (q.y + q.dy < floorY) q.y = floorY - q.dy; }   // clamp first, then resolve collisions on the final positions
     act.sort((a, b) => a.y - b.y);
     for (let i = 0; i < act.length; i++) {
       const a = act[i];
@@ -2080,7 +2083,10 @@ export function create(engine) {
         const b = act[j];
         if (Math.abs(a.x - b.x) < ((a.el._w || 120) + (b.el._w || 120)) / 2 + 6 && Math.abs(a.y + a.dy - (b.y + b.dy)) < 24) a.dy = b.y + b.dy + 24 - a.y;
       }
-      engine.place(a.el, a.w, 0, a.dy);
+      // clamp inside the stage (labels at a cut-off end used to be clipped) and below the HUD chip rows on narrow stages
+      const half = (a.el._w || 120) / 2 + 6, x = Math.min(Math.max(a.x, half), Math.max(half, engine.w - half)), y = Math.max(a.y + a.dy, floorY);
+      a.el.style.display = "";
+      a.el.style.transform = `translate(${x.toFixed(1)}px, ${y.toFixed(1)}px) translate(-50%, -50%)`;
     }
   }
   const hideLabels = () => { for (const el of [...Object.values(names), ...Object.values(boards), ...feats]) el.style.display = "none"; };

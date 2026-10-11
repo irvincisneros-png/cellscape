@@ -1157,12 +1157,33 @@ export function create(engine) {
     add("node", "MHC", (o) => o.copy(mhcLoc[16].p).add(tV.set(0, 2.2, 1)));
   }
   const tLbl = new THREE.Vector3();
+  // keep 3D labels below the HUD chip rows on narrow stages (portrait): clamp their screen y to under the overlay
+  const _lp = new THREE.Vector3(), _cx = new Float32Array(16), _cy = new Float32Array(16), _cw = new Float32Array(16), _ch = new Float32Array(16); let _cn = 0;
+  function chipFloor() { const ov = engine.overlay; return ov && ov.firstChild && engine.w < 700 ? ov.offsetTop + ov.offsetHeight + 14 : -1e9; }
+  function placeClamped(el, v, dx, dy, minY) {
+    const p = _lp.copy(v).project(engine.camera);
+    if (p.z > 1 || p.z < -1) { el.style.display = "none"; return false; }
+    el.style.display = "";
+    const x = (p.x * 0.5 + 0.5) * engine.w + dx;
+    let y = (-p.y * 0.5 + 0.5) * engine.h + dy;
+    const w = el.offsetWidth || 100, h = el.offsetHeight || 22;
+    if (y - h / 2 < minY) {   // clamped: keep the label's top edge below the chips, then stack below any earlier label it would overlap
+      y = minY + h / 2;
+      for (let pass = 0; pass < 3; pass++) for (let i = 0; i < _cn; i++) if (Math.abs(x - _cx[i]) < (w + _cw[i]) / 2 + 6 && Math.abs(y - _cy[i]) < (h + _ch[i]) / 2 + 3) y = _cy[i] + (h + _ch[i]) / 2 + 3;
+    } else if (minY > -1e8) {   // narrow stage: an unclamped label also moves clear of labels already pushed down onto it
+      for (let pass = 0; pass < 3; pass++) for (let i = 0; i < _cn; i++) if (Math.abs(x - _cx[i]) < (w + _cw[i]) / 2 + 6 && Math.abs(y - _cy[i]) < (h + _ch[i]) / 2 + 3) y = _cy[i] + (h + _ch[i]) / 2 + 3;
+    }
+    if (_cn < 16) { _cx[_cn] = x; _cy[_cn] = y; _cw[_cn] = w; _ch[_cn++] = h; }
+    el.style.transform = `translate(${x.toFixed(1)}px, ${y.toFixed(1)}px) translate(-50%, -50%)`;
+    return true;
+  }
   function updateLabels() {
+    const floorY = chipFloor(); _cn = 0;
     for (const l of labels) {
       if (!showLabels || l.stg !== stage || stageBusy) { l.el.style.display = "none"; continue; }
       if (typeof l.html === "function") { const h = l.html(); if (l._h !== h) { l._h = h; l.el.innerHTML = h; } }
       if (l.get(tLbl) === false) { l.el.style.display = "none"; continue; }
-      engine.place(l.el, tLbl);
+      placeClamped(l.el, tLbl, 0, 0, floorY);
     }
   }
 

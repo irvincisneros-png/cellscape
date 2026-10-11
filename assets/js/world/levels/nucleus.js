@@ -763,7 +763,7 @@ export function create(engine) {
     chart.setAttribute("role", "img");
     ch.appendChild(chart);
     chartCtx = chart.getContext("2d");
-    ch.insertAdjacentHTML("beforeend", `<div class="legend" style="margin-top:6px"><span><i style="background:#f8fafc"></i>${y7 ? "Messages made/s" : "Transcription/s"}</span><span><i style="background:${MRNA_COL}"></i>${y7 ? "Messages out/s" : "mRNA export/s"}</span><span><i style="background:#a5b4fc"></i>${y7 ? "Ribosome parts out/s" : "Subunits out/s"}</span><span><i style="background:#fbbf24"></i>${y7 ? "Proteins in/s" : "Import/s"}</span></div>`);
+    ch.insertAdjacentHTML("beforeend", `<div class="legend" style="margin-top:6px"><span><i style="background:var(--ink)"></i>${y7 ? "Messages made/s" : "Transcription/s"}</span><span><i style="background:${MRNA_COL}"></i>${y7 ? "Messages out/s" : "mRNA export/s"}</span><span><i style="background:#a5b4fc"></i>${y7 ? "Ribosome parts out/s" : "Subunits out/s"}</span><span><i style="background:#fbbf24"></i>${y7 ? "Proteins in/s" : "Import/s"}</span></div>`);
 
     const bp = K.card(el, lens.pick({ "y7-8": "The big picture", "y9-10": "The big picture: from gene to protein" }));
     bp.insertAdjacentHTML("beforeend", lens.pick(BIG_PICTURE));

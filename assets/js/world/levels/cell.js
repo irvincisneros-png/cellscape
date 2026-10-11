@@ -5,8 +5,8 @@ import * as THREE from "three";
 import { RoundedBoxGeometry } from "three/addons/geometries/RoundedBoxGeometry.js";
 import * as K from "../../kit.js";
 import { physical, glass, specks, hash, wobble, softDot } from "../materials.js";
-import { PlantCellModel } from "./plantCellModel.js";
-import { ORGANELLES, SWITCHES, FLOWS, MISSIONS, QUIZ, narrative } from "./cellContent.js";
+import { PlantCellModel, LeafLab } from "./plantCellModel.js";
+import { ORGANELLES, SWITCHES, FLOWS, MISSIONS, QUIZ, LEAF_CHOICES, LEAF_NOTE, clockText, narrative } from "./cellContent.js";
 import { clipGeometryBelow, roundedRectPts, slabGeometry, clayMaterial } from "../style.js";
 
 const HX = 28, HY = 17, HZ = 17;               // membrane half-extents (µm)
@@ -46,6 +46,7 @@ function quatFromNormal(n, spin) {
 
 export function create(engine) {
   const M = new PlantCellModel();
+  const lab = new LeafLab(M);                    // records what the leaf missions need (reads the model, never changes it)
   const lens = engine.lens;
   const root = new THREE.Group();
   const pickables = [];
@@ -529,7 +530,7 @@ export function create(engine) {
 
   // ---------- panel ----------
   let progress = null; // { band, node } — the built panel, kept across dives so missions/quiz survive
-  let panelEl, explainBody, selCard, chips = {}, chart, chartCtx, mission, nightTime = 0, sec0 = 0, rows = {}, wasFlaccid = false;
+  let panelEl, explainBody, selCard, chips = {}, chart, chartCtx, dayChart, dayCtx, dayRead, clockRead, lightS, autoSeg, peakS, leafAbout, leafSeg, mission, nightTime = 0, sec0 = 0, rows = {}, wasFlaccid = false;
   function buildPanel(el) {
     panelEl = el;
     el.innerHTML = "";
@@ -549,18 +550,59 @@ export function create(engine) {
     selCard.style.display = "none";
 
     const env = K.card(el, "Conditions");
-    K.slider(env, { label: "☀ Light", min: 0, max: 100, value: M.light, unit: " %", onInput: (v) => (M.light = v) });
+    lightS = K.slider(env, { label: "☀ Light", min: 0, max: 100, value: Math.round(M.light), unit: " %", onInput: (v) => (M.light = v) });
+    lightS.input.disabled = M.auto;
     K.slider(env, { label: lens.pick({ "y7-8": "Carbon dioxide in the air", "y9-10": "CO₂ available" }), min: 0, max: 100, value: M.co2Out, unit: " %", onInput: (v) => (M.co2Out = v) });
     if (lens.atLeast("y9-10")) K.slider(env, { label: "Salt in the surrounding solution", min: 0, max: 100, value: M.outside, unit: " %", format: (v) => (v === 0 ? "pure water" : `${v} %`), onInput: (v) => (M.outside = v) });
+    if (lens.atLeast("y9-10")) K.slider(env, { label: "Hot, dry air", min: 0, max: 100, value: M.heat, unit: " %", format: (v) => (v === 0 ? "mild and humid" : v < 40 ? `${v} % (warm)` : `${v} %`), onInput: (v) => (M.heat = v) });
     const r = K.buttonRow(env);
-    K.button(r, "☀ Day", () => setLight(85));
-    K.button(r, "☾ Night", () => setLight(0));
+    K.button(r, "☀ Day", () => { setAuto(false); setLight(85); });
+    K.button(r, "☾ Night", () => { setAuto(false); setLight(0); });
     K.button(r, "Reset cell", () => {
-      M.reset(); sec0 = 0; tour = null; showStep(); engine.select(null);
+      M.reset(); lab.reset(); sec0 = 0; tour = null; showStep(); engine.select(null);
       for (const fm of Object.values(flowMeshes)) { fm.parts.length = 0; fm.acc = 0; }
       progress = null; buildPanel(panelEl);
     });
     function setLight(v) { M.light = v; env.querySelector("input").value = v; env.querySelector("input").dispatchEvent(new Event("input")); }
+
+    // ---- sun leaf or shade leaf, and a 24 h day ----
+    const lf = K.card(el, lens.pick({ "y7-8": "Sun leaf or shade leaf?", "y9-10": "Leaf type" }));
+    leafSeg = K.segmented(lf, LEAF_CHOICES.map((c) => ({ value: c.value, label: lens.pick(c.label) })), M.leaf, (v) => { M.leaf = v; showLeaf(); });
+    leafAbout = document.createElement("p");
+    leafAbout.className = "hint";
+    leafAbout.style.margin = "8px 0 0";
+    lf.appendChild(leafAbout);
+    lf.insertAdjacentHTML("beforeend", `<p class="hint" style="margin:6px 0 0">${LEAF_NOTE}</p>`);
+    function showLeaf() { const c = LEAF_CHOICES.find((x) => x.value === M.leaf); leafAbout.innerHTML = lens.pick(c.about); }
+    showLeaf();
+
+    const dn = K.card(el, lens.pick({ "y7-8": "Day and night", "y9-10": "Day and night cycle" }));
+    autoSeg = K.segmented(dn, [{ value: "manual", label: "Set the light myself" }, { value: "auto", label: "24 h day" }], M.auto ? "auto" : "manual", (v) => setAuto(v === "auto"));
+    peakS = K.slider(dn, { label: lens.pick({ "y7-8": "Brightest sunshine at noon", "y9-10": "Peak light at noon" }), min: 5, max: 100, value: M.peak, unit: " %", onInput: (v) => (M.peak = v) });
+    peakS.el.style.display = M.auto ? "" : "none";
+    clockRead = document.createElement("p");
+    clockRead.style.cssText = "margin:8px 0 0;color:var(--ink);font-weight:600";
+    clockRead.setAttribute("aria-live", "off");
+    dn.appendChild(clockRead);
+    dn.insertAdjacentHTML("beforeend", `<p class="hint" style="margin:6px 0 0">${lens.pick({ "y7-8": "Light follows the Sun: dark from 6 pm to 6 am, brightest at noon. One day takes 2 minutes.", "y9-10": "Light rises and falls smoothly: zero from 6 pm to 6 am, a peak at noon. One 24 h day takes 2 minutes. The cell respires the whole time." })}</p>`);
+    function setAuto(on) {
+      M.auto = !!on;
+      autoSeg.set(on ? "auto" : "manual");
+      peakS.el.style.display = on ? "" : "none";
+      lightS.input.disabled = on;
+    }
+
+    const dc = K.card(el, lens.pick({ "y7-8": "Oxygen and sugar over one day", "y9-10": "Net exchange over 24 h" }));
+    dayChart = document.createElement("canvas");
+    dayChart.className = "mini-chart";
+    dayChart.setAttribute("role", "img");
+    dc.appendChild(dayChart);
+    dayCtx = dayChart.getContext("2d");
+    dc.insertAdjacentHTML("beforeend", `<div class="legend" style="margin-top:6px"><span><i style="background:#f87171"></i>${lens.pick({ "y7-8": "Oxygen made minus used", "y9-10": "Net O₂ (made − used)" })}</span><span><i style="background:#a3e635"></i>${lens.pick({ "y7-8": "Sugar store (change)", "y9-10": "Sugar store (change)" })}</span></div>`);
+    dayRead = document.createElement("p");
+    dayRead.className = "hint";
+    dayRead.style.margin = "6px 0 0";
+    dc.appendChild(dayRead);
 
     const sw = K.card(el, lens.pick({ "y7-8": "Switch organelles on and off", "y9-10": "Knock out a part" }));
     sw.insertAdjacentHTML("beforeend", `<p class="hint" style="margin:0 0 8px">${lens.pick({ "y7-8": "Turn something off and watch what else stops working.", "y9-10": "Turn a part off and follow the knock-on effects through the cell." })}</p>`);
@@ -629,7 +671,7 @@ export function create(engine) {
 
     nightTime = 0; sec0 = M.secreted;
     wasFlaccid = false;
-    mission = K.missions(el, lens.filter(MISSIONS).map((m) => ({ text: m.text, check: () => m.check(M, { nightTime, sec0, wasFlaccid }) })), (m) => engine.toast(`🎯 Mission complete: ${m.text.replace(/<[^>]+>/g, "")}`, 3400));
+    mission = K.missions(el, lens.filter(MISSIONS).map((m) => ({ text: m.text, check: () => m.check(M, { nightTime, sec0, wasFlaccid, lab }) })), (m) => engine.toast(`🎯 Mission complete: ${m.text.replace(/<[^>]+>/g, "")}`, 3400));
     K.quiz(el, lens.filter(QUIZ));
     buildChips();
   }
@@ -673,6 +715,44 @@ export function create(engine) {
       H.forEach((p, i) => { const x = (i / 239) * w, y = h - (p[k] / 100) * (h - 4) - 2; i ? c.lineTo(x, y) : c.moveTo(x, y); });
       c.stroke();
     }
+  }
+
+  /** 24 h chart: net O₂ (made − used, centred on zero) and the change in sugar store since the day began. Drawn from what the model did. */
+  function drawDay() {
+    const w = dayChart.clientWidth, h = dayChart.clientHeight, dpr = Math.min(devicePixelRatio || 1, 2);
+    if (!w) return;
+    if (dayChart.width !== Math.round(w * dpr)) { dayChart.width = Math.round(w * dpr); dayChart.height = Math.round(h * dpr); }
+    const c = dayCtx, D = lab.day, N = D.net.length, padB = 16, ph = h - padB, mid = ph / 2;
+    c.setTransform(dpr, 0, 0, dpr, 0, 0);
+    c.clearRect(0, 0, w, h);
+    c.fillStyle = K.cssVar("--grid-line", "rgba(255,255,255,0.08)");
+    c.fillRect(0, 0, w / 4, ph); c.fillRect(w * 0.75, 0, w / 4, ph);   // night: 00:00–06:00 and 18:00–24:00
+    c.strokeStyle = K.cssVar("--grid-line", "rgba(255,255,255,0.18)"); c.lineWidth = 1;
+    c.beginPath(); c.moveTo(0, mid); c.lineTo(w, mid); c.stroke();
+    c.fillStyle = K.cssVar("--ink-dim", "#94a3b8"); c.font = "11px system-ui, sans-serif"; c.textBaseline = "alphabetic";
+    for (let q = 0; q <= 4; q++) { c.textAlign = q === 0 ? "left" : q === 4 ? "right" : "center"; c.fillText(String(q * 6).padStart(2, "0") + ":00", (q / 4) * w, h - 3); }
+    let SPAN_SUG = 6;
+    for (const B of [D, lab.prev]) for (let i = 0; i < N; i++) if (B.have[i]) SPAN_SUG = Math.max(SPAN_SUG, Math.abs(B.sugar[i] - B.start));
+    const SPAN_NET = 4;
+    const P = lab.prev;
+    for (const [src, arr, span, col, off, a] of [[P, P.net, SPAN_NET, "#f87171", 0, 0.3], [P, P.sugar, SPAN_SUG, "#a3e635", P.start, 0.3], [D, D.net, SPAN_NET, "#f87171", 0, 1], [D, D.sugar, SPAN_SUG, "#a3e635", D.start, 1]]) {
+      c.globalAlpha = a; c.strokeStyle = K.chartCol(col); c.lineWidth = 2; c.beginPath();   // the previous full day is drawn faintly, with its own baseline
+      let pen = false;
+      for (let i = 0; i < N; i++) {
+        if (!src.have[i]) { pen = false; continue; }
+        const x = ((i + 0.5) / N) * w, y = mid - ((arr[i] - off) / span) * (mid - 4);
+        pen ? c.lineTo(x, y) : c.moveTo(x, y); pen = true;
+      }
+      c.stroke();
+    }
+    c.globalAlpha = 1;
+    if (M.auto) { const x = (M.hour / 24) * w; c.strokeStyle = K.chartCol(K.cssVar("--ink", "#f8fafc")); c.lineWidth = 1; c.beginPath(); c.moveTo(x, 0); c.lineTo(x, ph); c.stroke(); }
+    const net = M.flux.net || 0, d = M.sugar - D.start;
+    dayChart.setAttribute("aria-label", `Net oxygen exchange now ${net >= 0 ? "+" : "minus "}${Math.abs(net).toFixed(1)} per second; sugar store ${M.sugar.toFixed(0)} percent, ${d >= 0 ? "up" : "down"} ${Math.abs(d).toFixed(1)} since the day began.`);
+    const L = lab.last, hrs = lab.hours;
+    const verdict = !L ? "" : ` Last full day: ${L.start.toFixed(0)} → ${L.end.toFixed(0)} % (${Math.abs(L.change) < 0.05 ? "no change" : `net ${L.change > 0 ? "gain" : "loss"} of ${Math.abs(L.change).toFixed(1)}`}). Mission test: ${L.ok ? "met" : `not met — ${[!L.held && "the store fell by more than 0.5", !L.positive && "the store ran out", !L.nightRespOk && "no night respiration recorded", !(M.on.chloroplast && M.on.mitochondrion) && "chloroplasts or mitochondria were off"].filter(Boolean).join("; ")}`}.`;
+    dayRead.textContent = !M.auto ? "Turn on the 24 h day to draw this chart as the hours pass."
+      : `Sugar store ${M.sugar.toFixed(0)} % (${d >= 0 ? "+" : "−"}${Math.abs(d).toFixed(1)} since the run began). ${hrs < 24 ? `${hrs.toFixed(0)} of 24 h recorded with these settings.` : ""}${verdict}`;
   }
 
   function updateExplain() {
@@ -945,6 +1025,7 @@ export function create(engine) {
     onLens() { showLabels = lens.band === "y7-8" || lens.band === "y9-10"; progress = null; buildPanel(panelEl); },
     update(dt, t, rdt = dt) {
       M.step(dt);
+      lab.update(dt);
       nightTime = M.light < 10 ? nightTime + dt : 0;
       if (M.turgor < 35 && M.outside > 20) wasFlaccid = true;
       if (gone === 0) emitFlows(dt);
@@ -955,6 +1036,7 @@ export function create(engine) {
       if ((uiT -= rdt) <= 0) {
         uiT = 0.25;
         updateChips();
+        if (M.auto) { lightS.value = Math.round(M.light); clockRead.textContent = `Time of day: ${clockText(M.hour)}`; } else clockRead.textContent = `Time of day: ${M.light < 1 ? "night (no light)" : "set by the light slider"}`;
         const st = M.status();
         for (const [k, row] of Object.entries(rows)) {
           const s = st[k] || (k === "pores" ? (M.on.pores ? (M.mrna > 70 ? "mRNA piling up" : "letting mRNA out") : "blocked") : k === "aquaporins" ? (M.on.aquaporins ? "letting water through" : "closed") : "");
@@ -964,7 +1046,7 @@ export function create(engine) {
         }
       }
       if ((exT -= rdt) <= 0) { exT = 0.6; updateExplain(); }
-      if ((chT -= rdt) <= 0) { chT = 0.5; drawChart(); }
+      if ((chT -= rdt) <= 0) { chT = 0.5; drawChart(); drawDay(); }
       mission?.update();
     },
   };

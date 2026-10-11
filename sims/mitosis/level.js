@@ -9,7 +9,7 @@ import { Scene3D, SCALE } from "./scene3d.js";
 import { PARTS, COMPARE, MISSIONS, QUIZ, narrative, taskText, CHR_NAME } from "./content3d.js";
 
 const CSS = `
-.mi-tl { position: absolute; left: 14px; right: 14px; bottom: 84px; z-index: 3; pointer-events: none; }
+.mi-tl { position: absolute; left: 14px; right: 14px; bottom: 130px; z-index: 3; pointer-events: none; }  /* sits above the Microscope / Pause buttons (bottom-right) so the Cytokinesis/G1 end of the strip is never covered */
 .mi-tl .bar { position: relative; height: 20px; display: flex; gap: 2px; pointer-events: auto; cursor: pointer; touch-action: none; border-radius: 7px; }
 .mi-tl.locked .bar { cursor: not-allowed; }
 .mi-tl .seg { flex: 1 1 0; border-radius: 5px; background: rgba(79,209,197,0.16); color: var(--ink-dim); font-size: 0.68rem; display: flex; align-items: center; justify-content: center; overflow: hidden; white-space: nowrap; user-select: none; }
@@ -23,7 +23,7 @@ const CSS = `
 .mi-tl .chk.held { color: var(--t-bad); animation: mi-pulse 1s ease-in-out infinite; }
 .mi-tl .grp { position: relative; height: 12px; font-size: 0.64rem; color: var(--ink-faint); margin-top: 2px; text-shadow: 0 1px 4px var(--shadow); }
 @keyframes mi-pulse { 50% { opacity: 0.45; } }
-.mi-act { position: absolute; left: 50%; bottom: 124px; transform: translateX(-50%); z-index: 3; max-width: calc(100% - 28px); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; touch-action: none;
+.mi-act { position: absolute; left: 50%; bottom: 172px; transform: translateX(-50%); z-index: 3; max-width: calc(100% - 28px); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; touch-action: none;
   background: rgba(251,191,36,0.18); border-color: rgba(251,191,36,0.7); color: #fff7d6; box-shadow: 0 0 18px rgba(251,191,36,0.25); }
 .mi-act.holding { background: rgba(251,191,36,0.42); }
 .mi-act[disabled] { opacity: 0.55; box-shadow: none; }
@@ -42,7 +42,7 @@ const CSS = `
 .lbl3d.mi-wait { color: #fde68a; font-size: 0.66rem; font-weight: 700; text-shadow: 0 0 8px #f59e0b, 0 1px 4px #000; }
 .mi-chip .w { color: var(--ink-faint); }
 .chip.mi-hold { border-color: rgba(248,113,113,0.7); }
-@media (max-width: 600px) { .mi-tl { bottom: 80px; left: 10px; right: 10px; } .mi-tl .seg { font-size: 0.6rem; } .mi-act { bottom: 116px; font-size: 0.8rem; } .mi-chip.opt { display: none; } }
+@media (max-width: 600px) { .mi-tl { bottom: 126px; left: 10px; right: 10px; } .mi-tl .seg { font-size: 0.6rem; } .mi-act { bottom: 164px; font-size: 0.8rem; } .mi-chip.opt { display: none; } }
 @media (prefers-reduced-motion: reduce) { .mi-tl .chk.held { animation: none; } }
 `;
 

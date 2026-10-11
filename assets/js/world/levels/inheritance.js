@@ -166,7 +166,7 @@ export function create(engine) {
   const gStage = new THREE.Group(); root.add(gStage);
   {
     const disc = new THREE.Mesh(share(new THREE.CircleGeometry(14, 64)), share(new THREE.MeshStandardMaterial({ color: "#0a1b2d", roughness: 1, metalness: 0, envMapIntensity: 0 })));
-    disc.rotation.x = -Math.PI / 2; disc.position.y = -0.01; gStage.add(disc);
+    disc.rotation.x = -Math.PI / 2; disc.position.y = -0.01; disc.userData.clayColor = "#efe3d1"; gStage.add(disc);   // clay: a warm cream stage, not a navy-turned-blue sheet
     const cv = document.createElement("canvas"); cv.width = cv.height = 256;
     const c = cv.getContext("2d"), g = c.createRadialGradient(128, 128, 0, 128, 128, 128);
     g.addColorStop(0, "rgba(94,234,212,0.55)"); g.addColorStop(0.45, "rgba(94,160,255,0.16)"); g.addColorStop(1, "rgba(94,160,255,0)");

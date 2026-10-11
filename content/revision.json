@@ -1,0 +1,2850 @@
+{
+ "generated": "tools/build-revision-bank.mjs",
+ "items": [
+  {
+   "id": "rv001",
+   "band": "y7-8",
+   "topics": [
+    "cell-structure"
+   ],
+   "q": "State the first statement of cell theory.",
+   "options": [
+    "All cells contain chloroplasts for energy",
+    "Cells can arise from non-living matter",
+    "All cells are identical in their structure",
+    "All living things are made of one or more cells"
+   ],
+   "answer": 3,
+   "why": "The first statement of cell theory is: all living things are made of one or more cells — from the simplest bacteria to blue whales."
+  },
+  {
+   "id": "rv002",
+   "band": "y7-8",
+   "topics": [
+    "cell-structure",
+    "microscopy"
+   ],
+   "q": "Who first used the word 'cell' to describe what he saw under a microscope?",
+   "options": [
+    "Anton van Leeuwenhoek",
+    "Theodor Schwann",
+    "Rudolf Virchow",
+    "Robert Hooke in 1665"
+   ],
+   "answer": 3,
+   "why": "Robert Hooke first used the word 'cell' in 1665 when he observed cork tissue under his microscope and described the small compartments he saw."
+  },
+  {
+   "id": "rv003",
+   "band": "y7-8",
+   "topics": [
+    "cell-structure"
+   ],
+   "q": "What does the third statement of cell theory say?",
+   "options": [
+    "Cells require oxygen to survive",
+    "All organisms are made of cells",
+    "The cell is the smallest unit of life",
+    "All cells arise from pre-existing cells"
+   ],
+   "answer": 3,
+   "why": "The third statement of cell theory says that new cells arise from existing cells through cell division."
+  },
+  {
+   "id": "rv004",
+   "band": "y7-8",
+   "topics": [
+    "membrane",
+    "cell-structure"
+   ],
+   "q": "What is the function of the cell membrane?",
+   "options": [
+    "Controls what enters and leaves the cell",
+    "Holds the DNA that controls the cell",
+    "Site of aerobic respiration in the cell",
+    "Provides rigid shape and support for the cell"
+   ],
+   "answer": 0,
+   "why": "The cell membrane is a thin, flexible layer that is selectively permeable: it lets some substances through and keeps others out."
+  },
+  {
+   "id": "rv005",
+   "band": "y7-8",
+   "topics": [
+    "organelles",
+    "cell-structure"
+   ],
+   "q": "What is the function of the nucleus in a cell?",
+   "options": [
+    "Site of photosynthesis in plant cells",
+    "Holds the DNA and directs cell activities",
+    "Stores water and dissolved wastes",
+    "Releases energy for the cell by respiration"
+   ],
+   "answer": 1,
+   "why": "The nucleus contains the cell's DNA (genetic material) and acts as the control centre for growth, metabolism and reproduction."
+  },
+  {
+   "id": "rv006",
+   "band": "y7-8",
+   "topics": [
+    "respiration",
+    "organelles"
+   ],
+   "q": "Where do most stages of aerobic cellular respiration occur in a plant or animal cell?",
+   "options": [
+    "Cytoplasm only",
+    "Mitochondria",
+    "Chloroplasts",
+    "Cell membrane"
+   ],
+   "answer": 1,
+   "why": "Glycolysis begins in the cytoplasm. The remaining stages of aerobic respiration occur in mitochondria."
+  },
+  {
+   "id": "rv007",
+   "band": "y7-8",
+   "topics": [
+    "photosynthesis",
+    "organelles"
+   ],
+   "q": "Where does photosynthesis take place in a plant cell?",
+   "options": [
+    "Mitochondria",
+    "Nucleus",
+    "Cell membrane",
+    "Chloroplasts"
+   ],
+   "answer": 3,
+   "why": "Photosynthesis occurs in chloroplasts, which contain chlorophyll — the green pigment that absorbs light energy to make glucose."
+  },
+  {
+   "id": "rv008",
+   "band": "y7-8",
+   "topics": [
+    "cell-structure",
+    "organelles"
+   ],
+   "q": "Which structure is found in plant cells but NOT in animal cells?",
+   "options": [
+    "A cellulose cell wall",
+    "A nucleus containing DNA",
+    "A cell membrane around the cytoplasm",
+    "Mitochondria for respiration"
+   ],
+   "answer": 0,
+   "why": "Plant cells have a rigid cell wall made of cellulose outside the cell membrane; animal cells have no cell wall."
+  },
+  {
+   "id": "rv009",
+   "band": "y7-8",
+   "topics": [
+    "organelles",
+    "cell-structure"
+   ],
+   "q": "Which three structures are typically present in a photosynthetic leaf cell but absent from an animal cell?",
+   "options": [
+    "Nucleus, mitochondria and ribosomes in the cytoplasm",
+    "Cytoplasm, nucleus and ribosomes in the cell",
+    "Cell wall, chloroplasts and a large central vacuole",
+    "Cell membrane, nucleus and mitochondria together"
+   ],
+   "answer": 2,
+   "why": "A typical photosynthetic leaf cell has a cellulose cell wall, chloroplasts and a large central vacuole. Animal cells lack these structures; many non-photosynthetic plant cells lack chloroplasts."
+  },
+  {
+   "id": "rv010",
+   "band": "y7-8",
+   "topics": [
+    "respiration",
+    "atp",
+    "organelles"
+   ],
+   "q": "What is the role of mitochondria in a cell?",
+   "options": [
+    "They control when the cell divides",
+    "They release energy (ATP) by respiration",
+    "They make glucose from sunlight energy",
+    "They store water for the cell to use"
+   ],
+   "answer": 1,
+   "why": "Mitochondria are the sites of aerobic cellular respiration, breaking down glucose to release energy stored as ATP for the cell's activities."
+  },
+  {
+   "id": "rv011",
+   "band": "y7-8",
+   "topics": [
+    "respiration"
+   ],
+   "q": "What is the word equation for aerobic cellular respiration?",
+   "options": [
+    "Oxygen + glucose produces water + sunlight + energy",
+    "Glucose + oxygen produces carbon dioxide + water + energy",
+    "Glucose + water produces oxygen + carbon dioxide",
+    "Carbon dioxide + water produces glucose + oxygen"
+   ],
+   "answer": 1,
+   "why": "Aerobic cellular respiration converts glucose and oxygen into carbon dioxide and water, transferring some of the released energy to ATP. In plant and animal cells, glycolysis occurs in the cytoplasm and the remaining stages occur in mitochondria."
+  },
+  {
+   "id": "rv012",
+   "band": "y7-8",
+   "topics": [
+    "photosynthesis"
+   ],
+   "q": "What is the word equation for photosynthesis?",
+   "options": [
+    "Glucose + oxygen, with light, makes carbon dioxide + water",
+    "Glucose + water makes oxygen + sunlight energy",
+    "Oxygen + carbon dioxide makes glucose + water + heat",
+    "Carbon dioxide + water, with light, makes glucose + oxygen"
+   ],
+   "answer": 3,
+   "why": "Photosynthesis: carbon dioxide + water (using light energy) produces glucose + oxygen. This happens in chloroplasts."
+  },
+  {
+   "id": "rv013",
+   "band": "y7-8",
+   "topics": [
+    "cell-structure"
+   ],
+   "q": "How does the shape of a typical plant cell differ from a typical animal cell?",
+   "options": [
+    "Animal cells are larger and more regular than plant cells",
+    "Animal cells are always rectangular and plant cells are always round",
+    "Both kinds of cell always have exactly the same shape",
+    "Plant cells are regular and boxy; animal cells are more irregular"
+   ],
+   "answer": 3,
+   "why": "Plant cells are typically rectangular and regular in shape because of their rigid cellulose cell wall; animal cells are more varied and irregular."
+  },
+  {
+   "id": "rv014",
+   "band": "y7-8",
+   "topics": [
+    "organelles",
+    "osmosis"
+   ],
+   "q": "What does the large central vacuole in a plant cell do?",
+   "options": [
+    "Carries out photosynthesis in the cell",
+    "Controls when the cell divides",
+    "Stores water and helps keep the cell firm",
+    "Makes proteins for the cell"
+   ],
+   "answer": 2,
+   "why": "The large central vacuole stores water and other substances, helping maintain turgor pressure that keeps the plant cell rigid and upright."
+  },
+  {
+   "id": "rv015",
+   "band": "y7-8",
+   "topics": [
+    "specialised-cells",
+    "diffusion"
+   ],
+   "q": "Why do root hair cells have long, thin extensions?",
+   "options": [
+    "To carry out photosynthesis more efficiently",
+    "To increase surface area for absorbing water",
+    "To push the plant through the soil",
+    "To store sugar made by the leaves"
+   ],
+   "answer": 1,
+   "why": "Root hair cells have a long thin extension that dramatically increases the surface area in contact with soil water, improving absorption of water and minerals."
+  },
+  {
+   "id": "rv016",
+   "band": "y7-8",
+   "topics": [
+    "specialised-cells",
+    "blood-transport"
+   ],
+   "q": "What is the function of red blood cells?",
+   "options": [
+    "To carry oxygen, packed with haemoglobin",
+    "To engulf and digest bacteria in the blood",
+    "To form blood clots when skin is cut",
+    "To make antibodies against pathogens"
+   ],
+   "answer": 0,
+   "why": "Red blood cells are packed with haemoglobin and have a biconcave disc shape with no nucleus, maximising oxygen-carrying capacity."
+  },
+  {
+   "id": "rv017",
+   "band": "y7-8",
+   "topics": [
+    "cell-structure",
+    "specialised-cells"
+   ],
+   "q": "What is a tissue in biology?",
+   "options": [
+    "A group of organs working together",
+    "A group of similar cells doing one job",
+    "A single, highly specialised cell",
+    "The outer covering of an organism"
+   ],
+   "answer": 1,
+   "why": "A tissue is a group of similar cells (sometimes a few closely associated types) that work together to perform a specific function."
+  },
+  {
+   "id": "rv018",
+   "band": "y7-8",
+   "topics": [
+    "cell-structure",
+    "specialised-cells"
+   ],
+   "q": "What is an organ in biology?",
+   "options": [
+    "A single type of tissue found in the body",
+    "A group of whole organisms living together",
+    "Several tissues working together for one function",
+    "A single specialised cell that has many nuclei"
+   ],
+   "answer": 2,
+   "why": "An organ (such as the heart or leaf) is made of several tissue types working together to perform a complex function."
+  },
+  {
+   "id": "rv019",
+   "band": "y7-8",
+   "topics": [
+    "specialised-cells",
+    "gas-exchange",
+    "plant-transport"
+   ],
+   "q": "What is the main role of guard cells in a plant leaf?",
+   "options": [
+    "Takes up water from the soil",
+    "Absorbs water and minerals from the soil",
+    "Opens and closes the stomata",
+    "Moves glucose down to the roots"
+   ],
+   "answer": 2,
+   "why": "Pairs of guard cells change their turgor and shape to open or close stomata, regulating gas exchange and water loss."
+  },
+  {
+   "id": "rv020",
+   "band": "y7-8",
+   "topics": [
+    "cell-structure",
+    "microscopy"
+   ],
+   "q": "Under a microscope, a student sees cells with: rectangular shape, clearly visible cell wall, and a large central clear space. What type of cell is this?",
+   "options": [
+    "Fungal cell (yeast)",
+    "Plant cell",
+    "Bacterial cell",
+    "Animal cell (cheek cell)"
+   ],
+   "answer": 1,
+   "why": "Rectangular shape, visible cell wall and large central vacuole are distinctive features of plant cells."
+  },
+  {
+   "id": "rv021",
+   "band": "y7-8",
+   "topics": [
+    "microscopy"
+   ],
+   "q": "How is total magnification calculated for a compound microscope?",
+   "options": [
+    "Eyepiece magnification + objective magnification",
+    "Eyepiece magnification × objective magnification",
+    "Objective magnification ÷ eyepiece magnification",
+    "Objective magnification alone"
+   ],
+   "answer": 1,
+   "why": "Total magnification = eyepiece magnification x objective magnification. For example, 10x eyepiece x 40x objective = 400x total."
+  },
+  {
+   "id": "rv022",
+   "band": "y7-8",
+   "topics": [
+    "microscopy",
+    "cell-structure"
+   ],
+   "q": "What stain is typically used to make the nucleus of animal cells (such as cheek cells) more visible?",
+   "options": [
+    "Congo red",
+    "Safranin",
+    "Iodine solution",
+    "Methylene blue"
+   ],
+   "answer": 3,
+   "why": "Methylene blue stains nuclei dark blue, making them more visible in animal cells under the microscope."
+  },
+  {
+   "id": "rv023",
+   "band": "y7-8",
+   "topics": [
+    "prokaryote-eukaryote",
+    "microscopy"
+   ],
+   "q": "Why do bacteria appear so different from plant and animal cells under a light microscope?",
+   "options": [
+    "Bacteria are larger than plant and animal cells",
+    "Bacteria always move too fast to be seen clearly",
+    "They are prokaryotes: much smaller, with no nucleus",
+    "Bacteria cannot be stained with any standard stain"
+   ],
+   "answer": 2,
+   "why": "Bacteria are prokaryotes: they are typically much smaller than eukaryotic cells and lack a membrane-bound nucleus and organelles."
+  },
+  {
+   "id": "rv024",
+   "band": "y7-8",
+   "topics": [
+    "photosynthesis",
+    "respiration"
+   ],
+   "q": "What does photosynthesis produce that cellular respiration uses as a reactant?",
+   "options": [
+    "Carbon dioxide and water",
+    "ATP and water",
+    "Oxygen and glucose",
+    "Carbon dioxide and ATP"
+   ],
+   "answer": 2,
+   "why": "Photosynthesis produces glucose and oxygen; aerobic cellular respiration uses glucose and oxygen as its reactants."
+  },
+  {
+   "id": "rv025",
+   "band": "y7-8",
+   "topics": [
+    "photosynthesis",
+    "organelles"
+   ],
+   "q": "What is the function of chlorophyll in plant cells?",
+   "options": [
+    "To produce ATP in the mitochondria",
+    "To break down glucose for energy",
+    "To control which substances enter the cell",
+    "To absorb light energy for photosynthesis"
+   ],
+   "answer": 3,
+   "why": "Chlorophyll is the green pigment in chloroplasts that absorbs light energy, which is then used to drive the photosynthesis reaction."
+  },
+  {
+   "id": "rv026",
+   "band": "y7-8",
+   "topics": [
+    "specialised-cells"
+   ],
+   "q": "Why does a nerve cell (neuron) have a very long axon?",
+   "options": [
+    "To carry electrical signals over long distances",
+    "To carry out photosynthesis over a large area",
+    "To store large amounts of energy",
+    "To absorb more oxygen from the blood"
+   ],
+   "answer": 0,
+   "why": "Neurons have very long axons to allow rapid transmission of electrical signals over long distances, connecting distant parts of the body."
+  },
+  {
+   "id": "rv027",
+   "band": "y7-8",
+   "topics": [
+    "cell-structure"
+   ],
+   "q": "What are the three statements of cell theory?",
+   "options": [
+    "All living things grow; all cells contain DNA; cells cannot die",
+    "Living things are made of cells; the cell is the basic unit of life; cells come from existing cells",
+    "All cells contain chloroplasts; all cells divide every 24 hours; all cells have a nucleus",
+    "Cells are made of atoms; all cells respire; all cells are the same size"
+   ],
+   "answer": 1,
+   "why": "Cell theory: (1) all living things are made of cells; (2) the cell is the basic structural and functional unit of life; (3) all cells arise from pre-existing cells."
+  },
+  {
+   "id": "rv028",
+   "band": "y7-8",
+   "topics": [
+    "organelles",
+    "cell-structure"
+   ],
+   "q": "What is the function of cytoplasm?",
+   "options": [
+    "Provides rigid structural support for the whole cell",
+    "Absorbs light energy for photosynthesis in plant cells",
+    "Controls what enters and leaves the whole cell",
+    "Contains the cytosol and organelles, where many cell reactions occur"
+   ],
+   "answer": 3,
+   "why": "Cytoplasm comprises the cytosol and the structures suspended in it, excluding the nucleus in eukaryotic cells. Many chemical reactions occur there."
+  },
+  {
+   "id": "rv029",
+   "band": "y7-8",
+   "topics": [
+    "photosynthesis",
+    "specialised-cells"
+   ],
+   "q": "Why is the palisade mesophyll tissue near the top of a leaf?",
+   "options": [
+    "It protects the leaf from insects that land on it",
+    "Its chloroplast-rich cells capture the most light there",
+    "It stops water being lost from the leaf surface",
+    "It allows gas exchange at the upper leaf surface"
+   ],
+   "answer": 1,
+   "why": "Palisade mesophyll cells are column-shaped and packed with chloroplasts, positioned near the top of the leaf to absorb maximum sunlight for photosynthesis."
+  },
+  {
+   "id": "rv030",
+   "band": "y7-8",
+   "topics": [
+    "prokaryote-eukaryote",
+    "cell-structure"
+   ],
+   "q": "What type of organisms are bacteria: prokaryotes or eukaryotes?",
+   "options": [
+    "Eukaryotes: they have a membrane-bound nucleus",
+    "Prokaryotes: they have no membrane-bound nucleus",
+    "Neither: bacteria are not made of cells at all",
+    "Eukaryotes: they have mitochondria in their cells"
+   ],
+   "answer": 1,
+   "why": "Bacteria are prokaryotes: they lack a membrane-bound nucleus; their DNA floats freely in the cytoplasm."
+  },
+  {
+   "id": "rv031",
+   "band": "y7-8",
+   "topics": [
+    "cell-structure",
+    "organelles",
+    "photosynthesis"
+   ],
+   "q": "Which feature distinguishes a plant cell from a fungal cell under the microscope?",
+   "options": [
+    "Plant cells are always much smaller than fungal cells",
+    "Plant cells have a cell wall but fungal cells do not",
+    "Green plant cells contain chloroplasts; fungal cells do not",
+    "Plant cells have a nucleus but fungal cells do not"
+   ],
+   "answer": 2,
+   "why": "Both plant and fungal cells have a cell wall, but plant cells (in green parts) contain chloroplasts for photosynthesis, while fungal cells do not."
+  },
+  {
+   "id": "rv032",
+   "band": "y7-8",
+   "topics": [
+    "cell-structure",
+    "specialised-cells"
+   ],
+   "q": "What is the level of organisation in a multicellular organism from smallest to largest?",
+   "options": [
+    "Cell, tissue, organ, organ system, organism",
+    "Tissue, cell, organ, organ system, organism",
+    "Organ, tissue, cell, organ system, organism",
+    "Organism, organ system, organ, tissue, cell"
+   ],
+   "answer": 0,
+   "why": "The correct order from smallest to largest is: cell, tissue, organ, organ system, organism."
+  },
+  {
+   "id": "rv033",
+   "band": "y7-8",
+   "topics": [
+    "specialised-cells"
+   ],
+   "q": "Why can a specialised cell (like a red blood cell) not survive independently?",
+   "options": [
+    "It has no cell membrane to protect its contents",
+    "It depends on other cell types for what it cannot do",
+    "It contains more DNA than it is able to use",
+    "It is far too large to exist on its own in water"
+   ],
+   "answer": 1,
+   "why": "Specialised cells give up some general functions to excel at one task; they therefore depend on other cell types in the organism for their survival."
+  },
+  {
+   "id": "rv034",
+   "band": "y7-8",
+   "topics": [
+    "specialised-cells",
+    "blood-transport"
+   ],
+   "q": "Which structural features help red blood cells carry oxygen efficiently?",
+   "options": [
+    "A biconcave shape and no nucleus, for more haemoglobin",
+    "A very large nucleus that is used for oxygen storage",
+    "Cilia on the surface to sweep oxygen in",
+    "Thick, rigid cell walls that can hold oxygen"
+   ],
+   "answer": 0,
+   "why": "Red blood cells are biconcave discs, which gives a large surface area for their volume, and they have no nucleus, so there is more room for haemoglobin to carry oxygen."
+  },
+  {
+   "id": "rv035",
+   "band": "y7-8",
+   "topics": [
+    "specialised-cells",
+    "gas-exchange"
+   ],
+   "q": "What do cilia do in the airways?",
+   "options": [
+    "Absorb oxygen from the air that is breathed in",
+    "Make the digestive enzymes for the airway",
+    "Control the opening and closing of stomata",
+    "Sweep mucus and trapped dust away from the lungs"
+   ],
+   "answer": 3,
+   "why": "Ciliated epithelial cells lining the airways beat their cilia to sweep mucus and trapped particles away from the lungs, preventing infection."
+  },
+  {
+   "id": "rv036",
+   "band": "y7-8",
+   "topics": [
+    "gas-exchange",
+    "diffusion"
+   ],
+   "q": "Why do the walls of alveoli need to be very thin?",
+   "options": [
+    "To let the lungs expand further when breathing in",
+    "To give gases a short distance to diffuse",
+    "To make the lungs lighter for the body to carry",
+    "To stop air from leaking out into the chest"
+   ],
+   "answer": 1,
+   "why": "A thin wall means gases need to travel only a very short distance to diffuse between air in the alveolus and blood in surrounding capillaries."
+  },
+  {
+   "id": "rv037",
+   "band": "y7-8",
+   "topics": [
+    "specialised-cells",
+    "diffusion"
+   ],
+   "q": "What structural feature of the small intestine greatly increases its surface area for absorption?",
+   "options": [
+    "A highly acidic environment inside the tube",
+    "A thick muscular wall around the outside",
+    "A very large diameter along its whole length",
+    "Villi and microvilli on its inner surface"
+   ],
+   "answer": 3,
+   "why": "The inner surface of the small intestine is folded into villi, and each villus has microvilli. This greatly increases the surface area for absorbing nutrients."
+  },
+  {
+   "id": "rv038",
+   "band": "y7-8",
+   "topics": [
+    "plant-transport"
+   ],
+   "q": "What is the function of xylem in a plant?",
+   "options": [
+    "To carry dissolved sugars from leaves to all plant parts",
+    "To produce food through photosynthesis",
+    "To carry water and dissolved minerals from roots to leaves",
+    "To anchor the plant in the soil"
+   ],
+   "answer": 2,
+   "why": "Xylem vessels transport water and dissolved minerals upward from the roots to the leaves and other parts of the plant."
+  },
+  {
+   "id": "rv039",
+   "band": "y7-8",
+   "topics": [
+    "plant-transport"
+   ],
+   "q": "What is the main transport function of phloem in a plant?",
+   "options": [
+    "To carry water upward from the roots to the leaves",
+    "To support the stem so the plant stands upright",
+    "To carry dissolved sugars to all plant parts",
+    "To take in water from the soil around the roots"
+   ],
+   "answer": 2,
+   "why": "Phloem transports dissolved sugars produced during photosynthesis from the leaves to all other parts of the plant that need energy."
+  },
+  {
+   "id": "rv040",
+   "band": "y7-8",
+   "topics": [
+    "plant-transport",
+    "specialised-cells"
+   ],
+   "q": "How do mature xylem vessel elements differ structurally from phloem sieve-tube elements?",
+   "options": [
+    "Xylem vessel elements are living, but sieve-tube elements are dead tubes",
+    "Xylem vessel elements are dead and hollow; sieve-tube elements are living with sieve plates",
+    "Xylem vessel elements have sieve plates, but sieve-tube elements have lignified walls",
+    "There is no structural difference between the two kinds of element"
+   ],
+   "answer": 1,
+   "why": "Mature xylem vessel elements are dead, with lignified walls and open or perforated ends. Phloem sieve-tube elements remain living and have perforated end walls called sieve plates."
+  },
+  {
+   "id": "rv041",
+   "band": "y7-8",
+   "topics": [
+    "plant-transport",
+    "gas-exchange"
+   ],
+   "q": "Through which structures on a leaf surface does water vapour escape during transpiration?",
+   "options": [
+    "Stomata",
+    "Root hairs",
+    "Chloroplasts",
+    "Vascular bundles"
+   ],
+   "answer": 0,
+   "why": "Stomata are tiny pores on the leaf surface through which water vapour and gases pass in and out of the leaf."
+  },
+  {
+   "id": "rv042",
+   "band": "y7-8",
+   "topics": [
+    "plant-transport"
+   ],
+   "q": "What pulls water up through the xylem from roots to leaves?",
+   "options": [
+    "Gravity pulling the water upward in the stem",
+    "Transpiration pull as water evaporates from leaves",
+    "The expansion of the xylem vessels themselves",
+    "The pumping action of cells in the root"
+   ],
+   "answer": 1,
+   "why": "As water evaporates from the leaf surface through stomata, it creates a pulling force (transpiration pull) that draws water up the xylem from the roots."
+  },
+  {
+   "id": "rv043",
+   "band": "y7-8",
+   "topics": [
+    "photosynthesis"
+   ],
+   "q": "Which type of organism is a producer in an ecosystem?",
+   "options": [
+    "An organism that breaks down dead matter to get its energy",
+    "An organism that eats only other animals to get all of its energy",
+    "An organism that makes its own food using light or chemical energy",
+    "An organism that eats both plants and animals to get its energy"
+   ],
+   "answer": 2,
+   "why": "Producers are autotrophs. Plants and algae use light energy, while some bacteria and archaea use chemical energy to make organic substances from inorganic materials."
+  },
+  {
+   "id": "rv044",
+   "band": "y7-8",
+   "topics": [
+    "photosynthesis"
+   ],
+   "q": "What is photosynthesis?",
+   "options": [
+    "Cells breaking down glucose to release energy for life processes",
+    "Animals digesting their food into small, soluble molecules inside the gut",
+    "Plants using light to turn carbon dioxide and water into glucose and oxygen",
+    "Plants absorbing water and minerals through their roots from soil"
+   ],
+   "answer": 2,
+   "why": "Photosynthesis is the process by which plants (and algae) use light energy to convert carbon dioxide and water into glucose (chemical energy) and oxygen."
+  },
+  {
+   "id": "rv045",
+   "band": "y7-8",
+   "topics": [
+    "respiration"
+   ],
+   "q": "What is aerobic cellular respiration?",
+   "options": [
+    "Cells breaking down glucose with oxygen to release energy",
+    "Breathing air in and out of the lungs each minute",
+    "Plants making their food from sunlight and carbon dioxide",
+    "Pumping blood around the body to supply the cells"
+   ],
+   "answer": 0,
+   "why": "Aerobic cellular respiration breaks down glucose using oxygen, releasing energy that is transferred to ATP and producing carbon dioxide and water. In plant and animal cells, it begins in the cytoplasm and continues in mitochondria."
+  },
+  {
+   "id": "rv046",
+   "band": "y7-8",
+   "topics": [
+    "diffusion",
+    "membrane"
+   ],
+   "q": "What is diffusion?",
+   "options": [
+    "The movement of particles from low to high concentration",
+    "Particles being pushed across a membrane using energy",
+    "The movement of water only, through a membrane",
+    "The net movement of particles from high to low concentration"
+   ],
+   "answer": 3,
+   "why": "Diffusion is passive. Particles spread out from a region of higher concentration to a region of lower concentration, and the cell uses no energy for it."
+  },
+  {
+   "id": "rv047",
+   "band": "y7-8",
+   "topics": [
+    "osmosis",
+    "plant-transport"
+   ],
+   "q": "A slice of potato is left in very salty water for an hour. What happens to it?",
+   "options": [
+    "It dissolves completely",
+    "It gains water and becomes firmer",
+    "It stays the same size because the cell walls block water",
+    "It loses water by osmosis and becomes soft and smaller"
+   ],
+   "answer": 3,
+   "why": "The salty water has a lower water concentration than the potato cells, so water moves out of the cells by osmosis and the slice goes limp."
+  },
+  {
+   "id": "rv048",
+   "band": "y7-8",
+   "topics": [
+    "enzymes"
+   ],
+   "q": "What is an enzyme?",
+   "options": [
+    "A sugar that stores energy for the cell to use later",
+    "A biological catalyst, usually a protein, that is not used up",
+    "A white blood cell that fights infection in the body",
+    "A waste gas that is made when cells respire in the dark"
+   ],
+   "answer": 1,
+   "why": "Most enzymes are proteins, although some catalytic RNA molecules also act as enzymes. They speed up reactions without being consumed."
+  },
+  {
+   "id": "rv049",
+   "band": "y7-8",
+   "topics": [
+    "mitosis",
+    "cell-cycle"
+   ],
+   "q": "What is the main job of mitosis in a multicellular organism?",
+   "options": [
+    "Making the sex cells used in reproduction",
+    "Releasing usable energy from glucose",
+    "Making new body cells for growth and repair",
+    "Halving the number of chromosomes in a cell"
+   ],
+   "answer": 2,
+   "why": "Mitosis produces two genetically identical body cells. Organisms use it to grow and to replace damaged or worn-out cells."
+  },
+  {
+   "id": "rv050",
+   "band": "y7-8",
+   "topics": [
+    "specialised-cells",
+    "respiration",
+    "organelles"
+   ],
+   "q": "Why does a sperm cell have many mitochondria packed behind its head?",
+   "options": [
+    "They store a copy of the father's DNA",
+    "They help it make its own food from light",
+    "They release the energy its tail needs for swimming",
+    "They give the head its streamlined shape"
+   ],
+   "answer": 2,
+   "why": "Swimming needs a lot of energy. The mitochondria carry out aerobic respiration, which supplies ATP to the tail."
+  },
+  {
+   "id": "rv051",
+   "band": "y7-8",
+   "topics": [
+    "photosynthesis",
+    "organelles"
+   ],
+   "q": "Why do most leaves look green?",
+   "options": [
+    "Mitochondria in the leaf cells are green in colour",
+    "Chlorophyll reflects green light and absorbs mostly red and blue",
+    "Chlorophyll absorbs green light most strongly of all",
+    "The cell wall is coloured by a green dye"
+   ],
+   "answer": 1,
+   "why": "Chlorophyll absorbs mostly red and blue light for photosynthesis. Green light is reflected, so the leaf looks green."
+  },
+  {
+   "id": "rv052",
+   "band": "y7-8",
+   "topics": [
+    "respiration",
+    "photosynthesis",
+    "organelles"
+   ],
+   "q": "Do plant cells carry out respiration?",
+   "options": [
+    "Yes, all the time, in light and in the dark",
+    "No, because plants only photosynthesise",
+    "Only the root cells of the plant respire",
+    "Only at night, when there is no light"
+   ],
+   "answer": 0,
+   "why": "Living plant cells respire in both light and darkness. Photosynthetic cells also photosynthesise when sufficient light is available; their net gas exchange depends on the relative rates of photosynthesis and respiration."
+  },
+  {
+   "id": "rv053",
+   "band": "y7-8",
+   "topics": [
+    "diffusion",
+    "respiration"
+   ],
+   "q": "Oxygen moves into a respiring cell by diffusion. Why does it move in?",
+   "options": [
+    "The cell uses oxygen up, so there is less inside",
+    "Cells pump oxygen in using energy from ATP",
+    "Oxygen is attracted to the nucleus of the cell",
+    "The membrane has no barrier to stop oxygen entering"
+   ],
+   "answer": 0,
+   "why": "Respiration uses oxygen, so its concentration inside the cell stays lower than outside. Oxygen diffuses down this concentration gradient."
+  },
+  {
+   "id": "rv054",
+   "band": "y9-10",
+   "topics": [
+    "immunity",
+    "prokaryote-eukaryote"
+   ],
+   "q": "Which type of pathogen is not made of cells and can only reproduce inside a host cell?",
+   "options": [
+    "Virus",
+    "Fungus",
+    "Bacterium",
+    "Protozoan"
+   ],
+   "answer": 0,
+   "why": "Viruses are not cellular. They can only reproduce by entering a living host cell and using its machinery. Bacteria, fungi and protozoa are all made of cells."
+  },
+  {
+   "id": "rv055",
+   "band": "y9-10",
+   "topics": [
+    "immunity",
+    "prokaryote-eukaryote"
+   ],
+   "q": "Which disease is caused by a bacterium?",
+   "options": [
+    "Malaria",
+    "Influenza",
+    "Tuberculosis",
+    "Tinea (athlete's foot)"
+   ],
+   "answer": 2,
+   "why": "Tuberculosis (TB) is caused by the bacterium Mycobacterium tuberculosis; malaria is protozoan, influenza is viral, and tinea is fungal."
+  },
+  {
+   "id": "rv056",
+   "band": "y9-10",
+   "topics": [
+    "immunity"
+   ],
+   "q": "Which of the following is the FIRST line of defence against pathogens?",
+   "options": [
+    "Antibodies produced by B-cells",
+    "Phagocytes engulfing pathogens",
+    "The skin, mucus, cilia, and stomach acid",
+    "Memory cells from previous infections"
+   ],
+   "answer": 2,
+   "why": "The first line of defence includes physical and chemical barriers such as skin, mucus, cilia, stomach acid, and tears that prevent pathogens from entering the body."
+  },
+  {
+   "id": "rv057",
+   "band": "y9-10",
+   "topics": [
+    "immunity"
+   ],
+   "q": "What is phagocytosis?",
+   "options": [
+    "The process of forming new memory cells",
+    "The production of antibodies by B-cells",
+    "White blood cells engulfing and digesting pathogens",
+    "The release of hormones to fight infection"
+   ],
+   "answer": 2,
+   "why": "Phagocytosis is when white blood cells called phagocytes (such as macrophages and neutrophils) engulf and digest pathogens — part of the non-specific second line of defence."
+  },
+  {
+   "id": "rv058",
+   "band": "y9-10",
+   "topics": [
+    "immunity"
+   ],
+   "q": "What is an antibody?",
+   "options": [
+    "A white blood cell that engulfs pathogens and digests them",
+    "A protein that is part of every type of vaccine given",
+    "A chemical released by damaged tissue during inflammation",
+    "A Y-shaped protein from plasma cells that binds a specific antigenic site"
+   ],
+   "answer": 3,
+   "why": "Plasma cells secrete antibodies. Each antibody recognises a particular antigenic site, called an epitope. Binding can neutralise a target or help other immune mechanisms remove it."
+  },
+  {
+   "id": "rv059",
+   "band": "y9-10",
+   "topics": [
+    "immunity"
+   ],
+   "q": "What is a memory cell?",
+   "options": [
+    "A nerve cell that stores long-term memories in the brain",
+    "A white blood cell that kills every kind of pathogen non-specifically",
+    "A type of platelet that is involved in blood clotting",
+    "A long-lived B- or T-cell that speeds up a second response"
+   ],
+   "answer": 3,
+   "why": "Memory B- and T-cells persist in the body after infection; on re-exposure to the same pathogen they produce a faster, stronger secondary immune response."
+  },
+  {
+   "id": "rv060",
+   "band": "y9-10",
+   "topics": [
+    "immunity",
+    "biotechnology"
+   ],
+   "q": "How does a vaccine stimulate immunity without causing disease?",
+   "options": [
+    "It exposes the immune system to antigens, or instructions for making them, to build immune memory",
+    "It injects pre-made antibodies straight into the bloodstream to give lasting protection",
+    "It destroys the pathogens in the body using a chemical that kills them",
+    "It contains live, fully active pathogens that infect the body mildly and for a short time"
+   ],
+   "answer": 0,
+   "why": "Vaccines provide weakened or inactivated pathogens, pathogen components, or genetic instructions for producing antigens. These stimulate an immune response and memory-cell formation."
+  },
+  {
+   "id": "rv061",
+   "band": "y9-10",
+   "topics": [
+    "immunity"
+   ],
+   "q": "What is herd immunity?",
+   "options": [
+    "Immunity that is shared between animals and humans",
+    "The point at which vaccinated cattle are protected from disease",
+    "Enough people are immune that the pathogen cannot spread widely",
+    "The immunity that is gained only by surviving a disease"
+   ],
+   "answer": 2,
+   "why": "Herd immunity occurs when a high enough proportion of a population is immune that the pathogen cannot find enough new hosts to spread, indirectly protecting those unable to be vaccinated."
+  },
+  {
+   "id": "rv062",
+   "band": "y9-10",
+   "topics": [
+    "immunity",
+    "prokaryote-eukaryote"
+   ],
+   "q": "Why are antibiotics ineffective against viral infections such as influenza?",
+   "options": [
+    "Antibiotics are too expensive to use against viruses",
+    "They target bacterial structures that viruses do not have",
+    "Viruses are not classified as pathogens at all",
+    "Viruses are too large for antibiotics to get through"
+   ],
+   "answer": 1,
+   "why": "Antibiotics work by targeting structures unique to bacteria (such as cell walls and bacterial ribosomes); viruses have none of these, so antibiotics have no effect on them."
+  },
+  {
+   "id": "rv063",
+   "band": "y9-10",
+   "topics": [
+    "immunity"
+   ],
+   "q": "What are the three lines of defence against pathogens in the human body?",
+   "options": [
+    "Barriers; non-specific response; specific adaptive response",
+    "Antibodies, vaccines and surgery, in that order",
+    "Fever, inflammation and memory cells only",
+    "Skin, blood and bone marrow, in that order"
+   ],
+   "answer": 0,
+   "why": "The three lines are: 1st line (physical/chemical barriers: skin, mucus, cilia), 2nd line (non-specific: inflammation, phagocytes, fever), 3rd line (specific: B-cells, T-cells, antibodies, memory cells)."
+  },
+  {
+   "id": "rv064",
+   "band": "y9-10",
+   "topics": [
+    "immunity",
+    "enzymes"
+   ],
+   "q": "Why does fever help fight infection?",
+   "options": [
+    "Fever raises the blood glucose that white blood cells use",
+    "Fever makes the body produce antibodies straight away",
+    "Fever melts the cell membranes of pathogens directly",
+    "Higher temperature slows bacteria and speeds up immune cells"
+   ],
+   "answer": 3,
+   "why": "Fever raises body temperature above the optimal growth range for many bacteria and accelerates immune cell reactions, helping the body fight infection more effectively."
+  },
+  {
+   "id": "rv065",
+   "band": "y9-10",
+   "topics": [
+    "immunity"
+   ],
+   "q": "What is the role of killer T-cells in the immune response?",
+   "options": [
+    "They form the physical first-line barrier to pathogens",
+    "They produce hormones to coordinate the immune response",
+    "They produce antibodies that bind to antigens",
+    "They destroy body cells that have been infected by a virus"
+   ],
+   "answer": 3,
+   "why": "Killer T-cells (cytotoxic T-cells) directly destroy body cells that have been infected by viruses, preventing the virus from replicating and spreading."
+  },
+  {
+   "id": "rv066",
+   "band": "y9-10",
+   "topics": [
+    "immunity",
+    "biotechnology"
+   ],
+   "q": "A vaccine containing a weakened (attenuated) but living pathogen is called:",
+   "options": [
+    "A live attenuated vaccine",
+    "A subunit vaccine made from protein pieces",
+    "An inactivated vaccine made from killed pathogens",
+    "An mRNA vaccine made in the laboratory"
+   ],
+   "answer": 0,
+   "why": "A live attenuated vaccine contains a living pathogen with reduced virulence that stimulates an immune response and immune memory. It can cause serious disease in people with significant immunocompromise."
+  },
+  {
+   "id": "rv067",
+   "band": "y9-10",
+   "topics": [
+    "immunity"
+   ],
+   "q": "Why does the secondary immune response (re-exposure to a pathogen) produce antibodies faster than the primary response?",
+   "options": [
+    "T-cells are more numerous after any first exposure",
+    "The body kept pre-made antibodies stored from the first exposure",
+    "The pathogen is weaker every time it is met again",
+    "Memory B-cells from the first exposure respond rapidly"
+   ],
+   "answer": 3,
+   "why": "Memory B-cells formed during the first infection persist in the body. On re-exposure they divide quickly and make plasma cells, so a faster and larger antibody response follows."
+  },
+  {
+   "id": "rv068",
+   "band": "y9-10",
+   "topics": [
+    "immunity",
+    "mutation"
+   ],
+   "q": "Why is overuse of antibiotics a public health concern?",
+   "options": [
+    "It causes side effects in every patient who takes them",
+    "It wastes money but has no other significant effects",
+    "It drives the spread of antibiotic-resistant bacteria",
+    "It makes vaccines work less well across the population"
+   ],
+   "answer": 2,
+   "why": "Overuse and misuse of antibiotics provides selection pressure for resistant bacteria to proliferate; antibiotic-resistant infections are increasingly difficult and expensive to treat."
+  },
+  {
+   "id": "rv069",
+   "band": "y9-10",
+   "topics": [
+    "immunity",
+    "specialised-cells"
+   ],
+   "q": "What causes the failure of blood glucose regulation in Type 1 diabetes?",
+   "options": [
+    "The immune system destroys insulin-making beta cells",
+    "The body makes too much insulin, so glucose falls too low",
+    "The kidneys cannot filter glucose out of the blood",
+    "The liver stops breaking down glycogen when needed"
+   ],
+   "answer": 0,
+   "why": "In Type 1 diabetes, the immune system mistakenly destroys the insulin-producing beta cells of the pancreas; without insulin, blood glucose rises dangerously after meals."
+  },
+  {
+   "id": "rv070",
+   "band": "y9-10",
+   "topics": [
+    "immunity",
+    "specialised-cells"
+   ],
+   "q": "Mucus and cilia in the airways form part of which line of defence?",
+   "options": [
+    "No specific line — they are structural features only",
+    "Third line — specific immune response",
+    "First line — physical and chemical barriers",
+    "Second line — non-specific immune response"
+   ],
+   "answer": 2,
+   "why": "Mucus traps pathogens and particles; cilia sweep this material out of the airways — both are first-line physical barriers that prevent pathogens from entering deeper tissues."
+  },
+  {
+   "id": "rv071",
+   "band": "y9-10",
+   "topics": [
+    "immunity",
+    "biotechnology"
+   ],
+   "q": "The Gardasil vaccine developed in Australia protects against:",
+   "options": [
+    "Measles virus, which causes a rash and fever",
+    "Human papillomavirus (HPV), a cause of cervical cancer",
+    "Hepatitis B virus, which infects the liver",
+    "Influenza virus, which causes seasonal flu"
+   ],
+   "answer": 1,
+   "why": "Gardasil, developed by Professor Ian Frazer and Dr Jian Zhou at the University of Queensland, is a subunit vaccine against HPV, the primary cause of cervical cancer."
+  },
+  {
+   "id": "rv072",
+   "band": "y9-10",
+   "topics": [
+    "dna-structure",
+    "genes"
+   ],
+   "q": "What molecule carries the genetic code in most living organisms?",
+   "options": [
+    "Ribonucleic acid (RNA)",
+    "Deoxyribonucleic acid (DNA)",
+    "Adenosine triphosphate (ATP)",
+    "Protein"
+   ],
+   "answer": 1,
+   "why": "DNA (deoxyribonucleic acid) is the molecule that stores the genetic instructions in most organisms."
+  },
+  {
+   "id": "rv073",
+   "band": "y9-10",
+   "topics": [
+    "dna-structure"
+   ],
+   "q": "How many different nucleotide bases are found in a DNA molecule?",
+   "options": [
+    "6",
+    "2",
+    "3",
+    "4"
+   ],
+   "answer": 3,
+   "why": "DNA uses four bases: adenine (A), thymine (T), cytosine (C), and guanine (G)."
+  },
+  {
+   "id": "rv074",
+   "band": "y9-10",
+   "topics": [
+    "dna-structure"
+   ],
+   "q": "What is the correct complementary base pairing rule for DNA?",
+   "options": [
+    "A pairs with C, and T pairs with G",
+    "A pairs with U, and C pairs with G",
+    "A pairs with G, and T pairs with C",
+    "A pairs with T, and C pairs with G"
+   ],
+   "answer": 3,
+   "why": "In DNA, adenine always pairs with thymine (A-T) and cytosine always pairs with guanine (C-G)."
+  },
+  {
+   "id": "rv075",
+   "band": "y9-10",
+   "topics": [
+    "genes",
+    "dna-structure"
+   ],
+   "q": "Which term describes the complete set of genetic information in an organism?",
+   "options": [
+    "Genome",
+    "Gene",
+    "Chromosome",
+    "Allele"
+   ],
+   "answer": 0,
+   "why": "The genome is the complete set of genetic information, including all chromosomes, in an organism."
+  },
+  {
+   "id": "rv076",
+   "band": "y9-10",
+   "topics": [
+    "inheritance",
+    "cell-cycle"
+   ],
+   "q": "A typical human body cell contains how many chromosomes?",
+   "options": [
+    "44",
+    "48",
+    "46",
+    "23"
+   ],
+   "answer": 2,
+   "why": "A typical human body cell contains 46 chromosomes: 22 pairs of autosomes and two sex chromosomes, usually XX or XY. X and Y are homologous only in small regions."
+  },
+  {
+   "id": "rv077",
+   "band": "y9-10",
+   "topics": [
+    "inheritance",
+    "meiosis"
+   ],
+   "q": "How many chromosomes does a human egg or sperm cell contain?",
+   "options": [
+    "46",
+    "22",
+    "23",
+    "48"
+   ],
+   "answer": 2,
+   "why": "Gametes (sex cells) contain 23 chromosomes — half the normal number — produced by meiosis."
+  },
+  {
+   "id": "rv078",
+   "band": "y9-10",
+   "topics": [
+    "dna-structure",
+    "chromatin"
+   ],
+   "q": "What is the role of histones in relation to DNA?",
+   "options": [
+    "Proteins that DNA is coiled around",
+    "Enzymes that copy DNA before cell division",
+    "The bases that pair together in the double helix",
+    "Molecules that carry genetic information between cells"
+   ],
+   "answer": 0,
+   "why": "Histone proteins act as spools around which DNA winds tightly, allowing it to be packaged into chromosomes."
+  },
+  {
+   "id": "rv079",
+   "band": "y9-10",
+   "topics": [
+    "genes"
+   ],
+   "q": "What is a gene?",
+   "options": [
+    "A pair of chromosomes that are inherited together",
+    "Any section of a chromosome, whatever it codes for",
+    "A segment of DNA that codes for a protein or RNA",
+    "The whole DNA molecule found in a cell"
+   ],
+   "answer": 2,
+   "why": "A gene is a specific sequence of DNA bases that carries the instructions for making a particular protein or functional RNA."
+  },
+  {
+   "id": "rv080",
+   "band": "y9-10",
+   "topics": [
+    "dna-structure"
+   ],
+   "q": "The two 'sides' of the DNA double helix are made of:",
+   "options": [
+    "Alternating bases and protein molecules",
+    "Pairs of nitrogenous bases joined together",
+    "Ribose and phosphate groups, as in RNA",
+    "Alternating sugar and phosphate groups"
+   ],
+   "answer": 3,
+   "why": "The sugar-phosphate backbone (deoxyribose alternating with phosphate groups) forms the two sides of the DNA ladder."
+  },
+  {
+   "id": "rv081",
+   "band": "y9-10",
+   "topics": [
+    "dna-structure",
+    "cell-cycle"
+   ],
+   "q": "Why is complementary base pairing important for DNA replication?",
+   "options": [
+    "Each strand can act as a template for a new strand",
+    "It lets genes be expressed as proteins straight away",
+    "It decides the structure of the histones",
+    "It allows mutations to occur in the new strand"
+   ],
+   "answer": 0,
+   "why": "Because each base pairs specifically with its partner, each separated strand can template the rebuilding of an exact copy of the other strand."
+  },
+  {
+   "id": "rv082",
+   "band": "y9-10",
+   "topics": [
+    "dna-structure"
+   ],
+   "q": "Which scientist worked with Raymond Gosling to produce Photograph 51, an X-ray diffraction image providing key evidence for DNA's double helix?",
+   "options": [
+    "James Watson",
+    "Maurice Wilkins",
+    "Francis Crick",
+    "Rosalind Franklin"
+   ],
+   "answer": 3,
+   "why": "Rosalind Franklin and her PhD student Raymond Gosling produced Photograph 51 at King's College London in May 1952. Its diffraction pattern provided important evidence for DNA's helical structure."
+  },
+  {
+   "id": "rv083",
+   "band": "y9-10",
+   "topics": [
+    "dna-structure"
+   ],
+   "q": "Who published the double helix model of DNA in Nature in 1953?",
+   "options": [
+    "Mendel and Darwin",
+    "Watson and Crick",
+    "Franklin and Wilkins",
+    "Pauling and Bragg"
+   ],
+   "answer": 1,
+   "why": "Watson and Crick published their double helix model in Nature in April 1953, building on data including Franklin's X-ray images."
+  },
+  {
+   "id": "rv084",
+   "band": "y9-10",
+   "topics": [
+    "inheritance",
+    "cell-cycle"
+   ],
+   "q": "In asexual reproduction, offspring are:",
+   "options": [
+    "Produced only after an egg and sperm fuse together",
+    "Made by combining the genes of two different parents",
+    "Genetically identical to the parent, apart from rare mutations",
+    "Always better adapted than the parent organism was"
+   ],
+   "answer": 2,
+   "why": "Asexual reproduction involves one parent without gamete fusion and generally produces genetically identical offspring, apart from mutations. Eukaryotes commonly reproduce asexually through processes involving mitosis; bacteria divide by binary fission."
+  },
+  {
+   "id": "rv085",
+   "band": "y9-10",
+   "topics": [
+    "meiosis",
+    "inheritance"
+   ],
+   "q": "In animals, which type of cell division produces haploid cells for gamete formation?",
+   "options": [
+    "Binary fission",
+    "Meiosis",
+    "Budding",
+    "Mitosis"
+   ],
+   "answer": 1,
+   "why": "In animals, meiosis halves the chromosome number to produce haploid cells involved in gamete formation. In plants, meiosis produces haploid spores; gametes are subsequently produced by mitosis."
+  },
+  {
+   "id": "rv086",
+   "band": "y9-10",
+   "topics": [
+    "inheritance",
+    "meiosis"
+   ],
+   "q": "What is a zygote?",
+   "options": [
+    "A sex cell produced by meiosis in the ovary",
+    "The cell formed when an egg and sperm fuse",
+    "A clone produced by asexual reproduction",
+    "A cell that has undergone a mutation"
+   ],
+   "answer": 1,
+   "why": "A zygote is the single cell formed when a sperm fertilises an egg; it contains a full set of chromosomes from both parents."
+  },
+  {
+   "id": "rv087",
+   "band": "y9-10",
+   "topics": [
+    "inheritance",
+    "genes"
+   ],
+   "q": "What does the term 'phenotype' mean?",
+   "options": [
+    "The observable characteristics of an organism",
+    "The set of alleles an organism carries",
+    "The number of chromosomes in a cell",
+    "The process by which genes are expressed"
+   ],
+   "answer": 0,
+   "why": "The phenotype is the observable physical or biochemical characteristics of an organism, resulting from its genotype and environment."
+  },
+  {
+   "id": "rv088",
+   "band": "y9-10",
+   "topics": [
+    "inheritance",
+    "genes"
+   ],
+   "q": "What does the term 'genotype' mean?",
+   "options": [
+    "The observable traits of an organism",
+    "The combination of alleles an organism carries",
+    "The process of chromosome separation in meiosis",
+    "The complete genome of a whole species"
+   ],
+   "answer": 1,
+   "why": "The genotype is the specific combination of alleles an organism possesses for a given gene or genes."
+  },
+  {
+   "id": "rv089",
+   "band": "y9-10",
+   "topics": [
+    "dna-structure"
+   ],
+   "q": "A sample of double-stranded DNA contains 30% adenine. What percentage of its bases are guanine?",
+   "options": [
+    "40%",
+    "25%",
+    "20%",
+    "30%"
+   ],
+   "answer": 2,
+   "why": "Adenine pairs with thymine (so T = 30%). The remaining 40% is split equally between C and G, giving G = 20%."
+  },
+  {
+   "id": "rv090",
+   "band": "y9-10",
+   "topics": [
+    "mutation"
+   ],
+   "q": "What is a mutation?",
+   "options": [
+    "A change in the DNA base sequence",
+    "The expression of a recessive allele",
+    "The fusion of two gametes at fertilisation",
+    "The copying of DNA before cell division"
+   ],
+   "answer": 0,
+   "why": "A mutation is any change to the base sequence of DNA; it can involve a single base or larger segments."
+  },
+  {
+   "id": "rv091",
+   "band": "y9-10",
+   "topics": [
+    "mutation"
+   ],
+   "q": "What type of mutation occurs when a single base is replaced by a different base?",
+   "options": [
+    "Deletion mutation",
+    "Frameshift mutation",
+    "Insertion mutation",
+    "Point substitution mutation"
+   ],
+   "answer": 3,
+   "why": "A point substitution mutation is when one nucleotide base is replaced by another in the DNA sequence."
+  },
+  {
+   "id": "rv092",
+   "band": "y9-10",
+   "topics": [
+    "mutation",
+    "dna-structure"
+   ],
+   "q": "Which of the following is an example of a mutagen?",
+   "options": [
+    "Histone protein",
+    "Thymine base",
+    "Ultraviolet radiation",
+    "Ribosome"
+   ],
+   "answer": 2,
+   "why": "UV radiation from the sun is a mutagen — an environmental agent that can damage DNA and cause mutations."
+  },
+  {
+   "id": "rv093",
+   "band": "y9-10",
+   "topics": [
+    "mutation",
+    "protein-folding",
+    "specialised-cells"
+   ],
+   "q": "Sickle cell anaemia is caused by:",
+   "options": [
+    "Deletion of an entire chromosome",
+    "Radiation exposure during development",
+    "A virus attacking the red blood cells",
+    "A point mutation in the haemoglobin gene"
+   ],
+   "answer": 3,
+   "why": "Sickle cell anaemia results from a single base substitution (A to T) in the haemoglobin gene, producing misshapen red blood cells."
+  },
+  {
+   "id": "rv094",
+   "band": "y9-10",
+   "topics": [
+    "mutation",
+    "protein-synthesis"
+   ],
+   "q": "Why are most mutations described as neutral rather than harmful or beneficial?",
+   "options": [
+    "Many fall in non-coding DNA or change no amino acid",
+    "All organisms can repair every mutation perfectly",
+    "Mutations can only happen in non-coding DNA",
+    "Mutations are rare, so most of them are harmless"
+   ],
+   "answer": 0,
+   "why": "Many mutations occur in non-coding regions or cause a synonymous codon change that still encodes the same amino acid, leaving the protein unchanged."
+  },
+  {
+   "id": "rv095",
+   "band": "y9-10",
+   "topics": [
+    "inheritance"
+   ],
+   "q": "In a simple one-gene model with brown eyes (B) dominant over blue eyes (b), and no new mutations, two brown-eyed parents can have a blue-eyed child if:",
+   "options": [
+    "At least one parent has a dominant allele for blue eyes",
+    "Both parents are heterozygous, carrying a recessive allele",
+    "Both parents are homozygous dominant for brown eyes",
+    "One parent is homozygous dominant for brown eyes"
+   ],
+   "answer": 1,
+   "why": "If both parents are heterozygous (Bb), there is a 25% chance of a child with bb. This uses a simple one-gene model. Real eye colour is controlled by several genes."
+  },
+  {
+   "id": "rv096",
+   "band": "y9-10",
+   "topics": [
+    "inheritance"
+   ],
+   "q": "What does 'homozygous dominant' mean?",
+   "options": [
+    "The organism carries two copies of the recessive allele",
+    "The organism carries one dominant and one recessive allele",
+    "The organism carries two copies of the dominant allele",
+    "The organism shows the recessive phenotype"
+   ],
+   "answer": 2,
+   "why": "Homozygous dominant means the organism carries two identical dominant alleles (e.g. TT) for a trait."
+  },
+  {
+   "id": "rv097",
+   "band": "y9-10",
+   "topics": [
+    "inheritance"
+   ],
+   "q": "A dominant allele (T) controls tall height and recessive (t) controls short. A Tt x Tt cross is performed. What fraction of offspring are expected to be short?",
+   "options": [
+    "1/2",
+    "All of them",
+    "3/4",
+    "1/4"
+   ],
+   "answer": 3,
+   "why": "A Tt x Tt cross produces a 1 TT : 2 Tt : 1 tt ratio; only tt (1/4) are short because tall (T) is dominant."
+  },
+  {
+   "id": "rv098",
+   "band": "y9-10",
+   "topics": [
+    "inheritance",
+    "genes"
+   ],
+   "q": "In a Punnett square for Ff x Ff (F = normal, f = cystic fibrosis allele), what fraction of offspring are expected to have cystic fibrosis?",
+   "options": [
+    "1/4",
+    "1/2",
+    "None",
+    "3/4"
+   ],
+   "answer": 0,
+   "why": "The cross Ff x Ff gives 1 FF : 2 Ff : 1 ff; only ff (1/4) will have cystic fibrosis because it is autosomal recessive."
+  },
+  {
+   "id": "rv099",
+   "band": "y9-10",
+   "topics": [
+    "inheritance"
+   ],
+   "q": "What does a shaded circle in a pedigree diagram represent?",
+   "options": [
+    "An unaffected female",
+    "An affected male",
+    "An unaffected male",
+    "An affected female"
+   ],
+   "answer": 3,
+   "why": "In standard pedigree notation, circles represent females and shading indicates the individual is affected by the condition being tracked."
+  },
+  {
+   "id": "rv100",
+   "band": "y9-10",
+   "topics": [
+    "inheritance"
+   ],
+   "q": "Squares in a pedigree diagram represent:",
+   "options": [
+    "Females",
+    "Males",
+    "Carriers",
+    "Affected individuals"
+   ],
+   "answer": 1,
+   "why": "In pedigree diagrams, squares represent males and circles represent females, regardless of whether they are affected."
+  },
+  {
+   "id": "rv101",
+   "band": "y9-10",
+   "topics": [
+    "inheritance",
+    "meiosis"
+   ],
+   "q": "What is Mendel's Law of Segregation?",
+   "options": [
+    "Alleles for different genes pass to gametes independently",
+    "Dominant alleles always mask recessive alleles",
+    "The two alleles for a trait separate into different gametes",
+    "Mutations occur at a steady, predictable rate"
+   ],
+   "answer": 2,
+   "why": "Mendel's Law of Segregation states that the pair of alleles an organism carries separates during meiosis, so each gamete receives only one allele for each gene."
+  },
+  {
+   "id": "rv102",
+   "band": "y9-10",
+   "topics": [
+    "biotechnology",
+    "genes"
+   ],
+   "q": "Which genetic technology uses a molecular 'scissors' to cut DNA at a specific target sequence?",
+   "options": [
+    "PCR (polymerase chain reaction)",
+    "Gel electrophoresis",
+    "DNA sequencing",
+    "CRISPR-Cas9 gene editing"
+   ],
+   "answer": 3,
+   "why": "CRISPR-Cas9 is a gene-editing tool that uses a guide RNA to direct the Cas9 protein to cut DNA at a precise target sequence."
+  },
+  {
+   "id": "rv103",
+   "band": "y9-10",
+   "topics": [
+    "biotechnology",
+    "dna-structure"
+   ],
+   "q": "The polymerase chain reaction (PCR) is used to:",
+   "options": [
+    "Edit specific genes in a living organism",
+    "Amplify (make many copies of) a small DNA sample",
+    "Sequence the bases in a DNA molecule",
+    "Insert a gene from one organism into another"
+   ],
+   "answer": 1,
+   "why": "PCR amplifies tiny samples of DNA by repeated cycles of heating and cooling, producing millions of copies for analysis."
+  },
+  {
+   "id": "rv104",
+   "band": "y9-10",
+   "topics": [
+    "biotechnology",
+    "genes"
+   ],
+   "q": "What was the first recombinant DNA pharmaceutical approved for human use (1982)?",
+   "options": [
+    "Aspirin made by a chemical reaction in the lab",
+    "Human insulin made by bacteria",
+    "The BRCA1 gene test used to screen for cancer risk",
+    "A polio vaccine grown in animal cells"
+   ],
+   "answer": 1,
+   "why": "In 1982, Humulin (human insulin produced by recombinant bacteria carrying the human insulin gene) became the first approved recombinant DNA drug."
+  },
+  {
+   "id": "rv105",
+   "band": "y9-10",
+   "topics": [
+    "genes",
+    "inheritance"
+   ],
+   "q": "Genetic testing that determines whether a healthy person carries one copy of a recessive disease allele is called:",
+   "options": [
+    "Pharmacogenomic testing",
+    "Carrier testing",
+    "Prenatal screening",
+    "Predictive testing"
+   ],
+   "answer": 1,
+   "why": "Carrier testing identifies whether an individual carries one copy of a recessive disease allele that they could pass to their children, even though they are unaffected."
+  },
+  {
+   "id": "rv106",
+   "band": "y9-10",
+   "topics": [
+    "cell-structure",
+    "biotechnology"
+   ],
+   "q": "HeLa cells are significant in medical research because they:",
+   "options": [
+    "Were the first animal cells ever seen under a microscope",
+    "Were used to sequence the first human genome in 1953",
+    "Were produced by genetic engineering in the 1980s",
+    "Were the first human cells grown continuously in a laboratory"
+   ],
+   "answer": 3,
+   "why": "HeLa cells, taken from Henrietta Lacks in 1951, were the first immortal human cell line and have been used in thousands of studies including polio vaccine development."
+  },
+  {
+   "id": "rv107",
+   "band": "y9-10",
+   "topics": [
+    "cell-structure",
+    "biotechnology"
+   ],
+   "q": "What was the key ethical issue in the original collection of Henrietta Lacks's cells?",
+   "options": [
+    "Her cells were taken without her knowledge or consent",
+    "The cells were collected after she recovered from her illness",
+    "She asked for the cells to be destroyed",
+    "Her family received excessive financial compensation"
+   ],
+   "answer": 0,
+   "why": "Henrietta Lacks's tumour tissue was collected during treatment and supplied to George Gey's laboratory for research without her knowledge or consent. The ethical issue was the absence of informed consent for that research use."
+  },
+  {
+   "id": "rv108",
+   "band": "y9-10",
+   "topics": [
+    "inheritance"
+   ],
+   "q": "A cross is performed between a black guinea pig (Bb) and a white guinea pig (bb), where B = black (dominant) and b = white. What percentage of offspring are expected to be black?",
+   "options": [
+    "100%",
+    "50%",
+    "75%",
+    "25%"
+   ],
+   "answer": 1,
+   "why": "The cross Bb x bb gives offspring Bb and bb in a 1:1 ratio; 50% are Bb (black) and 50% are bb (white)."
+  },
+  {
+   "id": "rv109",
+   "band": "y9-10",
+   "topics": [
+    "inheritance",
+    "genes"
+   ],
+   "q": "Which of the following best describes polygenic inheritance?",
+   "options": [
+    "Multiple genes contributing to the variation seen in one trait",
+    "Inheritance of a gene located on the X chromosome",
+    "A trait caused by a chromosomal deletion",
+    "A single gene determining one trait with two possible alleles"
+   ],
+   "answer": 0,
+   "why": "Polygenic inheritance means that many genes, each with small effects, combine to determine the final phenotype of a trait, such as human height."
+  },
+  {
+   "id": "rv110",
+   "band": "y9-10",
+   "topics": [
+    "genes",
+    "environment",
+    "epigenetics"
+   ],
+   "q": "Identical twins have the same DNA but can develop different heights as adults. This is because:",
+   "options": [
+    "One twin always gets more mutations than the other",
+    "Their chromosomes are different, even if they look the same",
+    "Natural selection acts differently on each twin",
+    "The environment, such as nutrition, affects how the genes show"
+   ],
+   "answer": 3,
+   "why": "Identical twins share genotype but environmental factors such as diet, illness, and physical activity during childhood interact with genes to produce phenotypic differences like height."
+  },
+  {
+   "id": "rv111",
+   "band": "y9-10",
+   "topics": [
+    "meiosis",
+    "inheritance"
+   ],
+   "q": "What is crossing over, and when does it occur?",
+   "options": [
+    "Homologous chromosomes swap segments during meiosis",
+    "Chromosomes line up at random during mitosis",
+    "Sister chromatids separate during mitosis",
+    "DNA is replicated before the cell divides"
+   ],
+   "answer": 0,
+   "why": "Crossing over occurs during meiosis when homologous chromosomes exchange segments, shuffling alleles and increasing the genetic variation in gametes."
+  },
+  {
+   "id": "rv112",
+   "band": "y9-10",
+   "topics": [
+    "mutation",
+    "dna-structure"
+   ],
+   "q": "Why are gamma rays more dangerous to living tissue than radio waves?",
+   "options": [
+    "Their photons carry enough energy to ionise atoms and damage DNA",
+    "Gamma rays travel much faster than radio waves do",
+    "Radio waves cannot pass through the body at all",
+    "Gamma rays are mechanical waves that push through tissue"
+   ],
+   "answer": 0,
+   "why": "Higher frequency EM waves carry more energy per photon; gamma rays are ionising — they have enough energy to remove electrons from atoms and damage DNA."
+  },
+  {
+   "id": "rv113",
+   "band": "y9-10",
+   "topics": [
+    "enzymes",
+    "protein-folding"
+   ],
+   "q": "A high temperature stops an enzyme working. What best explains this?",
+   "options": [
+    "The reaction gives out too much energy for it",
+    "The enzyme denatures, so the substrate no longer fits",
+    "The substrate becomes too large to react with it",
+    "The enzyme is used up by the reaction itself"
+   ],
+   "answer": 1,
+   "why": "Heat breaks the bonds that hold the enzyme in shape. The active site is distorted, so the substrate can no longer bind. Extreme pH does the same."
+  },
+  {
+   "id": "rv114",
+   "band": "y9-10",
+   "topics": [
+    "enzymes"
+   ],
+   "q": "What does the lock-and-key model say about enzymes?",
+   "options": [
+    "The enzyme is destroyed after one reaction",
+    "Every enzyme works equally well on every substrate",
+    "The substrate is the part that changes shape",
+    "The active site matches the shape of its own substrate"
+   ],
+   "answer": 3,
+   "why": "Each enzyme has an active site with a shape that fits a specific substrate, which is why enzymes are specific. The enzyme is released unchanged."
+  },
+  {
+   "id": "rv115",
+   "band": "y9-10",
+   "topics": [
+    "enzymes"
+   ],
+   "q": "How does the rate of an enzyme-controlled reaction change as temperature rises from low values?",
+   "options": [
+    "Stays about the same at all temperatures",
+    "Falls steadily from the start as particles slow down",
+    "Rises to an optimum, then drops as the enzyme denatures",
+    "Rises steadily and keeps rising at every temperature"
+   ],
+   "answer": 2,
+   "why": "Warmer particles collide more often with more energy, so the rate rises. Past the optimum the enzyme loses its shape and the rate drops sharply."
+  },
+  {
+   "id": "rv116",
+   "band": "y9-10",
+   "topics": [
+    "membrane"
+   ],
+   "q": "The cell membrane is described as selectively permeable. What does that mean?",
+   "options": [
+    "It lets every substance through",
+    "It lets some substances pass and blocks others",
+    "It blocks every substance, including water",
+    "It lets only large molecules through"
+   ],
+   "answer": 1,
+   "why": "Selective permeability means the membrane controls what crosses. Small non-polar molecules and water cross easily, but ions and large molecules need help or are kept out."
+  },
+  {
+   "id": "rv117",
+   "band": "y9-10",
+   "topics": [
+    "osmosis",
+    "membrane"
+   ],
+   "q": "Osmosis is the movement of which substance, and in which direction?",
+   "options": [
+    "Net movement of solute from low to high concentration across a membrane, using ATP",
+    "Net movement of water from a concentrated solution to a dilute one across a selectively permeable membrane",
+    "Net movement of water from a dilute to a more concentrated solution across a selectively permeable membrane",
+    "Net movement of any particle down its gradient through a gap in the cell wall"
+   ],
+   "answer": 2,
+   "why": "Osmosis is the net movement of water across a selectively permeable membrane from where water is more concentrated (the more dilute solution) to where it is less concentrated."
+  },
+  {
+   "id": "rv118",
+   "band": "y9-10",
+   "topics": [
+    "osmosis",
+    "specialised-cells"
+   ],
+   "q": "A red blood cell is placed in pure water. What happens?",
+   "options": [
+    "Water enters by osmosis and the cell can burst",
+    "Nothing happens because the membrane blocks water",
+    "The cell wall keeps its size the same",
+    "Water leaves and the cell shrinks"
+   ],
+   "answer": 0,
+   "why": "Pure water has a higher water concentration than the cytoplasm, so water enters. Animal cells have no cell wall, so the cell can swell and burst."
+  },
+  {
+   "id": "rv119",
+   "band": "y9-10",
+   "topics": [
+    "osmosis",
+    "organelles",
+    "plant-transport"
+   ],
+   "q": "A plant cell placed in pure water becomes firm (turgid) but does not burst. Why?",
+   "options": [
+    "The membrane stops any water at all from entering",
+    "The nucleus pumps the extra water back out again",
+    "Chloroplasts turn the extra water into starch",
+    "The cell wall resists the pressure of the water inside"
+   ],
+   "answer": 3,
+   "why": "Water enters the vacuole by osmosis and pushes the membrane against the strong cellulose wall. The wall pushes back, which keeps the cell firm instead of bursting."
+  },
+  {
+   "id": "rv120",
+   "band": "y9-10",
+   "topics": [
+    "active-transport",
+    "atp"
+   ],
+   "q": "How is active transport different from diffusion?",
+   "options": [
+    "It uses energy to move substances against their concentration or electrochemical gradient",
+    "It moves water only, straight through the lipid bilayer of the membrane",
+    "It happens only in plant cells and never in animal cells or in bacteria",
+    "It moves substances down their gradient with no energy being used at all"
+   ],
+   "answer": 0,
+   "why": "Active transport uses membrane proteins and energy to move substances against a gradient. Primary active transport uses energy directly, often from ATP; secondary active transport uses energy stored in another substance's gradient. Diffusion is passive."
+  },
+  {
+   "id": "rv121",
+   "band": "y9-10",
+   "topics": [
+    "atp",
+    "respiration"
+   ],
+   "q": "What is the main job of ATP in a cell?",
+   "options": [
+    "Carrying energy to where the cell can use it",
+    "Storing the genetic code of the cell",
+    "Building the structure of the cell membrane",
+    "Speeding up reactions inside the cell as an enzyme"
+   ],
+   "answer": 0,
+   "why": "ATP is the cell's energy carrier. Respiration uses the energy in glucose to make ATP, and ATP then powers jobs such as active transport and muscle contraction."
+  },
+  {
+   "id": "rv122",
+   "band": "y9-10",
+   "topics": [
+    "protein-synthesis",
+    "genes"
+   ],
+   "q": "Which sequence shows the flow of information when a cell makes a protein?",
+   "options": [
+    "DNA to protein to mRNA",
+    "Protein to mRNA to DNA",
+    "mRNA to DNA to protein",
+    "DNA to mRNA to protein"
+   ],
+   "answer": 3,
+   "why": "A gene in DNA is transcribed into mRNA. The mRNA is then translated into a chain of amino acids that folds into a protein."
+  },
+  {
+   "id": "rv123",
+   "band": "y9-10",
+   "topics": [
+    "protein-synthesis"
+   ],
+   "q": "What happens during transcription?",
+   "options": [
+    "Amino acids are joined into a chain at a ribosome",
+    "A finished protein is moved out of the cell",
+    "All the cell's DNA is copied before division",
+    "A gene's DNA sequence is copied into messenger RNA"
+   ],
+   "answer": 3,
+   "why": "In transcription, RNA polymerase reads one strand of a gene and builds a matching mRNA copy. In eukaryotes this happens in the nucleus."
+  },
+  {
+   "id": "rv124",
+   "band": "y9-10",
+   "topics": [
+    "protein-synthesis",
+    "organelles"
+   ],
+   "q": "Where does translation take place?",
+   "options": [
+    "At a ribosome, where amino acids are joined",
+    "In the nucleus, directly on the DNA",
+    "Only inside the mitochondria of the cell",
+    "On the cell wall, outside the membrane"
+   ],
+   "answer": 0,
+   "why": "Ribosomes read the mRNA and join amino acids in the order it specifies. The ribosome can be free in the cytoplasm or attached to the rough ER."
+  },
+  {
+   "id": "rv125",
+   "band": "y9-10",
+   "topics": [
+    "protein-synthesis",
+    "genes"
+   ],
+   "q": "What is a codon?",
+   "options": [
+    "A section of a ribosome that reads the code",
+    "A group of four bases that makes up a whole gene",
+    "Three mRNA bases that specify an amino acid or a stop",
+    "A single amino acid in a protein chain"
+   ],
+   "answer": 2,
+   "why": "The mRNA is read three bases at a time. Each triplet, called a codon, specifies one amino acid or a stop signal."
+  },
+  {
+   "id": "rv126",
+   "band": "y9-10",
+   "topics": [
+    "mutation",
+    "protein-folding",
+    "protein-synthesis"
+   ],
+   "q": "How can a single base change in a gene affect a protein?",
+   "options": [
+    "It can change one amino acid and so alter how the protein works",
+    "It always stops the protein from being made at all",
+    "It changes every amino acid in the whole protein chain",
+    "It cannot affect a protein, since proteins are not made from genes"
+   ],
+   "answer": 0,
+   "why": "A substitution can change one codon and so one amino acid. Sometimes the protein works the same, and sometimes its shape, and so its job, changes (as in sickle cell anaemia)."
+  },
+  {
+   "id": "rv127",
+   "band": "y9-10",
+   "topics": [
+    "mitosis",
+    "cell-cycle"
+   ],
+   "q": "Which is the correct order of the stages of mitosis?",
+   "options": [
+    "Metaphase, prophase, telophase, anaphase",
+    "Prophase, metaphase, anaphase, telophase",
+    "Telophase, anaphase, metaphase, prophase",
+    "Prophase, anaphase, metaphase, telophase"
+   ],
+   "answer": 1,
+   "why": "Chromosomes condense (prophase), line up in the middle (metaphase), sister chromatids are pulled apart (anaphase), then two nuclei form (telophase)."
+  },
+  {
+   "id": "rv128",
+   "band": "y9-10",
+   "topics": [
+    "mitosis",
+    "cell-cycle",
+    "inheritance"
+   ],
+   "q": "A human body cell with 46 chromosomes divides by mitosis. How many chromosomes are in each daughter cell?",
+   "options": [
+    "46",
+    "92",
+    "23",
+    "44"
+   ],
+   "answer": 0,
+   "why": "Mitosis makes two genetically identical cells, each with the same chromosome number as the parent cell."
+  },
+  {
+   "id": "rv129",
+   "band": "y9-10",
+   "topics": [
+    "cell-cycle",
+    "dna-structure",
+    "mitosis"
+   ],
+   "q": "Why is the cell's DNA copied before mitosis?",
+   "options": [
+    "So the cell can make more mitochondria to share",
+    "So the nucleus can be taken out of the cell",
+    "So each daughter cell gets a full set of genes",
+    "So each daughter cell gets half of the DNA"
+   ],
+   "answer": 2,
+   "why": "DNA replicates during the S phase of the cell cycle. Each chromosome then has two identical chromatids, which are shared equally between the daughter cells."
+  },
+  {
+   "id": "rv130",
+   "band": "y9-10",
+   "topics": [
+    "cell-cycle",
+    "mutation"
+   ],
+   "q": "What can happen when the controls on cell division fail?",
+   "options": [
+    "Cells stop respiring and soon die",
+    "Cells divide without control and may form a tumour",
+    "DNA is changed into protein by the nucleus",
+    "Cells turn into gametes in the same tissue"
+   ],
+   "answer": 1,
+   "why": "Cancer can develop when mutations disrupt the controls on cell growth and division. Abnormal cells may form a tumour, although some cancers, such as leukaemia, do not form solid tumours."
+  },
+  {
+   "id": "rv131",
+   "band": "y9-10",
+   "topics": [
+    "meiosis",
+    "mitosis",
+    "inheritance"
+   ],
+   "q": "How does meiosis differ from mitosis?",
+   "options": [
+    "It halves the chromosome number, using two divisions after one DNA replication",
+    "It makes two identical cells that keep the full chromosome number",
+    "It makes cells for the growth and repair of body tissues",
+    "It happens only in plants, never in animals or in fungi"
+   ],
+   "answer": 0,
+   "why": "Meiosis involves two divisions after one round of DNA replication, reducing the chromosome number by half. Crossing over and independent assortment generate variation. Its products are not always four functional gametes."
+  },
+  {
+   "id": "rv132",
+   "band": "y9-10",
+   "topics": [
+    "photosynthesis"
+   ],
+   "q": "Which three factors can limit the rate of photosynthesis?",
+   "options": [
+    "Only the colour of the leaf being tested",
+    "Only the amount of oxygen in the surrounding air",
+    "Only the number of mitochondria in the cells",
+    "Light intensity, carbon dioxide and temperature"
+   ],
+   "answer": 3,
+   "why": "Photosynthesis needs light, carbon dioxide and a suitable temperature for its enzymes. The factor in shortest supply sets the rate."
+  },
+  {
+   "id": "rv133",
+   "band": "y9-10",
+   "topics": [
+    "respiration",
+    "atp",
+    "specialised-cells"
+   ],
+   "q": "When muscle cells respire without enough oxygen, what is made?",
+   "options": [
+    "Lactate and a small amount of ATP",
+    "Carbon dioxide and water, with a large amount of ATP",
+    "Ethanol and carbon dioxide",
+    "Glucose and oxygen"
+   ],
+   "answer": 0,
+   "why": "Anaerobic glycolysis produces a net gain of two ATP per glucose. Pyruvate is converted to lactate, regenerating NAD+ so glycolysis can continue."
+  },
+  {
+   "id": "rv134",
+   "band": "y9-10",
+   "topics": [
+    "microscopy"
+   ],
+   "q": "A cell is 50 micrometres long. Its drawing is 5 cm long. What is the magnification?",
+   "options": [
+    "×100",
+    "×10",
+    "×1000",
+    "×10 000"
+   ],
+   "answer": 2,
+   "why": "Convert to the same unit: 5 cm = 50 000 micrometres. Magnification = image size divided by real size = 50 000 / 50 = 1000."
+  },
+  {
+   "id": "rv135",
+   "band": "y9-10",
+   "topics": [
+    "cell-structure",
+    "diffusion",
+    "membrane"
+   ],
+   "q": "Why does increasing a cell's size without changing its shape make exchange across its membrane more difficult?",
+   "options": [
+    "Its volume increases faster than its surface area, so exchange falls behind its needs",
+    "It would run out of space inside for its single large nucleus to fit",
+    "Its membrane would grow too thick for any materials to cross it at all",
+    "It could not contain enough DNA to run all of its activities as it grew"
+   ],
+   "answer": 0,
+   "why": "As a cell grows without changing shape, its surface area to volume ratio decreases. Its membrane therefore has less exchange area relative to the volume it must supply."
+  },
+  {
+   "id": "rv136",
+   "band": "y9-10",
+   "topics": [
+    "prokaryote-eukaryote",
+    "cell-structure"
+   ],
+   "q": "Which feature is found in a bacterial cell but not in an animal cell?",
+   "options": [
+    "Ribosomes for making proteins in the cell",
+    "A cell membrane around all of the cytoplasm",
+    "A cell wall, and DNA with no nucleus around it",
+    "Mitochondria for aerobic respiration in the cell"
+   ],
+   "answer": 2,
+   "why": "Bacteria are prokaryotes. Their DNA lies free in the cytoplasm, and most have a cell wall. Animal cells have a nucleus and no wall, and both cell types have ribosomes and a membrane."
+  },
+  {
+   "id": "rv137",
+   "band": "y11",
+   "topics": [
+    "respiration",
+    "atp",
+    "membrane",
+    "enzymes"
+   ],
+   "q": "In a mitochondrion, what drives ATP synthase to make ATP?",
+   "options": [
+    "Oxygen binding directly to the enzyme itself",
+    "Light being absorbed by the enzyme",
+    "Protons flowing back through it down their gradient",
+    "Glucose splitting into two pyruvate molecules"
+   ],
+   "answer": 2,
+   "why": "The electron transport chain pumps protons into the intermembrane space. They flow back through ATP synthase, and that flow powers the joining of ADP and phosphate."
+  },
+  {
+   "id": "rv138",
+   "band": "y11",
+   "topics": [
+    "respiration",
+    "membrane",
+    "organelles"
+   ],
+   "q": "Where does the electron transport chain of aerobic respiration operate in a eukaryotic cell?",
+   "options": [
+    "In the nucleus",
+    "In the cytoplasm",
+    "On the inner mitochondrial membrane",
+    "On the outer mitochondrial membrane"
+   ],
+   "answer": 2,
+   "why": "The folded cristae of the inner membrane carry the electron transport chain and ATP synthase, which gives a large surface area for ATP production."
+  },
+  {
+   "id": "rv139",
+   "band": "y11",
+   "topics": [
+    "respiration"
+   ],
+   "q": "What is the role of oxygen in aerobic respiration?",
+   "options": [
+    "It is the molecule that glucose is built from",
+    "It is the energy store made by the cell",
+    "It is split to release carbon dioxide",
+    "It is the final electron acceptor and forms water"
+   ],
+   "answer": 3,
+   "why": "Oxygen accepts electrons at the end of the electron transport chain and combines with protons to form water. Without it the chain backs up and ATP production falls."
+  },
+  {
+   "id": "rv140",
+   "band": "y11",
+   "topics": [
+    "respiration",
+    "atp"
+   ],
+   "q": "Which stage of aerobic respiration makes the most ATP for each glucose molecule?",
+   "options": [
+    "The Krebs cycle, in the matrix",
+    "Fermentation, when oxygen is low",
+    "Oxidative phosphorylation",
+    "Glycolysis, in the cytoplasm"
+   ],
+   "answer": 2,
+   "why": "Glycolysis and the Krebs cycle each make only a few ATP directly. Most of the ATP, roughly 26 to 28 of about 30 per glucose, comes from oxidative phosphorylation."
+  },
+  {
+   "id": "rv141",
+   "band": "y11",
+   "topics": [
+    "photosynthesis",
+    "organelles",
+    "membrane"
+   ],
+   "q": "Where in a chloroplast do the light-dependent reactions take place?",
+   "options": [
+    "In the thylakoid membranes",
+    "In the outer membrane",
+    "In the cell wall around it",
+    "In the fluid-filled stroma"
+   ],
+   "answer": 0,
+   "why": "Chlorophyll and the electron transport chain sit in the thylakoid membranes of the grana. The sugar-making reactions take place in the stroma."
+  },
+  {
+   "id": "rv142",
+   "band": "y11",
+   "topics": [
+    "photosynthesis",
+    "atp"
+   ],
+   "q": "What does the Calvin cycle (light-independent stage) do?",
+   "options": [
+    "Splits water to release oxygen and electrons",
+    "Absorbs light using chlorophyll in the grana",
+    "Makes ATP in the mitochondria from glucose",
+    "Uses ATP and NADPH to turn CO₂ into sugar"
+   ],
+   "answer": 3,
+   "why": "The light-dependent reactions supply ATP and NADPH. The Calvin cycle uses them to fix carbon dioxide into sugars in the stroma."
+  },
+  {
+   "id": "rv143",
+   "band": "y11",
+   "topics": [
+    "photosynthesis"
+   ],
+   "q": "Where does the oxygen released in photosynthesis come from?",
+   "options": [
+    "The breakdown of glucose in the stroma",
+    "The carbon dioxide that the leaf takes in",
+    "The ATP that the light reactions make",
+    "The splitting of water in the light reactions"
+   ],
+   "answer": 3,
+   "why": "Photolysis splits water, releasing electrons, protons and oxygen. The carbon from carbon dioxide ends up in glucose, not in the oxygen."
+  },
+  {
+   "id": "rv144",
+   "band": "y11",
+   "topics": [
+    "photosynthesis",
+    "respiration"
+   ],
+   "q": "What is the light compensation point of a plant?",
+   "options": [
+    "The light level that gives the fastest photosynthesis",
+    "The light level where photosynthesis equals respiration",
+    "The light level where respiration stops completely",
+    "The light level where photosynthesis first starts"
+   ],
+   "answer": 1,
+   "why": "Below this point the plant respires more than it photosynthesises, so it takes in oxygen and releases carbon dioxide. Above it there is a net oxygen output."
+  },
+  {
+   "id": "rv145",
+   "band": "y11",
+   "topics": [
+    "photosynthesis",
+    "respiration",
+    "specialised-cells"
+   ],
+   "q": "Which pair of features is typical of a shade leaf compared with a sun leaf?",
+   "options": [
+    "A thicker palisade layer and a higher light-saturation point",
+    "Fewer grana and a higher rate of respiration overall",
+    "More chlorophyll per chloroplast and a lower light compensation point",
+    "A thicker waxy cuticle and a higher compensation point"
+   ],
+   "answer": 2,
+   "why": "Shade leaves capture scarce light with larger grana and more chlorophyll, and respire more slowly. They break even at low light but saturate early."
+  },
+  {
+   "id": "rv146",
+   "band": "y11",
+   "topics": [
+    "enzymes",
+    "protein-folding"
+   ],
+   "q": "How does a competitive inhibitor reduce enzyme activity?",
+   "options": [
+    "It destroys the substrate before it can bind",
+    "It binds to the active site and blocks the substrate",
+    "It raises the temperature of the reaction",
+    "It moves the enzyme out to the nucleus"
+   ],
+   "answer": 1,
+   "why": "A competitive inhibitor resembles the substrate and occupies the active site. Adding more substrate can overcome it, because the substrate then competes better."
+  },
+  {
+   "id": "rv147",
+   "band": "y11",
+   "topics": [
+    "enzymes"
+   ],
+   "q": "How do enzymes speed up reactions?",
+   "options": [
+    "By supplying extra energy as ATP",
+    "By lowering the activation energy",
+    "By changing which products form",
+    "By raising the temperature of the cell"
+   ],
+   "answer": 1,
+   "why": "The enzyme holds the substrate in a favourable position and stabilises the transition state, so less energy is needed to start the reaction."
+  },
+  {
+   "id": "rv148",
+   "band": "y11",
+   "topics": [
+    "membrane"
+   ],
+   "q": "What is the main structure of a cell membrane in the fluid mosaic model?",
+   "options": [
+    "A rigid layer made of cellulose fibres",
+    "A double layer made of DNA molecules",
+    "A phospholipid bilayer with proteins embedded in it",
+    "A single layer of protein coated in lipid"
+   ],
+   "answer": 2,
+   "why": "Phospholipids form a bilayer that can move sideways (fluid). Proteins are scattered through it like tiles in a mosaic, acting as channels, carriers and receptors."
+  },
+  {
+   "id": "rv149",
+   "band": "y11",
+   "topics": [
+    "membrane"
+   ],
+   "q": "Why do phospholipids arrange themselves into a bilayer in water?",
+   "options": [
+    "Every part is attracted to water, so they pack in two rows",
+    "Water-loving heads face out and water-avoiding tails face in",
+    "Water-avoiding heads face out and water-loving tails face in",
+    "DNA holds the phospholipids together in two rows"
+   ],
+   "answer": 1,
+   "why": "Each phospholipid has a polar, water-loving head and non-polar, water-avoiding tails. In water the tails tuck together inside, and the heads face the water on both sides."
+  },
+  {
+   "id": "rv150",
+   "band": "y11",
+   "topics": [
+    "membrane",
+    "diffusion"
+   ],
+   "q": "Which molecule crosses the phospholipid bilayer most easily by simple diffusion?",
+   "options": [
+    "Glucose, a large polar molecule",
+    "A protein",
+    "Oxygen, a small non-polar molecule",
+    "Sodium ions"
+   ],
+   "answer": 2,
+   "why": "Small non-polar molecules such as oxygen diffuse easily through the bilayer. Ions and molecules such as glucose generally require transport proteins. Intact proteins usually require vesicular transport to cross the plasma membrane."
+  },
+  {
+   "id": "rv151",
+   "band": "y11",
+   "topics": [
+    "membrane",
+    "diffusion",
+    "active-transport"
+   ],
+   "q": "How does facilitated diffusion differ from active transport?",
+   "options": [
+    "It uses channel or carrier proteins to move substances down their gradient without ATP",
+    "It moves substances straight through the lipid bilayer without any proteins",
+    "It uses ATP to move substances up their gradient, against it",
+    "It moves water only, from a dilute to a concentrated solution"
+   ],
+   "answer": 0,
+   "why": "Both use membrane proteins. Facilitated diffusion is passive and follows the gradient, while active transport uses energy to move substances against it."
+  },
+  {
+   "id": "rv152",
+   "band": "y11",
+   "topics": [
+    "osmosis",
+    "specialised-cells"
+   ],
+   "q": "An animal cell is placed in a hypotonic solution. What happens?",
+   "options": [
+    "Nothing changes",
+    "Water enters and the cell may lyse",
+    "Solutes leave until the concentrations match",
+    "Water leaves and the cell shrinks"
+   ],
+   "answer": 1,
+   "why": "A hypotonic solution has a lower effective concentration of non-penetrating solutes than the cytoplasm. Water enters by osmosis, and the cell may swell and lyse because it has no cell wall."
+  },
+  {
+   "id": "rv153",
+   "band": "y11",
+   "topics": [
+    "active-transport",
+    "atp",
+    "membrane"
+   ],
+   "q": "What does the sodium-potassium pump do?",
+   "options": [
+    "Moves water by osmosis",
+    "Moves Na+ and K+ by facilitated diffusion",
+    "Moves 3 Na+ out and 2 K+ in using ATP",
+    "Moves 2 Na+ out and 3 K+ in without energy"
+   ],
+   "answer": 2,
+   "why": "The pump is a carrier protein that uses one ATP per cycle. It keeps sodium low and potassium high inside the cell, against both gradients."
+  },
+  {
+   "id": "rv154",
+   "band": "y11",
+   "topics": [
+    "cell-cycle",
+    "dna-structure"
+   ],
+   "q": "In which phase of the cell cycle is DNA replicated?",
+   "options": [
+    "Cytokinesis",
+    "M phase",
+    "G1 phase",
+    "S phase"
+   ],
+   "answer": 3,
+   "why": "In interphase, G1 is growth, S is DNA synthesis and G2 is preparation for division. M phase is mitosis and cytokinesis."
+  },
+  {
+   "id": "rv155",
+   "band": "y11",
+   "topics": [
+    "microscopy",
+    "organelles"
+   ],
+   "q": "Which microscope can show the internal structure of organelles such as mitochondria?",
+   "options": [
+    "A hand lens held close to the specimen",
+    "A dissecting microscope with a lamp",
+    "A transmission electron microscope",
+    "A school light microscope"
+   ],
+   "answer": 2,
+   "why": "Electron microscopes have much higher resolution than light microscopes. A transmission electron microscope shows the cristae inside mitochondria."
+  },
+  {
+   "id": "rv156",
+   "band": "y11",
+   "topics": [
+    "microscopy"
+   ],
+   "q": "What is resolution in microscopy?",
+   "options": [
+    "The smallest gap at which two points still look separate",
+    "How thick the specimen is on the slide",
+    "How many times larger the image is than the specimen",
+    "How brightly lit the final image appears to be"
+   ],
+   "answer": 0,
+   "why": "Magnification makes the image bigger, but resolution decides how much detail it shows. Beyond the resolution limit, more magnification only makes a larger blur."
+  },
+  {
+   "id": "rv157",
+   "band": "y12",
+   "topics": [
+    "protein-synthesis",
+    "genes"
+   ],
+   "q": "In eukaryotes, which part of the pre-mRNA is removed before translation?",
+   "options": [
+    "Introns",
+    "Exons",
+    "Ribosomes",
+    "Codons"
+   ],
+   "answer": 0,
+   "why": "Splicing removes introns and joins the retained exons. Exons can contain protein-coding sequences and untranslated regions. Mature mRNA is exported from the nucleus for translation."
+  },
+  {
+   "id": "rv158",
+   "band": "y12",
+   "topics": [
+    "protein-synthesis"
+   ],
+   "q": "What is the job of tRNA?",
+   "options": [
+    "To copy the genes in the nucleus into mRNA",
+    "To join amino acids using peptide bonds on its own",
+    "To carry the DNA out of the nucleus to the ribosome",
+    "To bring an amino acid to the ribosome, matched to a codon"
+   ],
+   "answer": 3,
+   "why": "Each tRNA carries one amino acid. Its anticodon pairs with the matching codon on the mRNA, so amino acids are added in the order the gene specifies."
+  },
+  {
+   "id": "rv159",
+   "band": "y12",
+   "topics": [
+    "dna-structure",
+    "cell-cycle"
+   ],
+   "q": "Why is DNA replication called semi-conservative?",
+   "options": [
+    "Each new DNA molecule has one old strand and one new strand",
+    "Both strands of each new molecule are brand new",
+    "The original molecule stays whole and a copy is made",
+    "Only half of the DNA in the cell gets copied"
+   ],
+   "answer": 0,
+   "why": "The two strands separate, and each acts as a template for a new strand. The result is two molecules, each with one old and one new strand."
+  },
+  {
+   "id": "rv160",
+   "band": "y12",
+   "topics": [
+    "dna-structure",
+    "enzymes",
+    "cell-cycle"
+   ],
+   "q": "Which enzyme adds nucleotides to build the new DNA strand during replication?",
+   "options": [
+    "Helicase",
+    "Amylase",
+    "DNA polymerase",
+    "Catalase"
+   ],
+   "answer": 2,
+   "why": "DNA polymerase adds nucleotides to the 3' end of the growing strand, following the template. Helicase only unwinds the double helix."
+  },
+  {
+   "id": "rv161",
+   "band": "y12",
+   "topics": [
+    "meiosis",
+    "inheritance"
+   ],
+   "q": "Which events in meiosis create genetic variation?",
+   "options": [
+    "Breakdown of the nuclear envelope",
+    "Crossing over and independent assortment",
+    "DNA replication and cytokinesis",
+    "Chromosome condensation and spindle formation"
+   ],
+   "answer": 1,
+   "why": "Crossing over swaps segments between homologous chromosomes, and independent assortment sends each pair to the gametes at random. Together they give many different gametes."
+  },
+  {
+   "id": "rv162",
+   "band": "y12",
+   "topics": [
+    "inheritance",
+    "genes"
+   ],
+   "q": "Why are X-linked recessive conditions more common in males?",
+   "options": [
+    "Males have two X chromosomes, so both alleles show",
+    "The Y chromosome carries a dominant allele that hides them",
+    "Recessive alleles are inherited only from fathers",
+    "Males have one X, so one recessive allele shows"
+   ],
+   "answer": 3,
+   "why": "In a typical XY male, a recessive disease allele on the X chromosome has no corresponding allele on the Y to mask it. XX females usually need two disease alleles to be fully affected, although some heterozygous females show symptoms because of X-inactivation."
+  },
+  {
+   "id": "rv163",
+   "band": "y12",
+   "topics": [
+    "mutation",
+    "protein-synthesis"
+   ],
+   "q": "What is a frameshift mutation?",
+   "options": [
+    "A substitution that creates a stop codon partway through the gene",
+    "An insertion or deletion in a coding sequence that shifts its reading frame",
+    "A swap of one amino acid for a similar amino acid in the protein",
+    "A change in the number of whole chromosomes in the cell"
+   ],
+   "answer": 1,
+   "why": "An insertion or deletion within a protein-coding sequence shifts the reading frame when the number of bases is not a multiple of three. This changes how downstream bases are grouped into codons and often introduces a premature stop signal."
+  },
+  {
+   "id": "rv164",
+   "band": "y12",
+   "topics": [
+    "biotechnology",
+    "dna-structure"
+   ],
+   "q": "Why is Taq polymerase used in PCR?",
+   "options": [
+    "It is heat stable, so it survives repeated heating",
+    "It cuts DNA at specific base sequences",
+    "It unwinds the DNA inside a living cell",
+    "It joins DNA from two different species together"
+   ],
+   "answer": 0,
+   "why": "Each PCR cycle heats the mixture to separate the strands. Taq polymerase comes from a heat-loving bacterium and is not denatured by this."
+  },
+  {
+   "id": "rv165",
+   "band": "y12",
+   "topics": [
+    "immunity",
+    "specialised-cells"
+   ],
+   "q": "Which type of cell presents antigens to helper T-cells to start the adaptive immune response?",
+   "options": [
+    "A red blood cell that carries oxygen around the body",
+    "An antigen-presenting cell, such as a dendritic cell",
+    "A platelet that helps the blood to clot at a wound",
+    "A neuron in the nervous system of the body"
+   ],
+   "answer": 1,
+   "why": "Antigen-presenting cells engulf pathogens and display fragments on their surface. Helper T-cells recognise these, and then activate B-cells and killer T-cells."
+  },
+  {
+   "id": "rv166",
+   "band": "y12",
+   "topics": [
+    "epigenetics",
+    "genes",
+    "chromatin"
+   ],
+   "q": "How does methylation of a gene's promoter usually affect that gene?",
+   "options": [
+    "It lowers transcription of the gene",
+    "It deletes the gene from the genome",
+    "It raises transcription of the gene",
+    "It changes the DNA base sequence"
+   ],
+   "answer": 0,
+   "why": "Methyl groups are added to cytosine bases without changing the sequence. This usually blocks transcription factors and recruits proteins that compact the chromatin."
+  },
+  {
+   "id": "rv167",
+   "band": "y12",
+   "topics": [
+    "epigenetics",
+    "chromatin",
+    "genes"
+   ],
+   "q": "What effect does histone acetylation generally have?",
+   "options": [
+    "It tightens chromatin and so silences genes",
+    "It changes the DNA base sequence",
+    "It cuts the DNA into short fragments",
+    "It loosens chromatin so genes can be transcribed"
+   ],
+   "answer": 3,
+   "why": "Acetyl groups reduce the positive charge on histones, so they hold DNA less tightly. The more open chromatin is easier for transcription machinery to reach."
+  },
+  {
+   "id": "rv168",
+   "band": "y12",
+   "topics": [
+    "x-inactivation",
+    "epigenetics"
+   ],
+   "q": "What does X-inactivation do in a typical XX somatic cell of a female human?",
+   "options": [
+    "Silences most of one X in each cell, forming a Barr body",
+    "Deletes one X chromosome from every cell for good",
+    "Makes both X chromosomes fully active in every cell",
+    "Silences the same X chromosome in every cell of the body"
+   ],
+   "answer": 0,
+   "why": "Early in development, one X chromosome is usually chosen at random for inactivation in each precursor cell. Its descendants retain that choice, producing patches of cells with different active X chromosomes. Most genes on the inactive X are silenced, helping balance X-linked gene dosage."
+  },
+  {
+   "id": "rv169",
+   "band": "y12",
+   "topics": [
+    "immunity",
+    "specialised-cells"
+   ],
+   "q": "How do killer (cytotoxic) T-cells recognise a virus-infected cell?",
+   "options": [
+    "By the shape of the cell wall around the cell",
+    "By free antibodies attached to the surface of the cell",
+    "By the number of mitochondria the cell contains",
+    "By viral antigens displayed on MHC class I molecules"
+   ],
+   "answer": 3,
+   "why": "Infected cells display viral fragments on MHC class I. A killer T-cell with a matching receptor binds, then releases molecules that make the cell self-destruct."
+  }
+ ]
+}

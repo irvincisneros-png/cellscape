@@ -46,7 +46,9 @@ export function create(engine) {
   const pickables = [], fallbackPickables = [];
   const tmpM = new THREE.Matrix4(), tmpV = new THREE.Vector3(), tmpV2 = new THREE.Vector3(), tmpQ = new THREE.Quaternion(), tmpS = new THREE.Vector3(), tmpE = new THREE.Euler();
   const X = new THREE.Vector3(1, 0, 0), Y = new THREE.Vector3(0, 1, 0);
-  const tag = (o, kind) => { o.traverse?.((m) => { if (m.isMesh || m.isInstancedMesh) m.userData.kind = kind; }); o.userData.kind = kind; return o; };
+  // clay look: the three layers share one orange family, so give each its own pastel (salmon outer, peach inner, gold cristae)
+  const CLAY_KIND = { outer: "#f0a184", inner: "#f8cba5", crista: "#ffe0ae" };
+  const tag = (o, kind) => { o.traverse?.((m) => { if (m.isMesh || m.isInstancedMesh) { m.userData.kind = kind; if (CLAY_KIND[kind]) m.userData.clayColor = CLAY_KIND[kind]; } }); o.userData.kind = kind; return o; };
   const shared = { supply: M.supply, o2: M.o2, anoxia: false, cyanide: false, dnp: false, olig: false, dirty: false };
   const state = { dived: false, cut: true, labels: true };
 

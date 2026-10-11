@@ -27,7 +27,7 @@
 }
 .cs-scale i { display: block; height: 4px; border: 2px solid var(--ink-dim); border-top: 0; min-width: 10px; }
 .cs-hint {
-  position: absolute; right: 150px; bottom: 14px; z-index: 3; font-size: 0.72rem; color: var(--ink-faint);   /* left of the Pause / Microscope buttons */
+  position: absolute; right: 150px; bottom: 14px; z-index: 3; font-size: 0.72rem; color: var(--ink-dim);   /* left of the Pause / Microscope buttons */
   text-align: right; pointer-events: none; text-shadow: 0 1px 6px #000; max-width: 40%;
 }
 .cs-up { position: absolute; left: 14px; bottom: 46px; z-index: 3; background: rgba(5, 11, 22, 0.75); }

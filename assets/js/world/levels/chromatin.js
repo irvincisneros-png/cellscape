@@ -246,6 +246,7 @@ export function create(engine) {
         .replace("#include <emissivemap_fragment>", `#include <emissivemap_fragment>\n${withGlow ? "totalEmissiveRadiance += vGlow * vec3(1.0, 0.72, 0.2) * uGeneGlow;" : ""}\ntotalEmissiveRadiance += vec3(0.85, 0.45, 1.0) * (1.0 - smoothstep(uHoleR, uHoleR * 1.08 + 0.6, hd)) * step(0.01, uHoleR) * 0.8;`);
     };
     mat.customProgramCacheKey = () => `chr-hole-${withGlow ? 1 : 0}`;
+    mat.userData.clayPatch = mat.onBeforeCompile; mat.userData.clayPatchKey = `chr-hole-${withGlow ? 1 : 0}`;   // keep the zoom cut-away and gene glow in the clay look
   }
 
   // ---------- chromatin loops around the locus (radial loops on the scaffold) ----------
