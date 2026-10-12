@@ -192,6 +192,12 @@ function glowMat(base, { rim = 0.5, glow = 0 } = {}) {
 
 /** An instanced field of organic, softly irregular cells (jittered, varied in size, randomly rotated; ≤ about 300). */
 const CELLG = cellGeo(), NUCG = nucleusGeo();
+
+/** LOD ordering: the engine keeps the FIRST k instances at lower tiers, so write instance i to slot spreadSlot(i, n, stride) and the survivors stay
+ *  evenly spread (a golden-ratio stride, coprime with n) instead of leaving a bare patch where the cut-off instances were. */
+const gcd = (a, b) => (b ? gcd(b, a % b) : a);
+function strideFor(n) { let s = Math.max(1, Math.round(n * 0.618034)); while (gcd(s, n) !== 1) s++; return s; }
+const spreadSlot = (i, n, stride) => (i * stride) % n;
 class HexField {
   constructor(cap, bodyMat, nucMat, kind, { plant = false, ghost = false, seed = 1 } = {}) {
     this.cap = cap; this.n = 0; this.R = 1; this.hy = 0.9; this.plant = plant; this.seed = seed; this.bodyK = plant ? 0.84 : 1;
@@ -203,6 +209,7 @@ class HexField {
       this.vac = new THREE.InstancedMesh(new THREE.SphereGeometry(1, 16, 12), glowMat({ color: "#ffffff", transparent: true, opacity: 0.38, depthWrite: false }, { rim: 0.8, glow: 0.05 }), cap);
       this.chl = new THREE.InstancedMesh(new THREE.SphereGeometry(1, 8, 6).scale(1.5, 0.7, 1), physical("#2f9e44", { emissive: new THREE.Color("#1f7a34"), emissiveIntensity: 0.35, roughness: 0.4 }), cap * 4);
       parts.push(this.wall, this.vac, this.chl);
+      this.chl.userData.lod = true;                // chloroplasts are decoration (4 per cell, laid out so a cut keeps 1-4 per cell, never none)
       this.wall.userData.clayHide = false;
     }
     for (const m of [this.body, this.nuc]) { m.userData.kind = kind; m.setColorAt(0, new THREE.Color()); }
@@ -223,6 +230,7 @@ class HexField {
   }
   layout(cells, pitch, R, y = 0, jitter = 0.14) {
     this.n = cells.length; this.R = R;
+    this.stride = strideFor(Math.max(1, this.n));
     for (let i = 0; i < cells.length; i++) {
       const h = (k) => hash(i * 12.9898 + k * 78.233 + this.seed * 3.1);
       this.px[i * 3] = cells[i].x * pitch + (h(1) - 0.5) * jitter * pitch; this.px[i * 3 + 1] = y; this.px[i * 3 + 2] = -cells[i].y * pitch + (h(2) - 0.5) * jitter * pitch;
@@ -230,10 +238,11 @@ class HexField {
       const a = h(6) * TAU, d = this.plant ? 0.42 : 0.14 * h(7); this.noff[i * 2] = Math.cos(a) * d; this.noff[i * 2 + 1] = Math.sin(a) * d;
     }
     for (const m of [this.body, this.nuc, this.wall, this.vac]) if (m) m.count = this.n;
-    if (this.chl) this.chl.count = this.n * 4;
+    if (this.chl) { this.chl.count = this.chl.userData.lodCount = this.n * 4; }
     if (this.ghost) {
-      this.ghost.count = this.n;
-      for (let i = 0; i < this.n; i++) { this.q.setFromAxisAngle(this.Y, this.rot[i]); this.ghost.setMatrixAt(i, this.m4.compose(this.v.set(this.px[i * 3], this.px[i * 3 + 1] - 0.9, this.px[i * 3 + 2]), this.q, this.s.set(R * this.sx[i], R * 0.12, R * this.sz[i]))); }
+      this.ghost.count = this.ghost.userData.lodCount = this.n;
+      this.ghost.userData.lod = true;              // faint footprint under each cell: decoration only
+      for (let i = 0; i < this.n; i++) { this.q.setFromAxisAngle(this.Y, this.rot[i]); this.ghost.setMatrixAt(spreadSlot(i, this.n, this.stride), this.m4.compose(this.v.set(this.px[i * 3], this.px[i * 3 + 1] - 0.9, this.px[i * 3 + 2]), this.q, this.s.set(R * this.sx[i], R * 0.12, R * this.sz[i]))); }
       this.ghost.instanceMatrix.needsUpdate = true;
     }
     this.dirty = true;
@@ -270,7 +279,7 @@ class HexField {
         this.vac.setMatrixAt(i, this.m4.compose(this.v.set(px - ox * 0.5, py + sy * 0.28, pz - oz * 0.5), this.q, this.s.set(sx * 0.5, sy * 0.3, sz * 0.5)));
         for (let c = 0; c < 4; c++) {
           const a = i * 1.7 + c * 1.57 + 0.6, rr = 0.62;
-          this.chl.setMatrixAt(i * 4 + c, this.m4.compose(this.v.set(px + Math.cos(a) * sx * rr * this.bodyK, py + sy * 0.22, pz + Math.sin(a) * sz * rr * this.bodyK), this.q, this.s.setScalar(R0 * 0.1 * s)));
+          this.chl.setMatrixAt(c * this.n + i, this.m4.compose(this.v.set(px + Math.cos(a) * sx * rr * this.bodyK, py + sy * 0.22, pz + Math.sin(a) * sz * rr * this.bodyK), this.q, this.s.setScalar(R0 * 0.1 * s)));
         }
       }
     }
@@ -363,6 +372,7 @@ export function create(engine) {
   const NCR = 150;
   const crowdG = wobble(new THREE.SphereGeometry(1, 14, 10), 0.09, 2.3, 5);
   const crowd = inst(crowdG, glowMat({ color: "#ffffff", transparent: true, opacity: 0.17, depthWrite: false }, { rim: 0.5, glow: 0.03 }), NCR, null); gM.add(crowd);
+  crowd.userData.lod = true;                         // background crowding blobs (random positions): fewer still reads as a crowded cell
   const crowdDef = [];
   {
     const pal = ["#6366f1", "#8b5cf6", "#38bdf8", "#14b8a6", "#a78bfa", "#60a5fa"];

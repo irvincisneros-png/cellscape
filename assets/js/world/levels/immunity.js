@@ -257,6 +257,7 @@ export function create(engine) {
       const len = 10 + rng() * 22; tS.set(len, 1, 1); tM.compose(tV, tQ, tS); fib.setMatrixAt(n++, tM);
     }
     fib.count = n; fib.instanceMatrix.needsUpdate = true;
+    fib.userData.lod = true; fib.userData.lodCount = n;      // decorative collagen: fewer threads still read as a fibre mesh
   }
   const dust = specks(150, 0.8, [140, 90, 60], ["#ffd9b8", "#ffb8a6", "#ffe8c8"], 0.22);
   dust.position.set(0, -8, 0); dust.userData.clayHide = true; gW.add(dust);
@@ -353,6 +354,7 @@ export function create(engine) {
   const phTotal = () => PD().reduce((a, b) => a + b, 0);
   const macMatP = addRuffle(membrane("#f2b49a", "#ffe0d0", { maxAlpha: 0.55 }), uTime, 0.4, 0.45, "macP");
   const pBody = tag(new THREE.Mesh(mP.body, macMatP), "macrophage"); gP.add(pBody);
+  pBody.userData.clayOpacity = 0.32;       // clay: a see-through jelly body, so the nucleus, lysosomes and the bacterium inside still show
   const pNuc = new THREE.Mesh(mP.nuc, physical("#ffffff", { roughness: 0.4, clearcoat: 0.6, vertexColors: true })); pNuc.position.set(-4.2, 2.6, -1.8); pNuc.scale.setScalar(0.95); gP.add(tag(pNuc, "macrophage"));
   const BP0 = new THREE.Vector3(MR + 2.7, 0.8, 0), X_IN = 5.0;
   // organelles of the macrophage: mitochondria, Golgi, vesicles (static, for crowding)
@@ -392,7 +394,7 @@ export function create(engine) {
       const tip = new THREE.Vector3(BP0.x + 1.7, BP0.y + c * 1.0, s * 1.0);
       const q1 = root.clone().lerp(mid, 0.5).add(new THREE.Vector3(1.4, 0, 0));
       const g = taperedTube(new THREE.CatmullRomCurve3([root, q1, mid, tip]), SEG, RAD, (u) => 1.5 * (1 - u) + 0.32);
-      const m = new THREE.Mesh(g, macMatP); m.frustumCulled = false; m.userData.kind = "pseudopod"; gP.add(m); arms.push(m);
+      const m = new THREE.Mesh(g, macMatP); m.frustumCulled = false; m.userData.kind = "pseudopod"; m.userData.clayOpacity = 0.6; gP.add(m); arms.push(m);
     }
   }
   PARTS.pseudopod = { name: { "y7-8": "Pseudopodia (\"false feet\")", y11: "Pseudopodia" }, color: "#f2b49a", role: { "y7-8": "Arms of the cell's membrane that stretch out and wrap around the germ.", "y9-10": "Extensions of the macrophage's membrane (and cytoplasm) that stretch around the bacterium so the cell can engulf it.", y11: "Actin-driven extensions of the plasma membrane that surround a particle in a zipper-like way (guided by receptors binding the target), closing to form a phagosome." } };
@@ -836,7 +838,7 @@ export function create(engine) {
       tQ.setFromEuler(tE.set(c.rx, c.ry, c.rz));
       put(RBCM, i, tV, tQ, c.s);
     }
-    done(RBCM, NRBC);
+    done(RBCM, Math.ceil(NRBC * engine.lodScale));      // crowding only (no count is quoted): thinner on slower tiers
   }
   function updateSignals(dt, t) {
     const lvl = prion ? 0 : clamp(M.S * 1.4 + M.w, 0, 1.2);

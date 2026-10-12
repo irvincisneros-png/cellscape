@@ -446,7 +446,10 @@ export function create(engine) {
     const a = engine.camera.aspect, t = Math.tan(THREE.MathUtils.degToRad(engine.camera.fov / 2));
     if (v === "thylakoid") return { target: new THREE.Vector3(-0.5, 1.5, 0), d: clamp(13 / (t * a), 18, 60), dir: new THREE.Vector3(0, 0.35, 1) };
     if (v === "calvin") return { target: G.WC.clone().add(new THREE.Vector3(0, 0.5, 0)), d: clamp(6.5 / (t * Math.min(a, 1)), 14, 40), dir: new THREE.Vector3(0.05, 0.2, 1) };
-    return { target: new THREE.Vector3(0, 1, 0), d: clamp(Math.max(16.5 / t, 15 / (t * a)), 36, 96), dir: new THREE.Vector3(0, 0.22, 1) };
+    // Arrival view: the membrane and its proteins lead; the lamp sits small at the top edge and Calvin cycle below.
+    // Portrait: fit the width to the membrane section and lift the view a little so the lamp stays in frame.
+    const portrait = a < 0.8;
+    return { target: new THREE.Vector3(0, portrait ? 1.2 : 1.6, 0), d: clamp(Math.max(16 / t, (portrait ? 14 : 13) / (t * a)), 34, 96), dir: new THREE.Vector3(0, 0.3, 1) };
   }
   function flyTo(v) {
     if (engine.busy) return;
@@ -472,6 +475,7 @@ export function create(engine) {
   // ---------- level ----------
   let uiT = 0, exT = 0, gT = 0;
   buildPanel();
+  // No LOD here: heads and tails are laid out in spatial rows, so thinning either would delete a region of the bilayer.
   const level = {
     title: "Thylakoid membrane",
     debug: { S, G },
@@ -546,6 +550,7 @@ export function create(engine) {
       model = PM.rates(S, S.den);
       if (d) G.step(d, t, model);
       G.render(t, model, { hover });
+      G.lampGlow.scale.multiplyScalar(0.4);   // keep the lamp's halo modest so it doesn't outshine the membrane
       updateLabels();
       pushShared();
       if (graph.sweep) { graph.sweep.t = Math.min(1, graph.sweep.t + realDt / 2.2); if (graph.sweep.t >= 1) finishSweep(); }

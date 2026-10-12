@@ -19,6 +19,7 @@
       <a class="back" href="../../index.html">← CellScape</a>
       <h1>Membrane Transport</h1>
       <span class="tag">Biology Y11 · Module 1 · Cell membrane transport</span>
+      <span class="tag" id="cfg-switch">Show: <a href="?config=animal">animal cell membrane</a> · <a href="?config=plant">plant cell membrane</a></span>
       <span class="cs-theme-slot"></span>
     </header>
     <main class="stage" id="stage">
@@ -32,12 +33,13 @@
     // three.js r169 needs WebGL2; without it (or if 3D fails to start) use the 2D version of this simulation
     let gl = false;
     try { gl = !!document.createElement("canvas").getContext("webgl2") && sessionStorage.getItem("cs2d") !== "1"; } catch { gl = false; }
-    const fallback = () => { document.getElementById("labels")?.remove(); import("./sim2d.js"); };
+    const fallback = () => { document.getElementById("labels")?.remove(); document.getElementById("cfg-switch")?.remove(); /* the 2D version shows the animal configuration only */ import("./sim2d.js"); };
     if (!gl) fallback();
     else import("../../assets/js/world/shell.js")
       .then((m) => m.boot({ start: "membrane", root: "../../" }))
       .catch((e) => { console.error(e); try { sessionStorage.setItem("cs2d", "1"); } catch {} location.reload(); });
   </script>
+  <script>(function(){try{var c=new URLSearchParams(location.search).get("config")==="plant"?"plant":"animal",a=document.querySelectorAll("#cfg-switch a");a[c==="plant"?1:0].setAttribute("aria-current","true");a[c==="plant"?1:0].style.fontWeight="700"}catch(e){}})()</script>
   <script type="module">import("../../assets/js/world/theme.js").then((m) => { const s = document.querySelector(".cs-theme-slot"); if (s) m.mountThemeToggle(s); });</script>
 </body>
 </html>

@@ -3,7 +3,7 @@
 // particle gets its own depth. The model stays the single source of truth for the science.
 import * as THREE from "three";
 import { mergeGeometries } from "three/addons/utils/BufferGeometryUtils.js";
-import { SP, ORDER } from "./model.js";
+import { SP } from "./model.js";
 
 export const VW = 1000, VH = 620;          // fixed virtual model size
 const S = 0.02;                              // world units per model px (water)
@@ -12,9 +12,10 @@ const PS = 1.45;                             // protein scale
 const PART = 1.35;                           // particle scale
 const BEND = 0.012;                          // membrane curvature
 const VIS = 2.1;                             // particles drawn larger than their model radius
-const PROT_Z = { aqp: -1.2, kch: 1.0, glut: -0.4, pump: 0.9, nach: -1.4 };
+const PROT_Z = { aqp: -1.2, kch: 1.0, glut: -0.4, pump: 0.9, nach: -1.4, suc: -0.4, hpump: 0.9, nit: -1.4 };
 const VES_Z = 0.4;
 const SPECIES_PROT = { h2o: ["aqp"], k: ["kch", "pump"], na: ["nach", "pump"], glc: ["glut"] };
+const SPECIES_PROT_PLANT = { h2o: ["aqp"], k: ["kch"], suc: ["suc"], h: ["hpump", "suc", "nit"], no3: ["nit"] };
 
 const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 const lerp = (a, b, t) => a + (b - a) * t;
@@ -92,6 +93,18 @@ function particleGeometry(sp) {
       }
       return mergeGeometries(parts);
     }
+    case "no3": { // planar NO₃⁻: N in the middle, three O at 120°
+      const parts = [sphereAt(0.1, 0, 0, 0, "#3b82f6", 16, 12)];
+      for (let i = 0; i < 3; i++) { const a = (i / 3) * Math.PI * 2 + Math.PI / 2; parts.push(sphereAt(0.105, Math.cos(a) * 0.2, Math.sin(a) * 0.2, 0, "#e5484d", 16, 12)); }
+      return mergeGeometries(parts);
+    }
+    case "suc": { // sucrose: a six-membered glucose ring joined through an O to a five-membered fructose ring
+      const glc = paint(new THREE.TorusGeometry(0.15, 0.052, 8, 6), col), fru = paint(new THREE.TorusGeometry(0.12, 0.05, 8, 5), "#d9f99d");
+      glc.translate(-0.25, 0, 0); fru.translate(0.27, 0.02, 0);
+      const parts = [glc, fru, sphereAt(0.065, 0, 0.0, 0, "#e5484d", 10, 8)];
+      for (const [x, y, c] of [[-0.25, 0.25, "#ecfccb"], [-0.43, -0.12, "#ecfccb"], [-0.25, -0.26, "#e5484d"], [0.27, 0.27, "#ecfccb"], [0.43, -0.17, "#e5484d"]]) parts.push(sphereAt(0.05, x, y, 0, c, 8, 6));
+      return mergeGeometries(parts);
+    }
     case "prot": {
       const g = new THREE.IcosahedronGeometry(0.36, 3);
       const p = g.attributes.position, v = new THREE.Vector3();
@@ -163,13 +176,13 @@ function buildGlut(P) {
   return g;
 }
 
-function buildPump(P) {
+function buildPump(P, plant = false) {
   const g = new THREE.Group(), mat = physical(P.color), matB = physical("#99f6e4"), matD = physical("#14b8a6");
-  const subs = [];
-  for (let i = 0; i < 4; i++) {
-    const a = (i / 4) * Math.PI * 2 + Math.PI / 4;
+  const subs = [], nSub = plant ? 6 : 4; // the H⁺-ATPase is one chain crossing the bilayer ~10 times; drawn as a ring of helices
+  for (let i = 0; i < nSub; i++) {
+    const a = (i / nSub) * Math.PI * 2 + Math.PI / 4;
     const pivot = new THREE.Group();
-    pivot.position.set(Math.cos(a) * 0.5, 0, Math.sin(a) * 0.5);
+    pivot.position.set(Math.cos(a) * (plant ? 0.58 : 0.5), 0, Math.sin(a) * (plant ? 0.58 : 0.5));
     pivot.add(capsule(0.34, 2.05, mat));
     pivot.userData.a = a;
     g.add(pivot);
@@ -183,14 +196,21 @@ function buildPump(P) {
   const A = new THREE.Mesh(new THREE.SphereGeometry(0.42, 32, 24), mat); A.position.set(-0.1, -0.55, -0.25);
   dom.add(N, Pd, A);
   g.add(dom);
-  // β-subunit on the outside with a sugar chain
-  const beta = capsule(0.3, 0.55, matB);
-  beta.position.set(0.25, 1.6, -0.1); beta.rotation.z = -0.35;
-  g.add(beta);
-  for (let i = 0; i < 4; i++) {
-    const s = new THREE.Mesh(new THREE.SphereGeometry(0.09, 12, 10), physical("#fef3c7"));
-    s.position.set(0.5 + i * 0.12, 2.0 + i * 0.13, -0.1 + (i % 2) * 0.08);
-    g.add(s);
+  if (plant) {
+    // C-terminal regulatory domain (autoinhibitory tail) on the cytoplasmic side: no β-subunit in plants
+    const tail = new THREE.Mesh(new THREE.SphereGeometry(0.3, 24, 18), physical("#5eead4"));
+    tail.position.set(0.7, -2.2, 0.2);
+    dom.add(tail);
+  } else {
+    // β-subunit on the outside with a sugar chain
+    const beta = capsule(0.3, 0.55, matB);
+    beta.position.set(0.25, 1.6, -0.1); beta.rotation.z = -0.35;
+    g.add(beta);
+    for (let i = 0; i < 4; i++) {
+      const s = new THREE.Mesh(new THREE.SphereGeometry(0.09, 12, 10), physical("#fef3c7"));
+      s.position.set(0.5 + i * 0.12, 2.0 + i * 0.13, -0.1 + (i % 2) * 0.08);
+      g.add(s);
+    }
   }
   const phos = new THREE.Mesh(new THREE.SphereGeometry(0.13, 16, 12), physical("#fbbf24", { emissive: new THREE.Color("#f59e0b"), emissiveIntensity: 1.6 }));
   phos.position.set(-0.75, -1.6, 0.55);
@@ -212,6 +232,8 @@ export class Scene3D {
     this.world.rotation.z = -0.1;
     this.root.add(this.world);
 
+    this.plant = M.plant;
+    this.protZ = PROT_Z;
     this.addBackground();
     this.buildMembrane();
     this.buildProteins();
@@ -301,6 +323,10 @@ export class Scene3D {
         heads.push([X, Z, hash(X * 31 + Z * 57)]);
       }
     }
+    // Order the lipids so any prefix of the buffer is an even, quasi-random spread over the sheet (golden-ratio ranks).
+    // That way the engine's LOD (it just lowers InstancedMesh.count) thins the bilayer evenly instead of cutting off its front rows.
+    const ranked = heads.map((h, j) => [(j * 0.6180339887) % 1, h]).sort((a, b) => a[0] - b[0]).map((r) => r[1]);
+    heads.length = 0; heads.push(...ranked);
     const n = heads.length * 2;
     const headGeo = new THREE.SphereGeometry(0.2, 12, 9);
     const headMat = physical("#c3b4d6", { roughness: 0.38, clearcoat: 0.6, sheen: 0.8 });
@@ -308,6 +334,9 @@ export class Scene3D {
     const tailMat = new THREE.MeshStandardMaterial({ color: "#6b5a3e", roughness: 0.7 });
     this.heads = new THREE.InstancedMesh(headGeo, headMat, n);
     this.tails = new THREE.InstancedMesh(tailGeo, tailMat, n * 2);
+    this.heads.userData.lod = true;   // decorative crowding: fewer lipids still show a bilayer (engine.lodScale thins them)
+    this.tails.userData.lod = true;
+    this.headScale = 1; this.lodApplied = 1;
     this.headData = [];
     const m = new THREE.Matrix4(), q = new THREE.Quaternion(), e = new THREE.Euler(), p = new THREE.Vector3(), s = new THREE.Vector3(1, 1, 1);
     const cA = new THREE.Color("#c9bbdb"), cB = new THREE.Color("#9f8fba"), cC = new THREE.Color("#d8cbe6"), c = new THREE.Color();
@@ -353,7 +382,7 @@ export class Scene3D {
     this.protObj = {};
     this.pickables = [];
     for (const P of this.M.prot) {
-      const g = P.kind === "pump" ? buildPump(P) : P.kind === "carrier" ? buildGlut(P) : buildChannel(P);
+      const g = P.kind === "pump" ? buildPump(P, this.plant) : P.kind === "carrier" || P.kind === "symport" ? buildGlut(P) : buildChannel(P);
       const X = (P.x - VW / 2) * S;
       g.position.set(X, bend(X), PROT_Z[P.id]);
       g.rotation.z = Math.atan(slope(X));
@@ -368,11 +397,11 @@ export class Scene3D {
   buildParticles() {
     this.pmesh = {};
     const MAX = 160;
-    for (const sp of ORDER) {
+    for (const sp of this.M.order) {
       let geo = particleGeometry(sp), mat;
       if (geo) mat = new THREE.MeshPhysicalMaterial({ vertexColors: true, roughness: 0.22, clearcoat: 1, clearcoatRoughness: 0.15 });
       else {
-        geo = new THREE.SphereGeometry(sp === "k" ? 0.27 : 0.22, 32, 24);
+        geo = new THREE.SphereGeometry(sp === "k" ? 0.27 : sp === "h" ? 0.2 : 0.22, 32, 24);
         mat = physical("#ffffff", { map: labelTexture(SP[sp].name, SP[sp].color), roughness: 0.18, clearcoat: 1 });
       }
       const mesh = new THREE.InstancedMesh(geo, mat, MAX);
@@ -481,7 +510,32 @@ export class Scene3D {
   }
 
   // ---------- per-frame ----------
+  /** Performance tier: when the engine thins the lipids (lodScale < 1) the remaining heads grow a little so the sheet still reads as continuous. */
+  applyLod(ls) {
+    this.lodApplied = ls;
+    this.headScale = Math.min(1.4, 1 / Math.sqrt(ls));
+    const m = this.tmpM, hs = this.headScale, p = this.tmpV, q = this.tmpQ.identity(), sc = this.tmpS.set(hs, hs, hs);
+    this.headData.forEach((d, j) => { m.compose(p.set(d.X, d.Y, d.Z), q, sc); this.heads.setMatrixAt(j, m); });
+    this.heads.instanceMatrix.needsUpdate = true;
+    // cheaper lipid heads on the lower tiers (216 -> 120 -> 80 triangles each)
+    this.headGeos ??= { 1: this.heads.geometry };
+    const seg = ls >= 1 ? 1 : ls >= 0.75 ? 0.75 : 0.5;
+    this.headGeos[seg] ??= seg === 0.75 ? new THREE.SphereGeometry(0.2, 10, 6) : new THREE.SphereGeometry(0.2, 8, 5);
+    this.heads.geometry = this.headGeos[seg];
+    this.vesHidden = true;       // let updateVesicle re-apply the hole if one is open
+    this.specks.geometry.setDrawRange(0, Math.ceil(this.specks.geometry.attributes.position.count * ls));
+  }
+
+  /** Text for the "outside / inside" tags and protein labels (the level sets these from the year lens). */
+  setLabels({ out, inside, prot } = {}) {
+    if (out != null) this.sideOut.textContent = out;
+    if (inside != null) this.sideIn.textContent = inside;
+    if (prot) for (const id in prot) if (this.protLabels[id]) this.protLabels[id].textContent = prot[id];
+  }
+
   update(dt, t, ui = {}) {
+    const ls = this.engine.lodScale ?? 1;
+    if (ls !== this.lodApplied) this.applyLod(ls);
     this.specks.rotation.y = Math.sin(t * 0.03) * 0.05;
     this.specks.position.y = Math.sin(t * 0.05) * 0.4;
     this.world.rotation.y = Math.sin(t * 0.07) * 0.035;
@@ -509,6 +563,14 @@ export class Scene3D {
           s.rotation.set(Math.sin(a) * (1 - open) * 0.28, 0, -Math.cos(a) * (1 - open) * 0.28);
         });
         u.ring.material.emissiveIntensity = 0.2 + open * 0.6 + glow * 2;
+        u.mat.emissive.set(P.color).multiplyScalar(glow * 0.6);
+      } else if (P.kind === "symport") {
+        const S2 = M.sym[P.id], th = 0.24 * -S2.c;
+        u.lobes[0].rotation.z = th; u.lobes[1].rotation.z = -th;
+        u.lobes[0].position.y = u.lobes[1].position.y = Math.sin(t * 1.7 + P.fx * 9) * 0.02;
+        u.inhib.visible = S2.blocked;
+        u.inhib.position.set(0, 1.3, 0.1);
+        u.inhib.rotation.set(t, t * 0.7, 0);
         u.mat.emissive.set(P.color).multiplyScalar(glow * 0.6);
       } else if (P.kind === "carrier") {
         const gl = M.glut, th = 0.24 * -gl.c;
@@ -543,11 +605,11 @@ export class Scene3D {
     }
     let target = own.base, w = 0, pz = 0;
     if (p.mode === "transit" && p.tr && PROT_Z[p.tr.via] !== undefined) { w = 1; pz = PROT_Z[p.tr.via]; }
-    else if (p.mode === "bound") { w = 1; pz = p.sp === "glc" ? PROT_Z.glut : PROT_Z.pump; }
+    else if (p.mode === "bound") { w = 1; pz = PROT_Z[p.bid] ?? (p.sp === "glc" ? PROT_Z.glut : PROT_Z.pump); }
     else if (p.mode === "ves") { w = 1; pz = VES_Z; }
     else {
       // drift toward the depth of a protein the particle is approaching
-      for (const id of SPECIES_PROT[p.sp] || []) {
+      for (const id of (this.plant ? SPECIES_PROT_PLANT : SPECIES_PROT)[p.sp] || []) {
         const P = this.M.byId[id];
         const d = Math.hypot(p.x - P.x, p.y - L.midY);
         const ww = Math.exp(-((d / 70) ** 2));
@@ -563,12 +625,12 @@ export class Scene3D {
   updateParticles(dt, t) {
     const M = this.M, m = this.tmpM, q = this.tmpQ, v = this.tmpV, s = this.tmpS, e = this.tmpE;
     const lists = {};
-    for (const sp of ORDER) lists[sp] = [];
+    for (const sp of M.order) lists[sp] = [];
     for (const p of M.parts) if (!p.dead && lists[p.sp].length < 160) lists[p.sp].push(p);
     const seen = new Set();
     let glowI = 0;
-    for (const sp of ORDER) {
-      const mesh = this.pmesh[sp], list = lists[sp], ion = sp === "na" || sp === "k";
+    for (const sp of M.order) {
+      const mesh = this.pmesh[sp], list = lists[sp], ion = sp === "na" || sp === "k" || sp === "h";
       for (let i = 0; i < list.length; i++) {
         const p = list[i];
         seen.add(p.id);
@@ -605,7 +667,7 @@ export class Scene3D {
     const fly = M.pump.fly;
     if (fly && a < 32) {
       const k = fly.t, x = lerp(fly.from.x, fly.to.x, k), y = lerp(fly.from.y, fly.to.y, k) - Math.sin(k * Math.PI) * 30;
-      this.toLocal(x, y, lerp(0, PROT_Z.pump + 0.6, k), v);
+      this.toLocal(x, y, lerp(0, PROT_Z[M.pumpId] + 0.6, k), v);
       m.compose(v, q.identity(), s.set(1.2, 1.2, 1.2));
       this.atpMesh.setMatrixAt(a++, m);
     }
@@ -615,7 +677,7 @@ export class Scene3D {
     let b = 0;
     for (const sp of M.fx.sprites) {
       if (b >= 16) break;
-      this.toLocal(sp.x, sp.y, PROT_Z.pump + 0.6, v);
+      this.toLocal(sp.x, sp.y, PROT_Z[M.pumpId] + 0.6, v);
       const k = (1 - sp.t) * (sp.kind === "ADP" ? 1.3 : 0.9);
       m.compose(v, q.identity(), s.set(k, k, k));
       this.piMesh.setMatrixAt(b++, m);
@@ -637,8 +699,8 @@ export class Scene3D {
     for (const j of this.vesHeads) {
       const d = this.headData[j];
       const hide = want && Math.hypot(d.X - vx, d.Z - VES_Z) < R;
-      m.makeTranslation(d.X, d.Y, d.Z);
-      if (hide) m.scale(this.tmpS.set(0, 0, 0));
+      const hs = hide ? 0 : this.headScale;
+      m.compose(this.tmpV.set(d.X, d.Y, d.Z), this.tmpQ.identity(), this.tmpS.set(hs, hs, hs));
       this.heads.setMatrixAt(j, m);
     }
     this.heads.instanceMatrix.needsUpdate = true;
@@ -652,16 +714,16 @@ export class Scene3D {
       if (i >= this.glows.length) break;
       const g = this.glows[i++];
       g.visible = true;
-      this.toLocal(f.x, f.y, PROT_Z.pump + 0.7, g.position);
+      this.toLocal(f.x, f.y, PROT_Z[M.pumpId] + 0.7, g.position);
       g.material.color.set(f.color);
       g.material.opacity = (1 - f.t) * 1.2;
       g.scale.setScalar((f.r * S) * 4 * (0.6 + f.t));
     }
     // pump glow while feeding ATP
     if (M.feeding && i < this.glows.length) {
-      const g = this.glows[i++], P = M.byId.pump;
+      const g = this.glows[i++], P = M.byId[M.pumpId];
       g.visible = true;
-      this.toLocal(P.x, M.L.memBot + 70, PROT_Z.pump + 0.6, g.position);
+      this.toLocal(P.x, M.L.memBot + 70, PROT_Z[M.pumpId] + 0.6, g.position);
       g.material.color.set("#fbbf24");
       g.material.opacity = 0.6 + 0.3 * Math.sin(t * 12);
       g.scale.setScalar(2.6);
@@ -677,14 +739,14 @@ export class Scene3D {
       v.set(X, bend(X) + PS * (P.kind === "pump" ? 2.65 : 1.95), PROT_Z[P.id]);
       this.place(el, v);
       el.classList.toggle("hover", ui.hover === P.id);
-      el.classList.toggle("off", (P.kind === "channel" && !P.open) || (P.kind === "carrier" && M.glut.blocked));
+      el.classList.toggle("off", (P.kind === "channel" && !P.open) || (P.kind === "carrier" && M.glut.blocked) || (P.kind === "symport" && M.sym[P.id].blocked) || (P.kind === "pump" && M.plant && M.pump.blocked));
     }
-    const P = M.byId.pump;
+    const P = M.byId[M.pumpId];
     this.pumpStatus.textContent = M.pumpStatus();
-    v.set((P.x - VW / 2) * S, bend((P.x - VW / 2) * S) - PS * 2.9, PROT_Z.pump + 0.4);
+    v.set((P.x - VW / 2) * S, bend((P.x - VW / 2) * S) - PS * 2.9, PROT_Z[M.pumpId] + 0.4);
     this.place(this.pumpStatus, v);
-    this.place(this.sideOut, this.toLocal(150, 40, 0, v));
-    this.place(this.sideIn, this.toLocal(150, L.uh - 40, 0, v));
+    this.place(this.sideOut, this.toLocal(260, 120, 0, v)); // below the stage's chip rows (plant mode has an extra chip)
+    this.place(this.sideIn, this.toLocal(260, L.uh - 40, 0, v));
 
     // floating event text
     const live = new Set();
@@ -693,7 +755,7 @@ export class Scene3D {
       let el = this.floaters.get(f);
       if (!el) { el = this.mk("floater", f.text); el.style.color = f.color; this.floaters.set(f, el); }
       el.style.opacity = String(f.t < 0.15 ? f.t / 0.15 : 1 - Math.max(0, (f.t - 0.6) / 0.4));
-      this.place(el, this.toLocal(f.x, f.y, PROT_Z.pump + 0.5, v));
+      this.place(el, this.toLocal(f.x, f.y, PROT_Z[M.pumpId] + 0.5, v));
     }
     for (const [f, el] of this.floaters) if (!live.has(f)) { el.remove(); this.floaters.delete(f); }
 

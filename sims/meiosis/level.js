@@ -226,6 +226,9 @@ export function create(engine) {
   }
   function viewFor() {
     const box = G.frameBox(S.phase);
+    // arrive with the whole cell (radius 40) in view and some breathing room, not cropped at the wall
+    const floor = !S.fert && S.phase <= P.ANA1 ? 46 : 0;
+    box.hx = Math.max(box.hx * 1.14, floor); box.hy = Math.max(box.hy * 1.14, floor);
     // portrait phones: leave room under the subject for the stage bar
     if (engine.camera.aspect < 0.8) { box.c.y -= box.hy * 0.2; box.hy *= 1.2; }
     return { target: box.c.clone(), distance: K.clamp(fitDistance(box), 40, 400), dir: VDIR.clone() };

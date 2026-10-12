@@ -278,6 +278,7 @@ export function create(engine) {
   const riboMesh = new THREE.InstancedMesh(new THREE.SphereGeometry(0.075, 6, 5), physical("#6366f1", { emissive: new THREE.Color("#4338ca"), emissiveIntensity: 0.45, roughness: 0.5 }), riboPos.length / 3);
   riboMesh.frustumCulled = false;
   riboMesh.userData.clayColor = "#8b95e8";
+  riboMesh.userData.lod = true;          // decorative crowding on the rough ER: fewer still reads as studded
   for (let i = 0; i < riboPos.length / 3; i++) riboMesh.setMatrixAt(i, tmpM.makeTranslation(riboPos[i * 3], riboPos[i * 3 + 1], riboPos[i * 3 + 2]));
   rerGroup.add(riboMesh);
 
@@ -376,6 +377,7 @@ export function create(engine) {
   const gVes = instanced(new THREE.IcosahedronGeometry(0.32, 3), gVesMat, gVesPos.length / 3, "golgi");
   const gTiny = instanced(new THREE.IcosahedronGeometry(0.11, 2), physical("#f5d0a9", { roughness: 0.4 }), gTinyPos.length / 3, "golgi");
   gVes.userData.clayHide = gTiny.userData.clayHide = true;
+  gTiny.userData.lod = true;             // tiny Golgi vesicles: decorative
   cellGroup.add(gVes, gTiny);
 
   // ---------- mitochondria ----------
@@ -567,8 +569,8 @@ export function create(engine) {
       break;
     }
   }
-  mvMesh.userData.clayHide = true;
   mvMesh.count = mvData.length;
+  mvMesh.userData.lod = true; mvMesh.userData.lodCount = mvData.length;   // decorative fingers: fewer still shows an absorptive surface
   mvData.forEach((m, i) => {
     tmpQ.setFromUnitVectors(UP, m.n);
     tA.copy(m.p).addScaledVector(m.n, 0.3 * m.len);
@@ -601,7 +603,8 @@ export function create(engine) {
     if (i < NGLUT) { glutMesh.setMatrixAt(i, tmpM.compose(tA, tmpQ, tmpS.set(1, 1, 1))); glutCore.setMatrixAt(i, tmpM.compose(tA, tmpQ, tmpS.set(1, 1, 1))); }
     else pumpMesh.setMatrixAt(i - NGLUT, tmpM.compose(tA, tmpQ, tmpS.set(1, 1, 1)));
   });
-  glutMesh.userData.clayHide = glutCore.userData.clayHide = pumpMesh.userData.clayHide = true;
+  // transporters and microvilli stay visible in clay: the update loop lays them along the cut rim (see animate)
+  glutMesh.userData.clayColor = "#b6e07a"; glutCore.userData.clayColor = "#f1f7d4"; pumpMesh.userData.clayColor = "#b9a3f0";
   cellGroup.add(glutMesh, glutCore, pumpMesh);
 
   // ---------- cytosol crowding: ribosomes and small molecules ----------
@@ -973,7 +976,8 @@ export function create(engine) {
     marker.scale.setScalar(Math.max(1e-3, cy)); cytoMarker.scale.setScalar(Math.max(1e-3, cy));
     marker.visible = cytoMarker.visible = cy > 0.01 && dissolve < 0.2;
     key.intensity = 1.3 * morph.cyto; rimL.intensity = 1.0 * morph.cyto;
-    clayKit.visible = clay && dissolve < 0.15;      // (the clay bowl does not stylise lysis: it simply goes when the cell bursts)
+    clayKit.visible = clay && dissolve < 0.15;
+    if (mtKit) { mtKit.visible = engine.quality !== "low" && cy > 0.5; actinKit.visible = actinOn && cy > 0.5; }      // (the clay bowl does not stylise lysis: it simply goes when the cell bursts)
   }
   const tAx = new THREE.Vector3(), tSc = new THREE.Vector3();
   let t0Anim = 0;
@@ -1099,6 +1103,14 @@ export function create(engine) {
     const mk = Math.max(1e-3, cy * fade);
     for (let i = 0; i < mvData.length; i++) {
       const m = mvData[i];
+      if (clay) {     // clay: microvilli stand up on the cut rim, a little chunkier so they read as fingers of clay
+        const th = Math.atan2(m.p.z, m.p.x), R = rimAt(th) + 0.5;
+        tmpQ.identity();
+        if (!still) { tmpE.set(Math.sin(t * 1.2 + m.ph) * 0.08, 0, Math.cos(t * 0.9 + m.ph) * 0.08); tmpQ.multiply(tQ2.setFromEuler(tmpE)); }
+        tAx.set(Math.cos(th) * R, CUT + 0.4 + m.len * 0.55 * mk, Math.sin(th) * R);
+        mvMesh.setMatrixAt(i, tmpM.compose(tAx, tmpQ, tSc.set(mk * 1.7, m.len * mk * 1.4, mk * 1.7)));
+        continue;
+      }
       tmpQ.setFromUnitVectors(UP, m.n);
       if (!still) { tmpE.set(Math.sin(t * 1.2 + m.ph) * 0.12, 0, Math.cos(t * 0.9 + m.ph) * 0.12); tmpQ.multiply(tQ2.setFromEuler(tmpE)); }
       tAx.copy(m.p).addScaledVector(m.n, 0.3 * m.len * mk);
@@ -1107,10 +1119,14 @@ export function create(engine) {
     mvMesh.instanceMatrix.needsUpdate = true;
     for (let i = 0; i < NGLUT + NPUMP; i++) {
       const m = memSites[i];
-      tmpQ.setFromUnitVectors(ZAX, m.n);
-      tAx.copy(m.p).multiplyScalar(0.992);
+      let s = mk;
+      if (clay) {     // clay: transporters sit on the cut rim, lying flat so the ring / block faces the camera
+        const th = Math.atan2(m.p.z, m.p.x), R = rimAt(th) + 0.3;
+        tmpQ.setFromUnitVectors(ZAX, UP);
+        tAx.set(Math.cos(th) * R, CUT + (i < NGLUT ? 0.7 : 0.9), Math.sin(th) * R);
+        s = mk * 1.8;
+      } else { tmpQ.setFromUnitVectors(ZAX, m.n); tAx.copy(m.p).multiplyScalar(0.992); }
       if (!still) tmpQ.multiply(tQ2.setFromAxisAngle(ZAX, t * 0.25 + i));
-      const s = mk * (i < NGLUT ? 1 : 1);
       tmpM.compose(tAx, tmpQ, tSc.set(s, s, s));
       if (i < NGLUT) { glutMesh.setMatrixAt(i, tmpM); glutCore.setMatrixAt(i, tmpM); } else pumpMesh.setMatrixAt(i - NGLUT, tmpM);
     }
@@ -1549,7 +1565,7 @@ export function create(engine) {
   const clayKit = new THREE.Group();
   clayKit.visible = false;
   cellGroup.add(clayKit);
-  let kitBuilt = false, saved = null, kitAo = null, halfMito = null, halfCrist = null;
+  let mtKit = null, actinKit = null, kitBuilt = false, saved = null, kitAo = null, halfMito = null, halfCrist = null;
   const cutR = (th, inset) => {                                  // radius of the cell outline at the cut, minus an inset
     let lo = 0, hi = 26;
     for (let i = 0; i < 24; i++) { const m = (lo + hi) / 2; if (insideCell(tmpV.set(Math.cos(th) * m, CUT, Math.sin(th) * m), inset)) lo = m; else hi = m; }
@@ -1576,6 +1592,26 @@ export function create(engine) {
     add(slabGeometry(o1, o2, 2.5), mat("#f6c5a2"), CUT - 2.05);       // lipid tails (peach); a thin rim, not individual molecules
     add(slabGeometry(o2, null, 2.0), mat("#8db0ea"), CUT - 2.0);      // cytoplasm floor
     bowl.geometry.computeBoundingBox();
+    // clay cytoskeleton: microtubules radiate from the centrosome along the floor, and an actin ring lines the inside of the rim
+    {
+      const gm = [], c0 = tA.set(NUC.x, CUT, NUC.z).addScaledVector(nucDirCentro.clone().setY(0).normalize(), NUC_R + 1.3).clone();
+      for (let k = 0; k < 26; k++) {
+        const th = (k / 26) * Math.PI * 2 + 0.2, R = cutR(th, 1.4);
+        const e = new THREE.Vector3(Math.cos(th) * R, CUT + 0.18, Math.sin(th) * R);
+        if (Math.hypot(e.x - c0.x, e.z - c0.z) < 6) continue;
+        const dx = e.x - c0.x, dz = e.z - c0.z, L = Math.hypot(dx, dz) || 1;
+        // skip rays that would run through the nucleus
+        const t0 = ((NUC.x - c0.x) * dx + (NUC.z - c0.z) * dz) / (L * L), px = c0.x + dx * t0, pz = c0.z + dz * t0;
+        if (t0 > 0 && t0 < 1 && Math.hypot(px - NUC.x, pz - NUC.z) < NUC_R + 0.9) continue;
+        const pts = [];
+        for (let q = 0; q <= 8; q++) { const u = q / 8, bend = Math.sin(u * Math.PI) * 0.9 * Math.sin(k * 2.3); pts.push(new THREE.Vector3(c0.x + dx * u - dz / L * bend, CUT + 0.18, c0.z + dz * u + dx / L * bend)); }
+        gm.push(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts), 24, 0.13, 6, false));
+      }
+      mtKit = add(mergeGeometries(gm), mat("#a9deb3"));
+      mtKit.userData.claySide = "double";
+      const ring = outline(1.5, 96).map(([x, z]) => new THREE.Vector3(x, CUT + 0.12, z));
+      actinKit = add(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(ring, true), 160, 0.1, 6, true), mat("#f6b3c4"));
+    }
     // soft contact-shadow blobs under the organelles (a cheap stand-in for ambient occlusion)
     const aoMat = new THREE.MeshBasicMaterial({ map: ST.blobTexture, transparent: true, depthWrite: false, opacity: 0.55, fog: false });
     const ao = new THREE.InstancedMesh(new THREE.PlaneGeometry(1, 1).rotateX(-Math.PI / 2), aoMat, 160);

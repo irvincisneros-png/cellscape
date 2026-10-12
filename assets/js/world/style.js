@@ -234,12 +234,13 @@ export class StyleManager {
     const g = orig.userData?.glass, gBase = g ? (g.maxA.value <= 0.5 ? Math.min(0.26, Math.max(0.12, g.maxA.value * 0.65)) : 1) : 1, lv0 = g ? orig.opacity : orig.transparent && orig.opacity < 0.9 ? Math.max(0.15, orig.opacity) : 1;
     const opacity = gBase * lv0;
     const op = o.userData.clayOpacity ?? opacity, dbl = o.userData.claySide === "double" || orig.side === THREE.DoubleSide;
-    const key = `${vc ? "v" : "p"}${perInst ? "i" : ""}${op}${dbl ? "d" : ""}${o.userData.clayColor || ""}`;
+    const back = !dbl && orig.side === THREE.BackSide;                     // an inside-out shell (a room seen from inside) stays inside-out
+    const key = `${vc ? "v" : "p"}${perInst ? "i" : ""}${op}${dbl ? "d" : back ? "b" : ""}${o.userData.clayColor || ""}`;
     let per = this.cache.get(orig);
     if (!per) this.cache.set(orig, (per = {}));
     if (per[key]) { per[key].userData.opReset?.(o.userData.clayOpacity !== undefined ? op : lv0); return per[key]; }   // reused: start from the real material's current fade
     const color = o.userData.clayColor ? new THREE.Color(o.userData.clayColor) : tinted ? (orig.color || new THREE.Color("#ffffff")).clone() : pastelOf(orig.color || new THREE.Color("#cccccc"));
-    const m = (per[key] = this.makeClay(color, { vc, pastelShader: tinted, opacity: op, side: dbl ? THREE.DoubleSide : THREE.FrontSide }));
+    const m = (per[key] = this.makeClay(color, { vc, pastelShader: tinted, opacity: op, side: dbl ? THREE.DoubleSide : back ? THREE.BackSide : THREE.FrontSide }));
     if (o.userData.clayOpacity !== undefined) this.linkOpacity(m, 1, op); else this.linkOpacity(m, gBase, lv0);
     this.syncClip(orig, m);
     // a realistic material may carry a shader patch that still matters in clay (cut-away holes, glowing bands): re-apply it on top of the clay shader

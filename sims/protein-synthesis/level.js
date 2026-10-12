@@ -90,6 +90,7 @@ export function create(engine) {
   const lens = engine.lens;
   const toast = (m, ms) => engine.toast?.(m, ms);
   const reduced = engine.reducedMotion;
+  let startApplied = false;
   const parentId = engine.stack.at(-1)?.id || null;
 
   const labelLayer = document.createElement("div");
@@ -858,6 +859,11 @@ export function create(engine) {
       engine.labelLayer.appendChild(labelLayer);
       engine.stageEl.appendChild(tray);
       trayKey = "";
+      if (!startApplied) {
+        startApplied = true;
+        const st = engine.stack.at(-1)?.portal?.start;
+        if (st?.mutation === "sickle") { setGeneTo(M.SICKLE_GENE, [M.SICKLE_INDEX]); toast(lens.pick({ "y7-8": "Codon 6 is changed from GAG to GTG (the sickle-cell change). Press Run it.", "y9-10": "Sickle-cell allele loaded: codon 6 GAG → GTG. Run it to see the protein." })); }
+      }
     },
     unmountPanel() { overlay.remove(); labelLayer.remove(); tray.remove(); closePicker(); G.pool1.drag = G.pool2.drag = null; },
     onResume() { engine.labelLayer.appendChild(labelLayer); },

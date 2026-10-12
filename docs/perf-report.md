@@ -60,3 +60,23 @@ Material downgrades live in `materials.js` (`applyTier`). They change the real l
 
 ## Adaptive quality
 `engine.autoQuality` averages about 3 s of real frames (30+ frames, ignoring gaps over 0.25 s, hidden tabs, microscope mode and dives), then steps down one tier if the average is slower than 32 fps (High to Medium) or 24 fps (Medium to Low). In Low, a device slower than 20 fps drops the pixel ratio to 0.75 once. It never steps back up and does nothing when `lockQuality` is set (the Quality control sets it). Checked with simulated frame times: it stepped High to Medium to Low one window at a time, ignored pauses, stayed put on fast frames and on lock.
+
+## LOD adoption: molecular levels (epigenetics, cristae, chromatin)
+Measured as one `renderer.render(scene, camera)` on the level alone (real style, hidden pane, default framing), with `lodCount` restored for "before" and the tier's own counts for "after". Calls / triangles, same tier before then after. Epigenetics is one scene per mode, so its modes are listed separately.
+
+| View | Medium | Low (Fast) |
+|---|---|---|
+| Cristae (ATP synthase) | 89 / 441k then 352k | 89 / 441k then 263k (-40%) |
+| Chromatin | 36 / 454k then 379k | 36 / 454k then 303k (-33%) |
+| Epigenetics, molecular | 23 / 174k then 165k | 174k then 155k |
+| Epigenetics, mosaic (X-inactivation) | 4 / 759k then 705k | 759k then 651k |
+| Epigenetics, vernalisation / fur / agouti views | 7 / 274k then 266k | 274k then 258k |
+
+What is marked `userData.lod` (decoration or crowding only):
+- **cristae:** the lipid bilayer, heads and tails (about 2900 lipids).
+- **chromatin:** the 300 radial chromatin loops and the solenoid nucleosomes packed inside the 30 nm fibre. Not marked: the 8 gene nucleosomes, histone H1, acetyl and methyl tags, DNA base pairs, polymerase and mRNA beads.
+- **epigenetics:** background crowding blobs, the faint footprint under each mosaic cell, and plant chloroplasts.
+
+Instances are written to golden-ratio-stride slots (or, for chloroplasts, one per cell per pass) because the engine keeps the first k instances. Plain row-order would leave a bare strip of membrane, fibre or chromosome at Medium and Fast; this keeps the survivors evenly spread.
+
+Deliberately not marked, because the model or narrative refers to them: the hexagonal cell fields (the X-inactivation mosaic, vernalisation weeks and fur-temperature map each use every cell), all model-driven tags, enzymes, CpGs, protons and ATP synthase parts, and the 150-proton crowd in cristae (it is the gradient). Those cell fields are most of epigenetics' remaining load (mosaic 540k, rabbit about 300k). Cutting them further needs lower-detail cell geometry per tier, not instance culling.

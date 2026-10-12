@@ -357,6 +357,7 @@ function buildNeuron(X) {
   add(soma, blob(6, 5.8, 5.6, 0.04, 8, 3), M.nucleus, 0.8, 0.5, 0);
   add(soma, new THREE.IcosahedronGeometry(1.9, 2), M.nucleolus, 1.4, 0.9, 1.2);
   const nissl = inst(new THREE.IcosahedronGeometry(0.9, 1), physical("#d6a3ff", { roughness: 0.5 }), 26, soma);
+  nissl.userData.lod = true;           // decorative granules in the cell body
   for (let i = 0; i < 26; i++) { const a = rng() * TAU, b = Math.acos(2 * rng() - 1), r = 7.6 + rng() * 1.6; setI(nissl, i, Math.sin(b) * Math.cos(a) * r, Math.cos(b) * r * 0.9, Math.sin(b) * Math.sin(a) * r, 0.6 + rng() * 0.7); }
   upd(nissl);
   // dendrites: two levels of branching, tapering
@@ -860,7 +861,7 @@ function buildCilia(X) {
   ciliaGeo.setAttribute("aRnd", new THREE.InstancedBufferAttribute(aRnd, 1));
   const cU = { uPhase: { value: 0 }, uAmp: { value: 1 }, uCoord: { value: 1 } };
   const ciliaMat = physical("#ffd9e8", { roughness: 0.35, emissive: col("#f472b6"), emissiveIntensity: 0.18, side: THREE.DoubleSide });
-  ciliaMat.onBeforeCompile = (sh) => {
+  const ciliaPatch = (sh) => {
     Object.assign(sh.uniforms, cU);
     sh.vertexShader = sh.vertexShader.replace("#include <common>", "#include <common>\nattribute float aPh; attribute float aRnd; uniform float uPhase, uAmp, uCoord; varying float vC;")
       .replace("#include <beginnormal_vertex>", `
@@ -874,10 +875,11 @@ function buildCilia(X) {
         vC = hh;`)
       .replace("#include <begin_vertex>", "vec3 transformed = vec3(position.x * ca + position.y * sa, -position.x * sa + position.y * ca, position.z);");
   };
+  ciliaMat.onBeforeCompile = ciliaPatch;
   ciliaMat.customProgramCacheKey = () => "cilia";
-  ciliaMat.userData.clayColor = "#f0b0c9";
+  ciliaMat.userData.clayPatch = ciliaPatch; ciliaMat.userData.clayPatchKey = "cilia";   // clay keeps the beating wave: the bend is re-applied on top of the clay shader
   const cilia = inst(ciliaGeo, ciliaMat, NC, g);
-  cilia.userData.keepMaterial = true;
+  cilia.userData.clayColor = "#ee9fbd";
   { let n = 0; cil.forEach((c) => { for (let k = 0; k < 14; k++) { const p = ciliaPos[n]; setI(cilia, n++, p[0], 0.1, p[1], 1); } }); upd(cilia); }
   // periciliary fluid and the mucus blanket riding on top
   const fluid = add(g, new THREE.BoxGeometry(96, 6, 44), M.fluid, 0, 3, 0); fluid.userData.clayHide = true;
@@ -1024,6 +1026,7 @@ function buildRootHair(X) {
   const GC = ["#5e4b3b", "#4c4036", "#6d5a46", "#585550", "#74604b"];
   grains.forEach((q, i) => { setI(gm, i, q.x, q.y, q.z, q.r, q.r * 0.8, q.r * 0.9, q.rot, q.rot * 2, 0); gm.setColorAt(i, _c.set(GC[i % GC.length])); setI(gf, i, q.x, q.y, q.z, q.r * 1.13, q.r * 0.93, q.r * 1.03, q.rot, q.rot * 2, 0); });
   upd(gm); upd(gf); gm.instanceColor.needsUpdate = true;
+  gm.userData.lod = gf.userData.lod = true;     // soil grains: pure crowding (both meshes share one count, so each grain keeps its water film)
   // water molecules (osmosis) and mineral ions (active transport)
   const NW = 90, wm = inst(new THREE.IcosahedronGeometry(0.62, 1), new THREE.MeshBasicMaterial({ color: "#7dd3fc" }), NW, g);
   wm.userData.clayColor = "#8fbdea";
@@ -1119,6 +1122,7 @@ function buildPalisade(X) {
   const cells = inst(colGeo, M.wallGreen, GRID.length, g), vacs = inst(vacGeo, M.vacuole, GRID.length, g);
   GRID.forEach((c, i) => { setI(cells, i, c.x, 0, c.z, 1); setI(vacs, i, c.x, 0, c.z, 1); }); upd(cells); upd(vacs);
   cells.userData.clayColor = "#a6ddc2"; vacs.userData.clayColor = "#d9e5a4";
+  cells.userData.clayOpacity = 0.36; vacs.userData.clayOpacity = 0.46;      // clay walls a little firmer so the tall cells read as cells, not fog
   const nucs = inst(new THREE.SphereGeometry(1, 16, 12), M.nucleus, GRID.length, g);
   GRID.forEach((c, i) => setI(nucs, i, c.x + 6.9, 6 + hash(i) * 14, c.z + 1, 2.4, 3.2, 2.4)); upd(nucs);
   // chloroplasts: layout A (face-on to the light, near the top and bottom walls) <-> B (edge-on, against the side walls)
@@ -1513,6 +1517,7 @@ function soilBlock(w, d, h, y) {
   const slab = add(g, new THREE.BoxGeometry(w, h, d), gl("#9b7a5c", "#e8cfae", { minAlpha: 0.18, maxAlpha: 0.55 }), 0, 0, 0);
   slab.userData.clayColor = "#d8c7b3";
   const n = 60, gr = inst(new THREE.IcosahedronGeometry(1, 1), physical("#ffffff", { roughness: 0.95, clearcoat: 0, sheen: 0 }), n, g);
+  gr.userData.lod = true;
   const cs = ["#5e4b3b", "#4c4036", "#6d5a46", "#585550"];
   for (let i = 0; i < n; i++) { const r = 0.6 + rng() * 1.5; setI(gr, i, (rng() - 0.5) * (w - 4), (rng() - 0.5) * (h - 3), d * 0.5 - 1.2 - rng() * 3, r, r * 0.8, r, rng() * 3, rng() * 3, 0); gr.setColorAt(i, _c.set(cs[i % cs.length])); }
   upd(gr); gr.instanceColor.needsUpdate = true;

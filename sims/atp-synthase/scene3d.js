@@ -128,24 +128,31 @@ export class CristaeScene {
     this.tails = new THREE.InstancedMesh(new THREE.CylinderGeometry(0.04, 0.026, HB * 0.92, 5, 1, true), new THREE.MeshStandardMaterial({ color: "#6b5a3e", roughness: 0.7 }), n * 2);
     const m = this.tm, q = this.tq, e = this.te, p = this.tv, s = this.ts.set(1, 1, 1);
     const cA = new THREE.Color("#dcbfd0"), cB = new THREE.Color("#b493b0"), cC = new THREE.Color("#ecd8e2"), c = this.tc, cl = new THREE.Color("#f0b37e");
-    let i = 0, k = 0;
+    // LOD: the engine keeps the FIRST k lipids at lower tiers, so lipid i is written to a golden-ratio-stride slot; the survivors stay evenly spread
+    // over the bilayer instead of leaving a bare patch. Head slot = j, its two tails = 2j and 2j+1.
+    let stride = Math.max(1, Math.round(n * 0.618034));
+    for (const gcd = (a, b) => (b ? gcd(b, a % b) : a); gcd(stride, n) !== 1;) stride++;
+    let i = 0;
     for (const [X, Z, h] of heads) {
       const Y0 = bend(X), tilt = Math.atan(slope(X));
       for (const sgn of [1, -1]) {
         p.set(X, Y0 + sgn * (HB + 0.02), Z);
-        this.heads.setMatrixAt(i, m.compose(p, q.identity(), s));
+        const slot = (i * stride) % n;
+        this.heads.setMatrixAt(slot, m.compose(p, q.identity(), s));
         c.copy(h < 0.5 ? cA : cB).lerp(cC, hash(i) * 0.6);
         if (h > 0.93) c.copy(cl);                 // cardiolipin-rich patches (inner membrane lipid)
         if (sgn < 0) c.multiplyScalar(0.85);
-        this.heads.setColorAt(i, c);
+        this.heads.setColorAt(slot, c);
+        let tk = slot * 2;
         for (const off of [-0.07, 0.07]) {
           e.set((hash(i + off) - 0.5) * 0.3, 0, tilt + (hash(i * 3 + off) - 0.5) * 0.3);
           p.set(X + off, Y0 + sgn * HB * 0.5, Z);
-          this.tails.setMatrixAt(k++, m.compose(p, q.setFromEuler(e), s));
+          this.tails.setMatrixAt(tk++, m.compose(p, q.setFromEuler(e), s));
         }
         i++;
       }
     }
+    this.heads.userData.lod = this.tails.userData.lod = true;   // the lipid bilayer is the backdrop; fewer lipids still read as a membrane
     this.world.add(this.heads, this.tails);
     const core = new THREE.PlaneGeometry(25, z1 - z0, 64, 1);
     core.rotateX(-Math.PI / 2);

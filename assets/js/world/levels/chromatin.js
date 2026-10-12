@@ -257,6 +257,10 @@ export function create(engine) {
   const NLOOP = 300;
   const loopMat = physical(COL[0].light, { roughness: 0.45, emissive: new THREE.Color("#db2777"), emissiveIntensity: 0.25 });
   const loops = tag(new THREE.InstancedMesh(loopGeo, loopMat, NLOOP), "loops");
+  // LOD: the engine keeps the FIRST k instances at lower tiers. Loops are written to golden-ratio-stride slots so the survivors stay spread along the whole chromosome.
+  loops.userData.lod = true;
+  const spreadStride = (n) => { const g = (a, b) => (b ? g(b, a % b) : a); let s = Math.max(1, Math.round(n * 0.618034)); while (g(s, n) !== 1) s++; return s; };
+  const LOOP_STRIDE = spreadStride(NLOOP);
   const loopDef = [];
   for (let i = 0; i < NLOOP; i++) {
     const row = Math.floor(i / 10), dy = -50 + row * 3.4 + hash(i) * 1.5, ang = ((i % 10) / 10) * TAU + row * 0.37 + hash(i * 3) * 0.4;
@@ -271,7 +275,7 @@ export function create(engine) {
       const d = loopDef[i];
       tmpQ.setFromAxisAngle(Y, d.ang).multiply(tmpQ2.setFromAxisAngle(Zv, d.tilt));
       const sc = r * d.len;
-      loops.setMatrixAt(i, tmpM.compose(tmpV.set(L.x, L.y + d.dy * (0.35 + 0.65 * r / 26), L.z), tmpQ, tmpS.set(sc, sc, sc)));
+      loops.setMatrixAt((i * LOOP_STRIDE) % NLOOP, tmpM.compose(tmpV.set(L.x, L.y + d.dy * (0.35 + 0.65 * r / 26), L.z), tmpQ, tmpS.set(sc, sc, sc)));
     }
     loops.instanceMatrix.needsUpdate = true;
     loops.computeBoundingSphere();
@@ -314,7 +318,12 @@ export function create(engine) {
     }
   }
   const fibreNucMesh = tag(new THREE.InstancedMesh(lowNuc, nucMat, fibreNuc.length), "nucleosome");
-  fibreNuc.forEach((m, i) => fibreNucMesh.setMatrixAt(i, m));
+  {
+    // LOD: decorative solenoid inside the fibre; spread the survivors along its whole length (see the loops above)
+    fibreNucMesh.userData.lod = true;
+    const stride = spreadStride(fibreNuc.length);
+    fibreNuc.forEach((m, i) => fibreNucMesh.setMatrixAt((i * stride) % fibreNuc.length, m));
+  }
   detail.add(fibreNucMesh); pickables.push(fibreNucMesh);
 
   // the gene: a DNA string with 8 nucleosomes — "beads on a string" when open, packed when closed

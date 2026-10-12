@@ -1150,7 +1150,8 @@ export function create(engine) {
     }).join("")}</div>`;
     c.insertAdjacentHTML("beforeend", `<p>The <i>HBB</i> gene makes \u03b2-globin. Sickle-cell disease comes from <b>one base change</b> in codon 6 (counting from the first amino acid after Met): <b>GAG \u2192 GTG</b>, so glutamic acid becomes valine.</p>${row(ORIGINAL_GENE, "HbA", false)}${row(SICKLE_GENE, "HbS", true)}`);
     c.insertAdjacentHTML("beforeend", `<p class="hint">Glutamic acid is acidic and water-loving; valine is non-polar and water-hating. On deoxygenated haemoglobin the valine makes molecules stick together in long fibres, which bend the red blood cell. (A human gene shown in a plant cell for teaching: a simplified fragment of HBB.)</p>`);
-    c.insertAdjacentHTML("beforeend", `<div class="btn-row"><a class="btn" href="${engine.root}sims/protein-synthesis/index.html">See how a base change alters a protein \u25b8</a></div>`);
+    // dive straight into the DNA-to-protein level; up() brings the student back to this lab
+    K.button(K.buttonRow(c), "See how a base change alters a protein \u25b8", () => engine.dive({ to: "expression", label: "DNA to protein", radius: 4, center: () => new THREE.Vector3(0, 0.95, 3.2), object: root, start: { mutation: "sickle" } }), { kind: "primary" });
   }
 
   // ---- probability table and narrative

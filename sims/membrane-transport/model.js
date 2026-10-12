@@ -18,9 +18,25 @@ export const SP = {
   na:   { name: "Na⁺", long: "Sodium ion", short: "Na⁺", color: "#fb923c", r: 5.5, mob: 0.9, lipid: 0 },
   k:    { name: "K⁺", long: "Potassium ion", short: "K⁺", color: "#c084fc", r: 6.6, mob: 0.9, lipid: 0 },
   prot: { name: "Protein", long: "Large protein", short: "Prot", color: "#f472b6", r: 12, mob: 0.35, lipid: 0 },
+  // plant configuration only
+  h:    { name: "H⁺", long: "Hydrogen ion (proton)", short: "H⁺", color: "#f9a8d4", r: 4.4, mob: 1.1, lipid: 0.002 },
+  suc:  { name: "Sucrose", long: "Sucrose", short: "Suc", color: "#bef264", r: 9, mob: 0.7, lipid: 0 },
+  no3:  { name: "NO₃⁻", long: "Nitrate ion", short: "NO₃⁻", color: "#60a5fa", r: 6.2, mob: 0.85, lipid: 0 },
 };
+/** Charge of each ion (in elementary charges). Only used by the plant membrane potential. */
+const CHARGE = { h: 1, k: 1, na: 1, no3: -1 };
 export const ORDER = ["o2", "co2", "h2o", "glc", "na", "k", "prot"];
+export const ORDER_PLANT = ["o2", "co2", "h2o", "suc", "h", "no3", "k", "prot"];
 const START = { o2: [26, 2], co2: [3, 18], h2o: [16, 16], glc: [22, 2], na: [24, 16], k: [12, 22], prot: [2, 6] };
+// Plant: apoplast is acidic (more H⁺ outside), K⁺ is accumulated inside, sucrose and nitrate are scarce inside.
+const START_PLANT = { o2: [26, 2], co2: [3, 18], h2o: [16, 16], suc: [14, 2], h: [14, 3], no3: [14, 2], k: [14, 10], prot: [2, 6] };
+/** Plant plasma membrane: one membrane potential unit (a "charge") is worth KV mV, and leaks away with time constant Q_TAU. */
+export const KV = 16, Q_TAU = 40, Q_CAP = 4, RT_F = 26.7; // RT_F: RT/F in mV at 37 °C (the model uses this.rtf, which follows the temperature slider)
+export const rtfAt = (T) => 0.08617333 * (T + 273.15);
+const Q_MIN = -8, Q_MAX = 20;
+/** Where bound particles sit inside a symporter (hoisted: no per-step allocation). */
+const SYM_SLOTS = { 1: { cargo: [0, -4], h: [[-8, 5]] }, 2: { cargo: [0, -5], h: [[-9, 5], [9, 5]] } };
+const SYM_KB = 3.5, SYM_KF = 4, SYM_KU = 6, SYM_KE = 1.5; // loading rate scale (1/s per (C/10)(H/10)^n), flip rate scale (1/s), unloading rate (same on both faces) and empty-flip rate
 export const CAP = 300;
 export const SIDE_CAP = 60;
 
@@ -30,6 +46,15 @@ export const PROT_DEF = [
   { id: "glut", kind: "carrier", name: "GLUT carrier", short: "GLUT carrier", tiny: "GLUT", fx: 0.41, fxN: 0.355, color: "#4ade80" },
   { id: "pump", kind: "pump", name: "Na⁺/K⁺ pump", short: "Na⁺/K⁺ pump", tiny: "Na⁺/K⁺ pump", fx: 0.6, fxN: 0.53, color: "#2dd4bf" },
   { id: "nach", kind: "channel", name: "Na⁺ channel", short: "Na⁺ channel", tiny: "Na⁺ ch", fx: 0.775, fxN: 0.69, color: "#fb7185", sp: "na", p: 0.3, open: true, maxIn: 2, dur: 0.35 },
+];
+
+/** Plant plasma membrane. The P-type H⁺-ATPase (1 H⁺ per ATP) builds the proton gradient and the membrane potential;
+ *  the symporters use that proton-motive force: 1 H⁺ per sucrose, 2 H⁺ per nitrate (n). K⁺ channels and aquaporins are the same. */
+export const PROT_DEF_PLANT = [
+  PROT_DEF[0], PROT_DEF[1],
+  { id: "suc", kind: "symport", name: "H⁺–sucrose symporter", short: "H⁺–sucrose symporter", tiny: "H⁺/Suc", fx: 0.41, fxN: 0.355, color: "#a3e635", sp: "suc", n: 1 },
+  { id: "hpump", kind: "pump", name: "H⁺-ATPase (proton pump)", short: "H⁺ pump (H⁺-ATPase)", tiny: "H⁺ pump", fx: 0.6, fxN: 0.53, color: "#2dd4bf" },
+  { id: "nit", kind: "symport", name: "H⁺–nitrate symporter", short: "H⁺–nitrate symporter", tiny: "H⁺/NO₃⁻", fx: 0.775, fxN: 0.69, color: "#60a5fa", sp: "no3", n: 2 },
 ];
 
 /** Water viscosity (Pa·s), Vogel equation. */
@@ -62,7 +87,14 @@ export function layout(w, h) {
 }
 
 export class Model {
-  constructor() {
+  /** mode: "animal" (Na⁺/K⁺-ATPase, GLUT) or "plant" (P-type H⁺-ATPase, H⁺-sucrose and H⁺-nitrate symport). */
+  constructor(mode = "animal") {
+    this.mode = mode === "plant" ? "plant" : "animal";
+    this.plant = this.mode === "plant";
+    this.order = this.plant ? ORDER_PLANT : ORDER;
+    this.protDef = this.plant ? PROT_DEF_PLANT : PROT_DEF;
+    this.start = this.plant ? START_PLANT : START;
+    this.pumpId = this.plant ? "hpump" : "pump";
     this.L = null;
     this.temp = 37;
     this.atpProd = 0.6; // 0..1 of max respiration rate
@@ -77,14 +109,27 @@ export class Model {
     this.nextId = 1;
     this.atp = 14;
     this.feeding = false;
-    this.prot = PROT_DEF.map((d) => ({ ...d, x: this.L ? this.protX(d) : 0, openAnim: d.open ? 1 : 0, inTransit: 0, flash: 0 }));
+    this.prot = this.protDef.map((d) => ({ ...d, x: this.L ? this.protX(d) : 0, openAnim: d.open ? 1 : 0, inTransit: 0, flash: 0 }));
     this.byId = Object.fromEntries(this.prot.map((p) => [p.id, p]));
     this.glut = { c: -1, target: -1, state: "open", cargo: null, blocked: false, dwell: 0, blockedTime: 0 };
-    this.pump = { state: "E1", t: 0, c: 0, na: [], k: [], phos: false, waiting: false, fly: null, cycles: 0, flash: 0 };
+    this.pump = { state: "E1", t: 0, c: 0, na: [], k: [], h: [], phos: false, waiting: false, fly: null, cycles: 0, flash: 0, blocked: false };
+    // plant: one alternating-access symporter object per H⁺-coupled carrier (c: -1 faces outside, +1 faces inside)
+    this.sym = {};
+    if (this.plant) for (const d of this.protDef) if (d.kind === "symport") this.sym[d.id] = { id: d.id, sp: d.sp, n: d.n, c: -1, target: -1, state: "open", dwell: 0, cargo: null, h: [], blocked: false, blockedTime: 0 };
+    this.q = this.plant ? 4 : 0;
+    this.vmFixed = null; // tests / experiments can clamp the membrane potential (mV)
+    this.rtf = rtfAt(this.temp);
+    this.vmAvg = this.vm;
+    this.symList = Object.values(this.sym);
+    this.cn = {}; for (const k of Object.keys(SP)) this.cn[k] = { out: 0, in: 0 };
+    this.site = { x: 0, y: 0 };
+    // persistent attractors for the plant (reused every step: no per-step allocation)
+    this.plantAtt = null; // net positive charge moved out (plant membrane potential); see vm
+    this.hSrc = 0;
     this.ves = { phase: "none", mode: null, t: 0, cargo: [], pocket: null, vesicle: null };
     this.events = [];
     this.cross = {};
-    for (const s of ORDER) this.cross[s] = { in: 0, out: 0, glutIn: 0, glutOut: 0, lipid: 0 };
+    for (const s of Object.keys(SP)) this.cross[s] = { in: 0, out: 0, glutIn: 0, glutOut: 0, lipid: 0 };
     this.fx = { floaters: [], sprites: [], flashes: [] };
     this.atpDots = [];
     this.inspect = null;
@@ -116,9 +161,9 @@ export class Model {
   protX(P) { return (this.L.w < 1000 ? P.fxN : P.fx) * this.L.w; }
 
   populate() {
-    for (const s of ORDER) {
-      for (let i = 0; i < START[s][0]; i++) this.add(s, "out");
-      for (let i = 0; i < START[s][1]; i++) this.add(s, "in");
+    for (const s of this.order) {
+      for (let i = 0; i < this.start[s][0]; i++) this.add(s, "out");
+      for (let i = 0; i < this.start[s][1]; i++) this.add(s, "in");
     }
   }
 
@@ -164,7 +209,7 @@ export class Model {
 
   counts() {
     const c = {};
-    for (const s of ORDER) c[s] = { out: 0, in: 0 };
+    for (const s of this.order) c[s] = { out: 0, in: 0 };
     for (const p of this.parts) if (!p.dead && (p.side === "out" || p.side === "in")) c[p.sp][p.side]++;
     return c;
   }
@@ -195,7 +240,16 @@ export class Model {
     if (via === "lipid") c.lipid++;
     const P = this.byId[via];
     if (P) P.flash = 1;
+    if (this.plant && CHARGE[sp] && !this.sym[via]) this.moveCharge(CHARGE[sp] * dir); // symport cycles apply their net charge once, in updateSym
   }
+
+  /** Plant membrane potential (mV, inside relative to outside) and the proton gradient. */
+  /** dq = net positive charge moved INTO the cell (elementary charges). Signed: inside-positive is possible under perturbation. */
+  moveCharge(dq) { this.q = clamp(this.q - dq / Q_CAP, Q_MIN, Q_MAX); } // membrane capacitance: each charge moves the potential by KV/Q_CAP mV
+  get vm() { return this.vmFixed ?? -KV * this.q; }
+  get dpH() { return Math.log10((this.count("h", "out") + 0.5) / (this.count("h", "in") + 0.5)); }
+  /** Proton-motive force in mV (negative = pulls H⁺ in): Δp = Vm − 59·ΔpH (59 mV per pH unit at 25 °C; ≈ 61 at 37 °C). */
+  get pmf() { return this.vmAvg - this.rtf * Math.LN10 * this.dpH; }
 
   // ---------- controls ----------
   setChannel(id, open) {
@@ -213,7 +267,7 @@ export class Model {
   }
   feedATP(n) {
     this.atp = Math.min(this.atpMax, this.atp + n);
-    const P = this.byId.pump, L = this.L;
+    const P = this.byId[this.pumpId], L = this.L;
     this.fx.flashes.push({ x: P.x, y: L.memBot + L.protH * 0.45, r: 40 * L.sc, t: 0, life: 0.5, color: "#fbbf24" });
   }
 
@@ -247,8 +301,19 @@ export class Model {
       if (p.mode === "free") this.moveFree(p, dt);
       else if (p.mode === "transit") this.moveTransit(p, dt);
     }
-    this.updateGlut(dt);
-    this.updatePump(dt);
+    if (this.plant) {
+      this.q = clamp(this.q - (this.q / Q_TAU) * dt, Q_MIN, Q_MAX); // other ions leak: the potential decays unless the pump keeps up
+      this.hSrc += dt;      // metabolism keeps making H⁺ in the (buffered) cytoplasm, so the pump never runs out of substrate
+      if (this.hSrc >= 0.8) { this.hSrc = 0; if (this.count("h", "in") < 4) this.add("h", "in"); }
+      this.vmAvg += (this.vm - this.vmAvg) * Math.min(1, dt / 1.2);
+      this.rtf = rtfAt(this.temp);
+      this.tallyFree();
+      for (let i = 0; i < this.symList.length; i++) this.updateSym(this.symList[i], dt);
+      this.updateHPump(dt);
+    } else {
+      this.updateGlut(dt);
+      this.updatePump(dt);
+    }
     this.updateVes(dt);
     this.updateAtpDots(dt);
     this.updateFx(dt);
@@ -288,7 +353,7 @@ export class Model {
   contact(p, side, r) {
     const L = this.L;
     for (const P of this.prot) {
-      const half = P.kind === "pump" ? L.pw * 0.78 : P.kind === "carrier" ? L.pw * 0.62 : L.pw * 0.52;
+      const half = P.kind === "pump" ? L.pw * 0.78 : P.kind === "carrier" || P.kind === "symport" ? L.pw * 0.62 : L.pw * 0.52;
       const dx = Math.abs(p.x - P.x);
       if (dx < half + r * 0.5) {
         if (P.kind === "channel" && dx < L.pw * 0.3 && this.tryChannel(P, p, side)) return;
@@ -298,7 +363,7 @@ export class Model {
       }
     }
     if (this.ves.pocket && Math.abs(p.x - this.ves.pocket.cx) < L.vesR * 2.2) { this.reflect(p, side, r); return; }
-    const perm = SP[p.sp].lipid * this.dF;
+    const perm = SP[p.sp].lipid * this.dF * (this.plant ? this.driveFactor(p.sp, side) : 1); // H⁺ leak is voltage-dependent too
     if (perm > 0 && Math.random() < perm) { this.startTransit(p, side, "lipid", null); return; }
     this.reflect(p, side, r);
   }
@@ -306,7 +371,10 @@ export class Model {
   tryChannel(P, p, side) {
     if (p.cool > this.time) return false;
     if (!P.open || P.openAnim < 0.8 || p.sp !== P.sp || P.inTransit >= P.maxIn) return false;
-    if (Math.random() > P.p) return false;
+    // plant: the membrane potential (inside negative) pulls K⁺ in and holds it there: probability × exp(∓Vm/2RT/F)
+    // plant: equal baseline permeability both ways, scaled so forward/reverse acceptance has the Nernst ratio e^(z·Vm/RT_F)
+    const f = this.plant ? this.driveFactor(p.sp, side) : 1;
+    if (Math.random() > P.p * f) return false;
     this.startTransit(p, side, P.id, P);
     return true;
   }
@@ -354,7 +422,7 @@ export class Model {
     const g = this.glut;
     if (g.blocked || g.cargo || g.state !== "open" || p.sp !== "glc" || p.cool > this.time) return false;
     if ((g.c < 0 ? "out" : "in") !== side) return false;
-    g.cargo = p; p.mode = "bound"; p.from = side; g.dwell = 0;
+    g.cargo = p; p.mode = "bound"; p.from = side; p.bid = "glut"; g.dwell = 0;
     return true;
   }
 
@@ -388,6 +456,7 @@ export class Model {
    *  (A time-compression device: it acts equally on both sides, so net flux still follows the gradient.) */
   buildAttractors() {
     const L = this.L, A = [], P = this.pump, g = this.glut, R = L.attractR, RP = L.w;
+    if (this.plant) { this.buildAttractorsPlant(R, RP); return; }
     const X = this.byId.pump.x;
     if (P.state === "E1" && P.na.length < 3) A.push({ sp: "na", side: "in", x: X, y: L.memBot + 2, R: RP, s: 4.5, pump: true });
     if (P.state === "E2" && P.k.length < 2) A.push({ sp: "k", side: "out", x: X, y: L.memTop - 2, R: RP, s: 4.5, pump: true });
@@ -407,16 +476,22 @@ export class Model {
     const L = this.L;
     if (p.cool > this.time) return;
     for (const a of this.attractors) {
-      if (a.sp !== p.sp || a.side !== p.side) continue;
+      if (a.off || a.sp !== p.sp || a.side !== p.side) continue;
       const dx = a.x - p.x, dy = a.y - p.y, d = Math.hypot(dx, dy) || 1;
       if (d > a.R) continue;
+      if (a.hp) { // plant H⁺ pump: pull inside H⁺ toward the cytoplasmic mouth
+        const acc = a.s * this.vs(p.sp) * (0.35 + 0.65 * (1 - d / a.R)) * Math.sqrt(this.kF);
+        p.vx += (dx / d) * acc * dt; p.vy += (dy / d) * acc * dt;
+        if (d < r + 24 * L.sc && this.pump.h.length < 1 && !this.pump.blocked && this.pump.state === "E1") { p.mode = "bound"; p.from = "in"; p.bid = "hpump"; this.pump.h.push(p); a.R = 0; }
+        return;
+      }
       const acc = a.s * this.vs(p.sp) * (0.35 + 0.65 * (1 - d / a.R)) * (a.pump ? Math.sqrt(this.kF) : 1);
       p.vx += (dx / d) * acc * dt; p.vy += (dy / d) * acc * dt;
       if (a.glut && d < r + 30 * L.sc && this.tryGlut(p, p.side)) { a.R = 0; return; }
       if (a.pump && d < r + 24 * L.sc) {
         const P = this.pump, list = p.sp === "na" ? P.na : P.k;
         if (list.length >= (p.sp === "na" ? 3 : 2)) continue;
-        p.mode = "bound"; p.from = p.side;
+        p.mode = "bound"; p.from = p.side; p.bid = "pump";
         list.push(p);
         if (list.length >= (p.sp === "na" ? 3 : 2)) a.R = 0; // site full: stop attracting this frame
       }
@@ -424,8 +499,194 @@ export class Model {
     }
   }
 
+  // ---------- plant: P-type H⁺-ATPase and H⁺-coupled symporters ----------
+  /** Acceptance factor for a charged particle crossing from `side` (1 for the favoured direction, e^(−|zVm/RT_F|) against it).
+   *  With equal baseline permeability both ways the forward/reverse ratio is exactly e^(z·Vm/RT_F): the Nernst relation. */
+  driveFactor(sp, side) {
+    const z = CHARGE[sp];
+    if (!z) return 1;
+    const dir = side === "out" ? 1 : -1; // +1 = entering the cell
+    return Math.min(1, Math.exp(-dir * z * (this.vm / this.rtf)));
+  }
+
+  /** Free particles per side (one pass; used by the symporter rate laws). */
+  tallyFree() {
+    for (const k in this.cn) { this.cn[k].out = 0; this.cn[k].in = 0; }
+    for (const p of this.parts) if (!p.dead && p.mode === "free" && (p.side === "out" || p.side === "in")) this.cn[p.sp][p.side]++;
+  }
+
+  buildAttractorsPlant(R, RP) {
+    const L = this.L, P = this.pump;
+    let A = this.plantAtt;
+    if (!A) { // persistent objects, built once per layout
+      A = this.plantAtt = [{ sp: "h", side: "in", hp: true, s: 4.5, x: 0, y: 0, R: 0, off: true }];
+      for (const C of this.prot) if (C.kind === "channel") A.push({ sp: C.sp, side: "out", C, s: 2.2, x: 0, y: 0, R: 0, off: true }, { sp: C.sp, side: "in", C, s: 2.2, x: 0, y: 0, R: 0, off: true });
+    }
+    const h = A[0], X = this.byId.hpump.x;
+    h.off = !(P.state === "E1" && P.h.length < 1 && !P.blocked); h.x = X; h.y = L.memBot + 2; h.R = RP;
+    for (let i = 1; i < A.length; i++) { const a = A[i], C = a.C; a.off = !C.open; a.x = C.x; a.y = a.side === "out" ? L.memTop : L.memBot; a.R = R * 0.75; }
+    this.attractors = A;
+  }
+
+  /** Mass-action loading rate of an empty symporter facing `side` (1/s): ∝ [cargo]·[H⁺]ⁿ, so detailed balance holds with the flip rates below. */
+  symLoadRate(S, side) {
+    const C = this.cn[S.sp][side], Hh = this.cn.h[side];
+    if (C < 1 || Hh < S.n) return 0;
+    return SYM_KB * this.kF * (C / 10) * Math.pow(Hh / 10, S.n);
+  }
+  /** Thermodynamic drive of one inward cycle, ΔG/F in mV (positive = uphill inward):
+   *  RT/F·ln(Cin/Cout) + n·RT/F·ln(Hin/Hout) + (n + z_cargo)·Vm. Zero at equilibrium; its sign decides which way the carrier runs. */
+  symDrive(S) {
+    const cn = this.cn, e = 1e-6, zc = CHARGE[S.sp] || 0;
+    return this.rtf * Math.log((cn[S.sp].in + e) / (cn[S.sp].out + e)) + S.n * this.rtf * Math.log((cn.h.in + e) / (cn.h.out + e)) + (S.n + zc) * this.vm;
+  }
+  /** Loaded-carrier flip rate (1/s) when facing `faces`: the electrical part of the cycle, with equal baseline in both directions. */
+  symFlipRate(S, faces) {
+    const q = (S.n + (CHARGE[S.sp] || 0)) * (this.vm / this.rtf), dirIn = faces === "out" ? 1 : -1;
+    return SYM_KF * this.kF * Math.min(1, Math.exp(-dirIn * q));
+  }
+
+  /** Take the n nearest free H⁺ and the nearest free cargo on `side` into the carrier (all at once; they then ride inside it). */
+  loadSym(S, side) {
+    const X = this.byId[S.id].x, L = this.L;
+    const cargoBest = this.nearestFree(S.sp, side, X, null), hs = S.h;
+    if (!cargoBest) return false;
+    cargoBest.mode = "bound"; cargoBest.from = side; cargoBest.bid = S.id; S.cargo = cargoBest;
+    for (let k = 0; k < S.n; k++) {
+      const h = this.nearestFree("h", side, X, null);
+      if (!h) { this.unloadSym(S, 0.6); return false; }
+      h.mode = "bound"; h.from = side; h.bid = S.id; hs.push(h);
+    }
+    S.dwell = 0;
+    return true;
+  }
+  nearestFree(sp, side, x, skip) {
+    let best = null, bd = Infinity;
+    for (const p of this.parts) {
+      if (p.dead || p.mode !== "free" || p.sp !== sp || p.side !== side) continue;
+      const d = Math.abs(p.x - x);
+      if (d < bd) { bd = d; best = p; }
+    }
+    return best;
+  }
+
+  /** Release whatever the carrier holds onto the side it faces (the same rate on both faces). If that is not the side the particles were
+   *  loaded from, the transport is complete: record it. */
+  unloadSym(S, kick = 1) {
+    const side = S.c < 0 ? "out" : "in", X = this.byId[S.id].x, sc = this.L.sc;
+    if (!S.cargo) { S.h.length = 0; return; }
+    const crossed = S.cargo.from !== side, dir = side === "in" ? 1 : -1, nH = S.h.length;
+    this.freeAt(S.cargo, side, X - 9 * sc, kick); S.cargo = null;
+    for (let i = 0; i < nH; i++) this.freeAt(S.h[i], side, X + i * 9 * sc, kick);
+    S.h.length = 0;
+    if (crossed) { this.record(S.sp, dir, S.id); for (let i = 0; i < nH; i++) this.record("h", dir, S.id); }
+  }
+
+  /** Block / unblock. Blocking a moving carrier cancels the flip (back to its starting endpoint, no charge moved); whatever it holds is released
+   *  onto the side it now faces. */
+  setSymBlocked(id, b) {
+    const S = this.sym[id];
+    if (!S) return;
+    S.blocked = b; S.blockedTime = 0;
+    if (!b) return;
+    if (S.state === "moving") { S.c = -S.target; S.target = S.c; S.state = "open"; }
+    S.dwell = 0;
+    this.unloadSym(S, 0.8);
+  }
+  setPumpBlocked(b) {
+    const P = this.pump;
+    P.blocked = b;
+    if (b && P.state === "E1" && P.h.length) { P.h.forEach((p) => this.freeAt(p, "in", this.byId.hpump.x, 0.8)); P.h.length = 0; }
+  }
+
+  /** One H⁺-coupled symporter (alternating access), fully reversible:
+   *   empty:  loads n H⁺ + cargo from the face it faces at a mass-action rate; empty carriers flip symmetrically;
+   *   loaded: unloads onto the face it faces (same rate on both faces) or flips (voltage-dependent ratio; the cycle's signed net charge moves
+   *           at the flip). Cargo stays bound after a flip, so it can unload or flip back.
+   *  Wegscheider: Lout·kf = Lin·kr, so the net flux is zero when symDrive() = 0 and reverses sign with it:
+   *  [S]in/[S]out = ([H⁺]out/[H⁺]in)ⁿ · e^(−(n+z)Vm/(RT/F)). */
+  updateSym(S, dt) {
+    const kF = this.kF, L = this.L, X = this.byId[S.id].x;
+    if (S.blocked) { S.blockedTime += dt; return; }
+    if (S.state === "moving") {
+      const spd = 2 / (0.2 / kF), d = S.target - S.c, st = Math.sign(d) * spd * dt;
+      if (Math.abs(st) >= Math.abs(d)) {
+        const loaded = !!S.cargo, dir = S.target > 0 ? 1 : -1;
+        S.c = S.target; S.state = "open"; S.dwell = 0;
+        if (loaded) this.moveCharge(dir * (S.n + (CHARGE[S.sp] || 0))); // signed net charge, once per loaded flip
+      } else S.c += st;
+    } else {
+      S.dwell += dt;
+      const faces = S.c < 0 ? "out" : "in", r = Math.random();
+      if (S.cargo) {
+        const pu = SYM_KU * kF * dt, pf = this.symFlipRate(S, faces) * dt;
+        if (r < pu) this.unloadSym(S);
+        else if (r < pu + pf) { S.target = S.c < 0 ? 1 : -1; S.state = "moving"; }
+      } else {
+        const pl = this.symLoadRate(S, faces) * dt, pe = SYM_KE * kF * dt;
+        if (r < pl) this.loadSym(S, faces);
+        else if (r < pl + pe) { S.target = S.c < 0 ? 1 : -1; S.state = "moving"; }
+      }
+    }
+    // bound particles ride inside the carrier
+    const y = L.midY + S.c * L.th * 0.2, s = L.sc, e = Math.min(1, dt * 12), slots = SYM_SLOTS[S.n];
+    if (S.cargo) { S.cargo.x += (X + slots.cargo[0] * s - S.cargo.x) * e; S.cargo.y += (y + slots.cargo[1] * s - S.cargo.y) * e; }
+    for (let i = 0; i < S.h.length; i++) { const p = S.h[i]; p.x += (X + slots.h[i][0] * s - p.x) * e; p.y += (y + slots.h[i][1] * s - p.y) * e; }
+  }
+
+  /** P-type H⁺-ATPase: bind H⁺ inside → ATP phosphorylates the pump (E1~P) → shape change releases H⁺ outside (E2-P) → Pᵢ leaves → resets.
+   *  One H⁺ per ATP; the pump is electrogenic (moves + charge out, so the inside becomes negative). */
+  updateHPump(dt) {
+    const P = this.pump, kF = this.kF, L = this.L, X = this.byId.hpump.x;
+    const site = this.site; site.x = X + L.pw * 0.32; site.y = L.memBot + L.protH * 0.42;
+    P.flash = Math.max(0, P.flash - dt * 2);
+    P.waiting = false;
+    switch (P.state) {
+      case "E1":
+        P.c = Math.max(0, P.c - dt * 4);
+        if (P.blocked) break;
+        if (P.h.length >= 1) {
+          if (this.atp >= 1) { this.atp -= 1; P.state = "atp"; P.t = 0; P.fly = { from: this.takeAtpDot(), to: { x: site.x, y: site.y }, t: 0 }; }
+          else P.waiting = true;
+        }
+        break;
+      case "atp":
+        P.t += (dt * kF) / 0.18; P.fly.t = Math.min(1, P.t);
+        if (P.t >= 1) {
+          P.phos = true; P.state = "toE2"; P.t = 0; P.fly = null; P.flash = 1;
+          this.fx.flashes.push({ x: site.x, y: site.y, r: 60 * L.sc, t: 0, life: 0.7, color: "#fbbf24" });
+          this.fx.floaters.push({ text: "ATP → ADP + Pᵢ", x: X, y: L.memBot + L.protH * 0.95, t: 0, life: 1.8, color: "#fbbf24" });
+          this.fx.sprites.push({ kind: "ADP", x: site.x, y: site.y, vx: rand(45, 70) * L.sc, vy: rand(25, 45) * L.sc, t: 0, life: 2.2 });
+        }
+        break;
+      case "toE2":
+        P.t += (dt * kF) / 0.25; P.c = ease(Math.min(1, P.t));
+        if (P.t >= 1) {
+          const full = this.count("h", "out") >= SIDE_CAP; // the cell wall space is buffered / drains: don't overfill the stage
+          P.h.forEach((p, i) => { this.freeAt(p, "out", X + (i - 0.5) * 9 * L.sc, 1.3); this.record("h", -1, "hpump"); if (full) p.dead = true; });
+          P.h = []; P.state = "dephos"; P.t = 0;
+          this.fx.floaters.push({ text: "H⁺ out", x: X + L.pw * 1.6, y: L.memTop - L.protH * 0.3, t: 0, life: 1.4, color: SP.h.color });
+        }
+        break;
+      case "dephos":
+        P.c = 1;
+        P.t += (dt * kF) / 0.15;
+        if (P.t >= 1) {
+          P.phos = false; P.state = "toE1"; P.t = 0;
+          this.fx.sprites.push({ kind: "Pᵢ", x: site.x, y: site.y, vx: rand(-40, -15) * L.sc, vy: rand(15, 35) * L.sc, t: 0, life: 2 });
+        }
+        break;
+      case "toE1":
+        P.t += (dt * kF) / 0.25; P.c = 1 - ease(Math.min(1, P.t));
+        if (P.t >= 1) { P.state = "E1"; P.t = 0; P.cycles++; }
+        break;
+    }
+    const y = L.midY + lerp(L.th * 0.2, -L.th * 0.2, P.c), e = Math.min(1, dt * 12);
+    P.h.forEach((p) => { p.x += (X + 0 - p.x) * e; p.y += (y + 3 * L.sc - p.y) * e; });
+  }
+
   takeAtpDot() {
-    const X = this.byId.pump.x, L = this.L;
+    const X = this.byId[this.pumpId].x, L = this.L;
     let best = -1, bd = Infinity;
     this.atpDots.forEach((d, i) => { const dd = Math.hypot(d.x - X, d.y - L.memBot); if (dd < bd) { bd = dd; best = i; } });
     if (best < 0) return { x: X + rand(-60, 60), y: L.uh - 10 };
@@ -493,6 +754,17 @@ export class Model {
 
   pumpStatus() {
     const P = this.pump;
+    if (this.plant) {
+      if (P.blocked) return "blocked (vanadate)";
+      switch (P.state) {
+        case "E1": return P.waiting ? "H⁺ bound · waiting for ATP" : "binding H⁺";
+        case "atp": return "ATP binding";
+        case "toE2": return "phosphorylated · changing shape";
+        case "dephos": return "releasing phosphate";
+        case "toE1": return "flipping back";
+      }
+      return "";
+    }
     switch (P.state) {
       case "E1": return P.waiting ? "3 Na⁺ bound · waiting for ATP" : `binding Na⁺ (${P.na.length}/3)`;
       case "atp": return "ATP binding";

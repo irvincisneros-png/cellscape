@@ -40,6 +40,18 @@ const CSS = `
 .mi .countcard .fb { font-size: 0.85rem; margin-top: 8px; color: var(--ink-dim); }
 .mi canvas.mi-graph { width: 100%; height: 110px; display: block; }
 .lbl3d.mi-wait { color: #fde68a; font-size: 0.66rem; font-weight: 700; text-shadow: 0 0 8px #f59e0b, 0 1px 4px #000; }
+.style-clay .mi-tl .seg { background: rgba(255,255,255,0.72); color: #4a3f38; box-shadow: inset 0 0 0 1px rgba(90,70,60,0.14); }
+.style-clay .mi-tl .seg.m { background: rgba(207,190,242,0.85); }
+.style-clay .mi-tl .seg.c { background: rgba(246,190,176,0.9); }
+.style-clay .mi-tl .seg.on { background: #8fd3c9; color: #20302d; font-weight: 600; }
+.style-clay .mi-tl .seg.m.on { background: #b7a2ec; color: #231b3d; }
+.style-clay .mi-tl .seg.c.on { background: #f29c8a; color: #3c1612; }
+.style-clay .mi-tl .cur { background: #3f3832; box-shadow: 0 0 0 2px rgba(255,255,255,0.85); }
+.style-clay .mi-tl .chk { color: #8a5a00; text-shadow: 0 0 4px #fbf6ef, 0 0 8px #fbf6ef; font-weight: 700; }
+.style-clay .mi-tl .chk.held { color: #b42318; }
+.style-clay .mi-tl .grp { color: #5e534b; text-shadow: 0 0 4px #fbf6ef, 0 0 8px #fbf6ef; font-weight: 600; }
+.style-clay .lbl3d.mi-wait { color: #7a4a00; text-shadow: 0 0 5px #fbf6ef, 0 0 9px #fbf6ef; }
+.style-clay .mi-act { background: rgba(255,244,214,0.96); color: #5a3a00; border-color: #e0a526; box-shadow: 0 2px 8px rgba(90,70,60,0.2); }
 .mi-chip .w { color: var(--ink-faint); }
 .chip.mi-hold { border-color: rgba(248,113,113,0.7); }
 @media (max-width: 600px) { .mi-tl { bottom: 126px; left: 10px; right: 10px; } .mi-tl .seg { font-size: 0.6rem; } .mi-act { bottom: 164px; font-size: 0.8rem; } .mi-chip.opt { display: none; } }
@@ -65,6 +77,9 @@ export function create(engine) {
   const G = new Scene3D(engine);
   G.setCellType(M.cellType);
   const root = G.root;
+  // clay: the plant cell wall is an open-fronted pastel room (back faces only), so the spindle and chromosomes sit in front of solid clay walls
+  // instead of behind a washed-out pane; envelopes and membranes stay see-through so the action inside reads
+  G.wall.userData.clayColor = "#d6ead0"; G.wall.userData.clayOpacity = 1;
   const state = { labels: true, speed: engine.reducedMotion ? 0.6 : 1, counted: false, sel: null, drag: null, holdBtn: false, holdCell: false, standaloneATP: 75, lastGate: null, scrubbing: false, playing: true };
   const v = new THREE.Vector3(), v2 = new THREE.Vector3();
   const um = (x, y, z) => v.set(x * SCALE, y * SCALE, z * SCALE);

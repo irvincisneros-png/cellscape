@@ -97,9 +97,12 @@ export function create(engine) {
   const outerMat = glass("#8b5cf6", { rim: "#ddd6fe", minAlpha: 0.08, maxAlpha: 0.8, rimStrength: 0.75, side: THREE.DoubleSide, clippingPlanes: clip });
   const outer = tag(new THREE.Mesh(new THREE.SphereGeometry(RO, 72, 48), outerMat), "envelope");
   outer.renderOrder = 3;
+  // clay: the cut nucleus is a pale lilac bowl (opaque back wall) so the coloured chromatin reads against it, not through a grey haze
+  outer.userData.clayColor = "#dcc9f0"; outer.userData.clayOpacity = 1; outer.userData.claySide = "double";
   const innerMat = glass("#a78bfa", { rim: "#c4b5fd", minAlpha: 0.06, maxAlpha: 0.6, rimStrength: 0.5, side: THREE.DoubleSide, clippingPlanes: clip });
   const inner = tag(new THREE.Mesh(new THREE.SphereGeometry(RI, 64, 40), innerMat), "envelope");
   inner.renderOrder = 2;
+  inner.userData.clayHide = true;
   root.add(outer, inner);
   fallbackPickables.push(outer, inner);
   // the cut edge: two bright rims (outer + inner membrane) and the perinuclear space between them
@@ -144,6 +147,7 @@ export function create(engine) {
     tmpV.set(hash(i * 3.1) * 2 - 1, hash(i * 5.3) * 2 - 1, hash(i * 7.7) * 2 - 1).normalize();
     omRibo.setMatrixAt(i, tmpM.compose(tmpV2.copy(tmpV).multiplyScalar(RO + 0.08), tmpQ.setFromUnitVectors(new THREE.Vector3(0, 1, 0), tmpV), tmpS.set(1, 1, 1)));
   }
+  omRibo.userData.lod = true;      // decorative crowding: fewer still shows ribosomes studding the envelope
   root.add(omRibo);
 
   // ---------- nucleolus ----------
@@ -152,6 +156,7 @@ export function create(engine) {
   const noShellMat = glass("#9333ea", { rim: "#e9d5ff", minAlpha: 0.3, maxAlpha: 0.95, rimStrength: 0.6, clippingPlanes: clip, emissive: new THREE.Color("#7e22ce"), emissiveIntensity: 0.3 });
   const noShell = new THREE.Mesh(wobble(new THREE.IcosahedronGeometry(NO_R, 5), 0.14, 1.6, 4), noShellMat);
   nucleolus.add(noShell);
+  noShell.userData.clayColor = "#b99be3"; noShell.userData.clayOpacity = 1;   // the nucleolus stands out from the pale nucleoplasm wall
   // granular component: pre-ribosomal particles
   const gcN = 90;
   const gc = new THREE.InstancedMesh(new THREE.IcosahedronGeometry(0.13, 1), physical("#c084fc", { roughness: 0.45, clippingPlanes: clip }), gcN);
@@ -159,6 +164,7 @@ export function create(engine) {
     tmpV.set(hash(i * 1.7) * 2 - 1, hash(i * 2.9) * 2 - 1, hash(i * 4.3) * 2 - 1).normalize().multiplyScalar(NO_R * (0.45 + 0.45 * Math.cbrt(hash(i * 8.1))));
     gc.setMatrixAt(i, tmpM.compose(tmpV, tmpQ.identity(), tmpS.setScalar(0.7 + hash(i * 9.9) * 0.6)));
   }
+  gc.userData.lod = true;
   nucleolus.add(gc);
   // fibrillar centres (rDNA transcription by RNA pol I) with a dense fibrillar shell
   const fcMat = physical("#fdf4ff", { emissive: new THREE.Color("#f0abfc"), emissiveIntensity: 0.8, clippingPlanes: clip });
@@ -357,6 +363,7 @@ export function create(engine) {
       }
     });
   }
+  erRibo.userData.lod = true;
   er.add(erRibo);
   tag(er, "er");
   root.add(er);
@@ -620,12 +627,30 @@ export function create(engine) {
     hetero: () => tmpV.copy(terr[5].hc).multiplyScalar(0.92),
     gene: () => tmpV.copy(hbbGene.base).addScaledVector(hbbGene.dir, 2.0),
     lamina: () => tmpV.set(0, -LAM + 0.6, -2),
-    speckle: () => tmpV.copy(speckPos[speckPos.length - 1]).add(tmpV2.set(0, 0.8, 0)),
+    speckle: () => tmpV.copy(speckPos[speckIdx]).add(tmpV2.set(0, 0.8, 0)),
     er: () => tmpV.copy(erPts[9]).add(tmpV2.set(0, 1, 0)),
   };
   const LBL_BAND = { hetero: "y9-10", lamina: "y11", speckle: "y11", er: "y9-10" };
   const NARROW_HIDE = { lamina: 1, speckle: 1, er: 1, hetero: 1, envelope: 1 };
-  let labelPore = 0, labelPoreT = 0;
+  let labelPore = 0, labelPoreT = 0, speckIdx = speckPos.length - 1, speckT = 0;
+  const spA = new THREE.Vector3(), spB = new THREE.Vector3();
+  /** The speckle whose label sits farthest (on screen) from the other labels, so "Nuclear speckle" never covers "Chromatin territory". */
+  function pickSpeckle() {
+    if (simTime - speckT < 1.5 && speckT) return;
+    speckT = simTime + 0.001;
+    const others = [() => LBL.chromatin(), () => LBL.gene(), () => LBL.hetero(), () => LBL.nucleolus(), () => LBL.lamina(), () => tmpV.copy(PORTAL).addScaledVector(hbbGene.side, -1.9).add(tmpV2.set(0, -1.2, 0))];
+    const pts = others.map((f) => f().clone().project(engine.camera));
+    const asp = engine.camera.aspect;
+    let best = speckIdx, bs = -1;
+    for (let i = 0; i < speckPos.length; i++) {
+      spA.copy(speckPos[i]).add(spB.set(0, 0.8, 0)).project(engine.camera);
+      if (spA.z > 1 || Math.abs(spA.x) > 0.85 || Math.abs(spA.y) > 0.85) continue;
+      let d = 9;
+      for (const q of pts) d = Math.min(d, Math.hypot((spA.x - q.x) * asp, (spA.y - q.y) * 2.2));   // labels are wide, so weigh vertical gaps more
+      if (d > bs) { bs = d; best = i; }
+    }
+    speckIdx = best;
+  }
   function pickLabelPore() { // a pore on the upper far rim, so its label isn't in the cut-away
     if (simTime - labelPoreT > 2 || labelPoreT === 0) {
       labelPoreT = simTime + 0.001;
@@ -651,6 +676,7 @@ export function create(engine) {
   }
   function updateLabels() {
     const narrow = engine.camera.aspect < 0.8;
+    pickSpeckle();
     for (const [k, el] of Object.entries(labels)) {
       if (!state.labels || (LBL_BAND[k] && !lens.atLeast(LBL_BAND[k])) || (narrow && NARROW_HIDE[k])) { el.style.display = "none"; continue; }
       const s = status(k);

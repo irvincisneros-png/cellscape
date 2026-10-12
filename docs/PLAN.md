@@ -51,20 +51,13 @@ The clean-up of the existing repos becomes: put each world under the hub, then r
 | 5. Heredity & beyond | Human genes (karyotype, gene → trait), epigenetics in more depth, inheritance beyond meiosis (multi-gene traits, sex linkage, pedigrees), **animal cell** level with toggle, specialised cells, microscopy mode, cell-level immunity | In progress: **5a animal cell ✅** (hepatocyte; plant ⇄ animal morph; glucose/glycogen, osmosis/lysis, mitophagy, albumin secretion; Codex review, 2 rounds, clean). **5b human genes & inheritance ✅** (levels `karyotype` + `inheritance`, entered from the nucleus panel; absorbs the Year-10 genetics sims with their bugs fixed; Codex 2 rounds). **5c microscopy mode ✅** (🔬 stage button: light microscope with objectives, Abbe resolution, focus slice, stains, ruler, real micrographs; TEM thin section) **+ specialised cells ✅** (9 specialists with structure→function models, cell→organism ladder). **5d immune defence ✅** (innate + adaptive, primary/secondary response, vaccination, herd immunity). **5e epigenetics ✅** (level `epigenetics`, entered from the nucleus, chromatin and karyotype panels: marks & memory with a Dodd–Sneppen-inspired recruitment model + DNMT1/DNMT3/TET CpG layer and replication; X-inactivation with Xist, Barr bodies by karyotype and a clonal mosaic; environment bench: vernalisation/FLC, agouti Avy diet, Himalayan rabbit (non-epigenetic contrast), twin drift; "Is it heritable?" card fixes the Y10 framing). All Codex-reviewed (2 rounds, fixes applied). Phase 5 complete; next is Phase 6 |
 | Page theme | Auto / Light / Dark (header). Light mode re-themes the page; the 3D stage stays dark | ✅ |
 | Art styles | Switchable **Clay model** look (Graphics card → Look). Proof of concept done on plant + animal cells (cutaway diorama); other levels use the generic clay swap | PoC ✅; per-level polish in Phase 6 |
-| 6. Polish & publish | Full browser QA pass on real devices/Chromebooks, review round, performance tiers, accessibility, teacher mode, GitHub Pages | In progress: **6a ✅** (2026-10-11): revision quiz (169 checked items from science-defender + authored, `tools/build-revision-bank.mjs`), teacher page with class links + QR (`teacher.html`), accessibility (Explore list, keyboard, live region, contrast), quality tiers that really lighten Fast (`docs/perf-report.md`), clay polish on molecular levels, portrait label/strip fixes, sun & shade leaf 24 h mission. Codex 2 rounds, fixed. **Live on GitHub Pages** (repo public, 2026-10-11): https://irvincisneros-png.github.io/cellscape/. Left: real-device QA, levels adopting `userData.lod` |
+| 6. Polish & publish | Full browser QA pass on real devices/Chromebooks, review round, performance tiers, accessibility, teacher mode, GitHub Pages | In progress: **6a ✅** (2026-10-11): revision quiz (169 checked items from science-defender + authored, `tools/build-revision-bank.mjs`), teacher page with class links + QR (`teacher.html`), accessibility (Explore list, keyboard, live region, contrast), quality tiers that really lighten Fast (`docs/perf-report.md`), clay polish on molecular levels, portrait label/strip fixes, sun & shade leaf 24 h mission. Codex 2 rounds, fixed. **Live on GitHub Pages** (repo public, 2026-10-11): https://irvincisneros-png.github.io/cellscape/. **6b ✅** (2026-10-12): clay on every level, plant membrane configuration (P-type H⁺-ATPase, H⁺–sucrose and H⁺–nitrate symport, detailed-balance model, `tests/membraneModel.test.mjs`) with year-lens text, LOD on the heavy levels, thylakoid/meiosis framing, Year 12 plant-cell text, inheritance → protein synthesis with the sickle allele, gentler depth of field. Left: real-device and hand testing |
 
 The 2D simulations remain as WebGL fallbacks (`sims/<slug>/sim2d.js`).
 
 ## Known follow-ups (from build reports and reviews)
-- **Membrane level:**
-  - a plant H⁺-ATPase configuration (it currently shows animal proteins, with an honest note);
-  - full year-lens adaptation.
-- **Year 12 content:** text variants for the cell level (it falls back to Year 11).
-- **Quality tiers:** Fast now drops bokeh/bloom cost, physical-material extras and pixel ratio. Levels should mark heavy InstancedMeshes `userData.lod = true` (heaviest first: epigenetics, membrane, thylakoid, specialised, animal, cristae, nucleus, chromatin, immunity). Re-measure on a real Chromebook.
-- **Framing on arrival:**
-  - thylakoid opens with the lamp too prominent;
-  - meiosis arrives framed tight;
-  - check portrait views on every level.
+- **Quality tiers:** Fast now drops bokeh/bloom cost, physical-material extras and pixel ratio. LOD adopted on membrane, cristae, chromatin, epigenetics, nucleus, animal, specialised, immunity (6b; see `docs/perf-report.md`). Epigenetics cell sheets would need per-tier geometry to get lighter. Re-measure on a real Chromebook.
+- **Framing on arrival:** thylakoid and meiosis reframed (6b); portrait not checked on every level.
 - **Interactions to re-test by hand with a real mouse and touch:**
   - the enzyme drag;
   - the ATP-synthase crank;
@@ -76,18 +69,14 @@ The 2D simulations remain as WebGL fallbacks (`sims/<slug>/sim2d.js`).
   - the cyclin graph is drawn from curves;
   - Okazaki fragments are short;
   - HbS fibre has 2 strands.
-- **Nucleus:** the speckle label overlaps the chromatin label.
 - **Animal cell:**
   - morph `swapRoot` relies on requestAnimationFrame, so a hidden tab pauses it mid-swap until it's visible again (harmless);
-  - portrait: a label can overlap the top chips;
   - "other fuels" respiration term, lysis at 1.6× volume and 20 % non-osmotic volume are teaching-scale (stated on the page).
 - **Karyotype:** bands regenerated from UCSC hg38 cytoBand (2026-10-10); re-run `tools/cytoband-to-karyotype.mjs` if the reference changes.
-- **Clay style:** molecular levels lose custom shaders/glows; nucleus interior reads grey; animal transporters/microvilli/cytoskeleton hidden; plant ⇄ animal morph only approximate in clay. Clay wall texture slightly grainy.
+- **Clay style:** done on every level (6a/6b). Left: plant ⇄ animal morph only approximate in clay; chromatin/epigenetics glow shaders use plain clay shading; the specialised "biceps highlighted" ring isn't visible in clay.
 - **Microscopy:** TEM thin section is sparse (honest: a real slice cuts few organelles) and its fine structures are stylised; long-run frame rate untested; "what can you see" reflects what the current quality tier draws.
-- **Specialised cells / immunity:** checked by eye 2026-10-10 (fine). Left: portrait muscle fibre is small and its "Truncated…" label clips; root hair not individually screenshot.
-- **Light mode:** chart series now use `K.chartCol()` (darkened on light theme); legend swatches ringed. Nucleus legend "Transcription/s" swatch is grey while its line is black.
-- **Layout:** mitosis phase strip (Cytokinesis/G1) sits under the Microscope button in narrow stages; portrait: immunity "Breach in the barrier" and animal-cell "Rough ER" labels overlap the HUD chips.
+- **Specialised cells / immunity:** checked by eye; portrait fixes 6a. Root hair not individually screenshot.
+- **Light mode:** chart series use `K.chartCol()`; legend swatches ringed.
 - **Testing with the pane hidden:** `window.requestAnimationFrame = cb => setTimeout(() => cb(performance.now()), 33)` in the console lets dives and flights finish.
 - **Epigenetics:** the parameters for vernalisation thresholds, agouti coat cut-offs, twin drift and rabbit temperature are teaching values (stated on the page). Background proteins could use more depth blur (marks `env.aperture`). The "FLC on" label anchor has not been checked by eye.
-- **Inheritance lab:** mutation card links to the protein-synthesis sim (no direct portal to `expression`).
 - **Dev server:** sends no cache headers; edited modules need a cache-busting reload.
