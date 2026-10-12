@@ -155,7 +155,7 @@ export class Engine {
     this.renderer.toneMappingExposure = e.exposure;
     [this.bloom.strength, this.bloom.radius, this.bloom.threshold] = e.bloom;
     this.bokeh.uniforms.aperture.value = e.aperture;
-    this.bokeh.uniforms.maxblur.value = this.style.clay ? 0.008 : 0.006;
+    this.bokeh.uniforms.maxblur.value = this.style.clay ? 0.004 : 0.003;
     this.env = e;
     this.fade.style.background = `radial-gradient(circle at 50% 50%, ${e.bg[1]}, ${e.bg[0]})`;
   }
@@ -714,7 +714,14 @@ export class Engine {
     if (this.quality !== "high" && (this._tierT = (this._tierT || 0) - dt) <= 0) { this._tierT = 1; this.refreshTier(); }   // levels may spawn meshes mid-simulation
     this.updateScale();
     if (this.quality === "low" && !this.scopeActive) this.renderer.render(this.scene, this.camera);
-    else this.composer.render();
+    else {
+      // Depth of field stays gentle: the subject (anything within about half the viewing distance of the focus point)
+      // stays sharp and only the far background softens. Levels may still request more blur; it is capped here.
+      const ub = this.bokeh.uniforms, focus = ub.focus.value;
+      if (ub.aperture.value !== this._apCapped) this._apReq = ub.aperture.value;
+      ub.aperture.value = this._apCapped = Math.min(this._apReq, ub.maxblur.value / Math.max(1e-6, 0.5 * focus));
+      this.composer.render();
+    }
     const now = performance.now(), wall = this._wallT ? (now - this._wallT) / 1000 : 0;   // unclamped: K.loop clamps dt to 0.05, which hides < 20 fps
     this._wallT = now;
     this.autoQuality(wall);
