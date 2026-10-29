@@ -35,6 +35,7 @@ export async function boot(opts) {
   const levels = opts.levels || LEVELS;
   const header = K.$(".sim-header");
   header.innerHTML = `
+    <a class="hub" href="https://irvincisneros-png.github.io/">← Learning Hub</a>
     <a class="back" href="${root}index.html" title="CellScape home">CellScape</a>
     <nav class="crumbs" aria-label="Zoom level"></nav>
     <select class="lens-select" aria-label="Year level"></select>

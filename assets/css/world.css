@@ -50,6 +50,8 @@
 }
 .sim-header .lib { color: var(--ink-dim); font-size: 0.82rem; text-decoration: none; white-space: nowrap; }
 .sim-header .lib:hover { color: var(--ink); }
+.sim-header .hub { color: var(--ink-dim); font-size: 0.82rem; text-decoration: none; white-space: nowrap; }
+.sim-header .hub:hover { color: var(--ink); }
 
 /* panel helpers */
 .hint { font-size: 0.8rem; color: var(--ink-faint); margin: 6px 0 0; }
